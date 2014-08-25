@@ -12,7 +12,7 @@ class Subject(me.Document):
     category = me.ReferenceField('Category')
     curriculum = me.ReferenceField('Curriculum')
     studied_prerequisite = me.ListField(me.ReferenceField('Subject'))
-    passed_prerequisit = me.ListField(me.ReferenceField('Subject'))
+    passed_prerequisite = me.ListField(me.ReferenceField('Subject'))
     corequisite = me.ListField(me.ReferenceField('Subject'))
     cocurrent = me.ListField(me.ReferenceField('Subject'))
 

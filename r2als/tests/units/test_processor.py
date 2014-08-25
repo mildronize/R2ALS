@@ -7,7 +7,7 @@ class AlgorithmTest(unittest.TestCase):
     def test_processor(self):
         from r2als import processor
         p = processor.Processor()
-        self.assertEqual(p.start(),0)
+        self.assertEqual(p.start(),None)
 
 
     # def test_one_plus_one_should_be_two(self):
