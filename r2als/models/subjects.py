@@ -25,3 +25,10 @@ class Category(me.Document):
     meta = {'collection': 'categories'}
 
     name = me.StringField(required=True)
+
+class Curriculum(me.Document):
+    meta = {'collection': 'curriculums'}
+
+    faculty = me.StringField(required=True)
+    department = me.StringField(required=True)
+    year = me.IntField(required=True)

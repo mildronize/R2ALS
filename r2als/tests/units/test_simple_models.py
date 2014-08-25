@@ -3,8 +3,8 @@ import unittest
 
 
 class SimpleTest(unittest.TestCase):
-    def test_one_plus_one_should_be_two(self):
-        self.assertEqual(1+1,2)
+    # def test_one_plus_one_should_be_two(self):
+    #     self.assertEqual(1+1,2)
 
     '''def test_initial_db(self):
         from r2als import models
