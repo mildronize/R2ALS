@@ -9,7 +9,7 @@ class Subject(me.Document):
     id = me.StringField(required=True)
     name = me.StringField(required=True)
     credit = me.IntField(required=True)
-    category = me.ReferenceField('Category')
+    category = me.ListField(me.ReferenceField('Category'))
     curriculum = me.ReferenceField('Curriculum')
     studied_prerequisite = me.ListField(me.ReferenceField('Subject'))
     passed_prerequisite = me.ListField(me.ReferenceField('Subject'))

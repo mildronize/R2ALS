@@ -1,14 +1,19 @@
 import unittest
 
+class ConvertCurriculumTest(unittest.TestCase):
 
+    def test_convert_curriculum(self):
+        from r2als.scripts import convert_curriculum as cc
 
-class AlgorithmTest(unittest.TestCase):
+    def test_validate_comment(self):
+        from r2als.scripts import convert_curriculum as cc
+        self.assertEqual(cc.validate_comment("#test"),"#test")
+        self.assertEqual(cc.validate_comment("test"),None)
 
-    def test_processor(self):
-        from r2als import processor
-        p = processor.Processor()
-        self.assertEqual(p.start(),None)
-
+    def test_remove_special_char(self):
+        from r2als.scripts import convert_curriculum as cc
+        self.assertEqual(cc.remove_special_char("\ntest"),"test")
+        # self.assertEqual(cc.validate_comment("\t"),None)
 
     # def test_one_plus_one_should_be_two(self):
     #     self.assertEqual(1+1,2)

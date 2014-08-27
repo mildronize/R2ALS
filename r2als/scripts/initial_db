@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+'''
+initial_db
+Description#   Initialize a database and test case
+Developer#     Thada Wangthammang
+'''
+import os
+import sys
+import pymongo
+import pprint
+
+from r2als import models
+from r2als import config as cf
+from r2als.scripts import convert_curriculum as cc
+
+default_categories = ['lecture', 'lab','project']
+coe_curriculum = {
+    'faculty': 'Engineering',
+    'department': 'Computer Engineering',
+    'year': 2553
+}
+raw_subjects = cc.CsvToModel().process()
+
+# pp = pprint.PrettyPrinter(indent=4)
+# pp.pprint(subjects)
+
+if __name__ == '__main__':
+    # if len(argv) != 2:
+    #     usage(argv)
+    # config_uri = argv[1]
+    # setup_logging(config_uri)
+    # settings = get_appsettings(config_uri)
+
+    models.initial({'mongodb.db_name':cf.Config.db_name,'mongodb.host':cf.Config.host,'mongodb.is_reset':cf.Config.is_reset})
+
+    print ("Initial a database")
+    ####################################################
+
+    print ("create default categories")
+    for category in default_categories:
+        category_tmp = models.Category.objects(name=category).first()
+        if not category_tmp:
+            category_tmp = models.Category()
+            category_tmp.name = category
+            category_tmp.save()
+        else:
+            print("The default categories is exist")
+
+    ####################################################
+
+    print("create CoE 2553 curriculum")
+    curriculum_tmp = models.Curriculum()
+    for key in coe_curriculum.keys():
+        curriculum_tmp[key] = coe_curriculum[key]
+    curriculum_tmp.save()
+
+    ####################################################
+
+    print("create subjects in CoE 2553 curriculum and relationship between subjects")
+
+
+    #initial test cases
