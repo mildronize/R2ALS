@@ -6,10 +6,10 @@ import datetime
 class Subject(me.Document):
     meta = {'collection': 'subjects'}
 
-    id = me.StringField(required=True)
+    code = me.StringField(required=True)
     name = me.StringField(required=True)
     credit = me.IntField(required=True)
-    category = me.ListField(me.ReferenceField('Category'))
+    categories = me.ListField(me.ReferenceField('Category'))
     curriculum = me.ReferenceField('Curriculum')
     studied_prerequisite = me.ListField(me.ReferenceField('Subject'))
     passed_prerequisite = me.ListField(me.ReferenceField('Subject'))

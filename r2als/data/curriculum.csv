@@ -1,4 +1,4 @@
-id,name,credit,studied_prerequisite,passed_prerequisite,corequisite,cocurrent,category
+code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,*categories
 #Table 6 First semester courses for the first group of first-year students,,,,,,,lecture
 200-101,Introduction to Engineering,1,,,,,lecture
 242-101,Introduction to Computer Programming,3,,,,,lecture:lab

@@ -9,3 +9,5 @@ class EnrolledSubject(me.Document):
     subject = me.ReferenceField('Subject')
     member = me.ReferenceField('Member')
     grade = me.FloatField(required=True)
+    year = me.IntField(required=True)
+    semester = me.IntField(required=True)

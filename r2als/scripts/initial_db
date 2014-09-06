@@ -14,15 +14,16 @@ from r2als import config as cf
 from r2als.scripts import convert_curriculum as cc
 
 default_categories = ['lecture', 'lab','project']
-coe_curriculum = {
+coe_curriculum_data = {
     'faculty': 'Engineering',
     'department': 'Computer Engineering',
     'year': 2553
 }
-raw_subjects = cc.CsvToModel().process()
+# Not check key yet
+raw_subjects = cc.CsvToModel().process('curriculum.csv')
 
-# pp = pprint.PrettyPrinter(indent=4)
-# pp.pprint(subjects)
+pp = pprint.PrettyPrinter(indent=4)
+# pp.pprint(raw_subjects )
 
 if __name__ == '__main__':
     # if len(argv) != 2:
@@ -49,14 +50,39 @@ if __name__ == '__main__':
     ####################################################
 
     print("create CoE 2553 curriculum")
-    curriculum_tmp = models.Curriculum()
-    for key in coe_curriculum.keys():
-        curriculum_tmp[key] = coe_curriculum[key]
-    curriculum_tmp.save()
+    coe_curriculum = models.Curriculum()
+    for key in coe_curriculum_data.keys():
+        coe_curriculum[key] = coe_curriculum_data[key]
+    coe_curriculum.save()
 
     ####################################################
 
     print("create subjects in CoE 2553 curriculum and relationship between subjects")
+    for raw_subject in raw_subjects:
+
+        subject_tmp = models.Subject()
+
+        # add a simple data
+        subject_tmp.code = raw_subject['code']
+        subject_tmp.name = raw_subject['name']
+        try:
+            subject_tmp.credit = int(raw_subject['credit'])
+        except ValueError:
+            print("Error in convert '"+raw_subject['credit']+"'")
+            print("the credit is set to 0")
+            subject_tmp.credit = 0
+        # add curriculum
+        subject_tmp.curriculum = coe_curriculum
+
+        # add link to another object
+        # add categories
+        tmp_categories = raw_subject['categories'].split(':')
+        for tmp_category in tmp_categories:
+            print(raw_subject['name']+ " >> " +tmp_category)
+            subject_tmp.categories.append(models.Category.objects(name=tmp_category).first())
+
+        #
 
 
+        subject_tmp.save()
     #initial test cases
