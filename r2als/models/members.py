@@ -8,3 +8,4 @@ class Member(me.Document):
 
     id = me.StringField(required=True)
     name = me.StringField(required=True)
+    curriculum = me.ReferenceField('Curriculum')

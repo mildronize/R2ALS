@@ -52,7 +52,7 @@ code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurr
 242-212,Probability and Statistics,2,,,,,lecture
 242-213,Discrete Mathematics,2,,,,,lecture
 242-214,Data Communications,2,,,,,lecture
-...-...,Social Sciences or Humanities,3,,,,,lecture
+,Social Sciences or Humanities,3,,,,,lecture
 #Table 12 First semester courses for the third-year students,,,,,,,lecture
 242-301,Advanced Computer Engineering Laboratory I,1,,242-203:242-204,,,lab
 242-303,"Ethical, Legal and Social Issues in Computer Profession",1,,,,,lecture
@@ -60,8 +60,8 @@ code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurr
 242-305,Database Systems,3,242-207,,,,lecture
 242-306,Wireless and Mobile computing,2,,,,,lecture
 242-307,Computer Architecture and Organization,3,,,,,lecture
-242-3xx,Branch vocation,3,,,,,lecture
-...-...,Optional English Language,3,,,,,lecture
+,Branch Technical Subject,3,,,,,lecture
+,Optional English Language,3,,,,,lecture
 #Table 13 Second semester courses for the third-year students,,,,,,,lecture
 242-302 ,Advanced Computer Engineering Laboratory II,1,,242-301,,,lab
 242-308,Computer Engineering Project Preparation,2,,242-207:242-208,,,project
@@ -69,21 +69,21 @@ code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurr
 242-310,Introduction to Algorithms and Complexity,2,,242-207,,,lecture
 242-311,Client/Server Computing and Web Technologies,2,,,,,lecture
 242-312,Computer Security,2,,,,,lecture
-242-3xx,Branch Technical Subject,3,,,,,lecture
-...-...,Optional Language Subject,3,,,,,lecture
+,Branch Technical Subject,3,,,,,lecture
+,Optional English Language,3,,,,,lecture
 #Table 14 Third semester courses for the third-year students,,,,,,,lecture
-242-400,Practical Training,...Passed least 5 semesters,,,,,lecture
+242-400,Practical Training,,,,,,lecture
 #Table 15 First semester courses for the Fourth-year students,,,,,,,lecture
 242-401,Computer Engineering Project I,3,,242-203:242-204:242-308,,,project
-242-4xx,Branch Technical Subject,3,,,,,lecture
-242-4xx,Technical Elective,3,,,,,lecture
+,Branch Technical Subject,3,,,,,lecture
+,Technical Elective,3,,,,,lecture
 895-171,Wisdom of Living,3,,,,,lecture
-...-..,Free Elective,3,,,,,lecture
-...-..,Optional physical education,1,,,,,lecture
+,Free Elective,3,,,,,lecture
+,Optional physical education,1,,,,,lecture
 #Table 16 Second semester courses for the Fourth-year students,,,,,,,lecture
 242-402,Computer Engineering Project II,3,,242-401,,,project
 242-001,Co-Curricular Activities,1,,,,,lecture
 242-4xx,Branch Technical Subject,3,,,,,lecture
 242-4xx,Technical Elective,3,,,,,lecture
-...-...,Free Elective,3,,,,,lecture
-...-...,Optional physical education,1,,,,,lecture
+,Free Elective,3,,,,,lecture
+,Optional physical education,1,,,,,lecture

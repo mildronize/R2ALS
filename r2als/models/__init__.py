@@ -1,4 +1,4 @@
-from .subjects import Subject, Category, Curriculum
+from .subjects import Subject, Category, Curriculum, StudiedGroup
 from .members import Member
 from .enrolled_subjects import EnrolledSubject
 

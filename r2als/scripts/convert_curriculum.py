@@ -87,24 +87,31 @@ class CsvToModel:
 				else :
 					tmp = {}
 					for j in range(len(keys)):
-						if multiField[j] == True :
-							tmp[keys[j]] = []
-							elements = row[j].split(SPLIT_SYMBOL)
-							for element in elements:
-								tmp[keys[j]].append(element)
-						else :
-							tmp[keys[j]] = row[j]
+						if row[j] != '':
+							if multiField[j] == True :
+								tmp[keys[j]] = []
+								elements = row[j].split(SPLIT_SYMBOL)
+								for element in elements:
+									tmp[keys[j]].append(element)
+							else :
+								tmp[keys[j]] = row[j]
 					lists.append(tmp)
 				i = i + 1
 		return lists
 
-if __name__ == '__main__':
+def printInstruction():
+	print("Convert csv file of curriculum to object")
+	print("usage: convert_curriculum.py [path]")
 
-	if len(sys.argv) != 1:
+if __name__ == '__main__':
+	#print(len(sys.argv))
+
+	if len(sys.argv) != 2:
 		printInstruction()
 		exit()
 
-	path = sys.argv[0]
+	#print(str(sys.argv))
+	path = sys.argv[1]
 
 	f_out = open('curriculum.json', 'w')
 
@@ -113,7 +120,3 @@ if __name__ == '__main__':
 	lists = CsvToModel().process(path)
 	pp.pprint(lists)
 	f_out.close()
-
-def printInstruction():
-	print("Convert csv file of curriculum to object")
-	print("usage: convert_curriculum.py [path]")

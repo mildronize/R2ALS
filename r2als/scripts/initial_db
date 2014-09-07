@@ -20,7 +20,7 @@ coe_curriculum_data = {
     'year': 2553
 }
 # Not check key yet
-raw_subjects = cc.CsvToModel().process('curriculum.csv')
+raw_subjects = cc.CsvToModel().process('../data/coe_2553_curriculum.csv')
 
 pp = pprint.PrettyPrinter(indent=4)
 # pp.pprint(raw_subjects )
@@ -63,26 +63,49 @@ if __name__ == '__main__':
         subject_tmp = models.Subject()
 
         # add a simple data
-        subject_tmp.code = raw_subject['code']
+        if 'code' in raw_subject: subject_tmp.code = raw_subject['code']
         subject_tmp.name = raw_subject['name']
-        try:
-            subject_tmp.credit = int(raw_subject['credit'])
-        except ValueError:
-            print("Error in convert '"+raw_subject['credit']+"'")
-            print("the credit is set to 0")
-            subject_tmp.credit = 0
+        subject_tmp.credit = int(raw_subject.get('credit', '0'))
         # add curriculum
         subject_tmp.curriculum = coe_curriculum
 
         # add link to another object
         # add categories
-        tmp_categories = raw_subject['categories'].split(':')
-        for tmp_category in tmp_categories:
-            print(raw_subject['name']+ " >> " +tmp_category)
-            subject_tmp.categories.append(models.Category.objects(name=tmp_category).first())
-
-        #
-
+        for category in raw_subject['categories']:
+            subject_tmp.categories.append(models.Category.objects(name=category).first())
 
         subject_tmp.save()
+
+    # link all prerequisite subject
+    print("Link all prerequisite subject")
+    for raw_subject in raw_subjects:
+
+        if 'code' in raw_subject:
+            subject_code = models.Subject.objects(code=raw_subject['code']).first()
+        if 'studied_prerequisite' in raw_subject:
+            for sp_code in raw_subject['studied_prerequisite']:
+                subject_code.studied_prerequisite.append(models.Subject.objects(code=sp_code).first())
+        if 'passed_prerequisite' in raw_subject:
+            for pp_code in raw_subject['passed_prerequisite']:
+                subject_code.passed_prerequisite.append(models.Subject.objects(code=pp_code).first())
+        if 'corequisite' in raw_subject:
+            for cr_code in raw_subject['corequisite']:
+                subject_code.corequisite.append(models.Subject.objects(code=cr_code).first())
+        if 'cocurrent' in raw_subject:
+            for cc_code in raw_subject['cocurrent']:
+                subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
+
+        subject_code.save()
+
+
     #initial test cases
+
+    #add a member
+    print("Add Thongdee Mana")
+    member_tmp = models.Member()
+    member_tmp.id = '5510110999'
+    member_tmp.name = 'Thongdee Mana'
+    member_tmp.curriculum = coe_curriculum
+    member_tmp.save()
+
+    #add dummy data

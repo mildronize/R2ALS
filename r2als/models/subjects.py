@@ -6,7 +6,7 @@ import datetime
 class Subject(me.Document):
     meta = {'collection': 'subjects'}
 
-    code = me.StringField(required=True)
+    code = me.StringField()
     name = me.StringField(required=True)
     credit = me.IntField(required=True)
     categories = me.ListField(me.ReferenceField('Category'))
@@ -32,3 +32,8 @@ class Curriculum(me.Document):
     faculty = me.StringField(required=True)
     department = me.StringField(required=True)
     year = me.IntField(required=True)
+
+class StudiedGroup(me.Document):
+    meta = {'collection': 'studied_groups'}
+
+    name = me.StringField(required=True)

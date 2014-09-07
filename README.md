@@ -6,11 +6,11 @@ Registration Assistant Application using Local-Search (R2ALS)
 Todo
 ======
 
-### Today (7 Sep 2014) ###
-- link all prerequisite subject in database
-- Improve UI according to the adviser commented
 - Split type of student in database (upper group, lower group)
 - Modify the dynamic subject that can link another subject
+
+### Today (7 Sep 2014) ###
+
 
 
 Motivation
