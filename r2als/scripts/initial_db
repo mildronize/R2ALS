@@ -14,6 +14,19 @@ from r2als import config as cf
 from r2als.scripts import convert_curriculum as cc
 
 default_categories = ['lecture', 'lab','project']
+grade_info = [
+    {'name': "A", 'score': 4.0},
+    {'name': "B+", 'score': 3.5},
+    {'name': "B", 'score': 3.0},
+    {'name': "C+", 'score': 2.5},
+    {'name': "C", 'score': 2.0},
+    {'name': "D+", 'score': 1.5},
+    {'name': "D", 'score': 1.0},
+    {'name': "E", 'score': 0.0},
+    {'name': "S"},
+    {'name': "U"},
+    {'name': "W"}
+]
 # curriculum_data = {
 #     'faculty': 'Engineering',
 #     'department': 'Computer Engineering',
@@ -129,6 +142,11 @@ if __name__ == '__main__':
 
         subject_code.save()
 
+    ####################################################
+
+    print("Adding grade")
+    for grade in grade_info:
+        grade_tmp = models.Grade(grade).save()
 
     ####################################################
 
