@@ -10,3 +10,4 @@ class Member(me.Document):
     name = me.StringField(required=True)
     curriculum = me.ReferenceField('Curriculum')
     studied_group = me.StringField()
+    registered_year = me.IntField(required=True)

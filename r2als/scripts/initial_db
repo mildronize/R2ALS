@@ -146,7 +146,11 @@ if __name__ == '__main__':
 
     print("Adding grade")
     for grade in grade_info:
-        grade_tmp = models.Grade(grade).save()
+        grade_tmp = models.Grade()
+        grade_tmp.name = grade['name']
+        if 'score' in grade:
+            grade_tmp.score = grade['score']
+        grade_tmp.save()
 
     ####################################################
 
@@ -155,10 +159,11 @@ if __name__ == '__main__':
     #add a member
     print("Add Thongdee Mana")
     member_thongdee = models.Member()
-    member_thongdee.member_id = '5510110999'
+    member_thongdee.member_id = '5710110999'
     member_thongdee.name = 'Thongdee Mana'
     member_thongdee.curriculum = coe_curriculum
     member_thongdee.studied_group = 'first-group'
+    member_thongdee.registered_year = 2557
     member_thongdee.save()
 
     #add dummy data
@@ -172,4 +177,5 @@ if __name__ == '__main__':
         {'subject' : '640-101','grade' : 'C'},
         {'subject' : '890-101','grade' : 'C'}
     ]
+
     es_thongdee = models.EnrolledSubject()
