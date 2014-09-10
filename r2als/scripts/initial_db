@@ -60,7 +60,7 @@ if __name__ == '__main__':
     coe_curriculum['department'] = curriculum_data['department']
     coe_curriculum['year'] = curriculum_data['year']
     print("Add Studied Group")
-    coe_curriculum['studied_groups'].append('all')
+    # coe_curriculum['studied_groups'].append('all')
     for studied_group in curriculum_data['studied_groups']:
         coe_curriculum['studied_groups'].append(studied_group)
     coe_curriculum.save()
@@ -92,13 +92,20 @@ if __name__ == '__main__':
 
         # add link to another object
         # add categories
-        for category in raw_subject['categories']:
-            subject_tmp.categories.append(models.Category.objects(name=category).first())
+        if 'categories' in raw_subject:
+            for category in raw_subject['categories']:
+                subject_tmp.categories.append(models.Category.objects(name=category).first())
 
         if 'studied_group' in raw_subject:
             subject_tmp.studied_group = raw_subject['studied_group']
-        else : subject_tmp.studied_group = 'all'
+        # else : subject_tmp.studied_group = 'all'
 
+        if 'year' in raw_subject: subject_tmp.year = int(raw_subject.get('year', '0'))
+        else :
+            print(raw_subject['name'] +"doesn't have year")
+        if 'semester' in raw_subject: subject_tmp.semester = int(raw_subject.get('semester', '0'))
+        else :
+            print(raw_subject['name'] +"doesn't have semester")
         subject_tmp.save()
 
     # link all prerequisite subject
@@ -137,3 +144,14 @@ if __name__ == '__main__':
     member_thongdee.save()
 
     #add dummy data
+
+    enrolled_lists_1_1 = [
+        {'subject' : '200-101','grade' : 'C'},
+        {'subject' : '242-101','grade' : 'C'},
+        {'subject' : '322-101','grade' : 'W'},
+        {'subject' : '332-103','grade' : 'C'},
+        {'subject' : '332-113','grade' : 'C'},
+        {'subject' : '640-101','grade' : 'C'},
+        {'subject' : '890-101','grade' : 'C'}
+    ]
+    es_thongdee = models.EnrolledSubject()

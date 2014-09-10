@@ -16,7 +16,8 @@ class Subject(me.Document):
     corequisite = me.ListField(me.ReferenceField('Subject'))
     cocurrent = me.ListField(me.ReferenceField('Subject'))
     studied_group = me.StringField()
-
+    year = me.IntField()
+    semester = me.IntField()
     # registration_date = me.DateTimeField(
     #     required=True, default=datetime.datetime.now)
     # updated_date = me.DateTimeField(

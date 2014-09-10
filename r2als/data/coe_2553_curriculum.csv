@@ -1,94 +1,94 @@
-faculty,Engineering,,,,,,,
-department,Computer Engineering,,,,,,,
-year,2553,,,,,,,
-*studied_groups,first-group:second-group,,,,,,,
-*branches,information:information-network:computer-control:computer-system-design,,,,,,,
-code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,*categories,studied_group
-#Table 6 First semester courses for the first group of first-year students,,,,,,,lecture,
-200-101,Introduction to Engineering,1,,,,,lecture,first-group
-242-101,Introduction to Computer Programming,3,,,,,lecture:lab,first-group
-322-101,Basic Mathematics I,3,,,,,lecture,first-group
-332-103,General Physics I,3,,,,,lecture,first-group
-332-113,General Physics Laboratory I ,1,,,,,lab,first-group
-640-101,Healthy Body and Mind,3,,,,,lecture,first-group
-890-101,Fundamental English Listening and Speaking,3,,,,,lecture,first-group
-#Table 7 Second semester courses for the first group of first-year students,,,,,,,lecture,
-215-111,Engineering Drawing I,3,,,,,lecture,first-group
-220-102,Engineering Mechanics I,3,,,322-101,,lecture,first-group
-322-102,Basic Mathematics II,3,322-101,,,,lecture,first-group
-324-103,General Chemistry,3,,,,,lecture,first-group
-325-103,General Chemistry Laboratory,1,,,,,lab,first-group
-332-104,General Physics II,3,332-103,,,332-104,lecture,first-group
-332-114,General Physics Laboratory II,1,332-113,,,,lab,first-group
-340-326,"Science, Technology, and Society",3,,,,,lecture,first-group
-#Table 8 First semester courses for the second group of first-year students,,,,,,,lecture,
-215-111,Engineering Drawing I,3,,,,,lecture,second-group
-322-101,Basic Mathematics I,3,,,,,lecture,second-group
-324-103,General Chemistry,3,,,,,lecture,second-group
-332-103,General Physics I,3,,,,,lecture,second-group
-332-113,General Physics Laboratory I,1,,,,,lab,second-group
-640-101,Healthy Body and Mind,3,,,,,lecture,second-group
-890-100,Preparatory Foundation English,3,,,,,lecture,second-group
-#Table 9 Second semester courses for the second group of first-year students,,,,,,,lecture,
-200-101,Introduction to Engineering,1,,,,,lecture,second-group
-220-102,Engineering Mechanics I,3,,,322-101,,lecture,second-group
-242-101,Introduction to Computer Programming,3,,,,,lecture,second-group
-322-102,Basic Mathematics II,3,322-101,,,,lecture,second-group
-325-103,General Chemistry Laboratory,1,,,,,lab,second-group
-332-104,General Physics II,3,332-103,,,332-104,lecture,second-group
-332-114,General Physics Laboratory II,1,332-113,,,,lab,second-group
-340-326,"Science, Technology, and Society",3,,,,,lecture,second-group
-890-101,Fundamental English Listening and Speaking,3,,,,,lecture,second-group
-#Table 10 First semester courses for the second-year students,,,,,,,lecture,
-242-201,Computer Engineering Software Laboratory I,1,,,,,lab,
-242-202,Computer Engineering Hardware Laboratory I,1,,,,,lab,
-242-205,Electric Circuits,3,,,,,lecture,
-242-206,Introduction to Computer Networks,2,,,,,lecture,
-242-207,Programming Fundamentals I,3,,,,,lecture:lab,
-242-208,Digital Logic and Design,3,,,,,lecture,
-322-201,Basic Mathematics III,3,322-102,,,,lecture,
-890-102,Fundamental English Reading and Writing,3,,,,,lecture,
-#Table 11 Second semester courses for the second-year students,,,,,,,lecture,
-242-203,Computer Engineering Software Laboratory II,1,,242-201,,,lab,
-242-204,Computer Engineering Hardware Laboratory II,1,,242-202,,,lab,
-242-209,Basic Electronics,3,,,,,lecture,
-242-210 ,Programming Fundamentals II,2,242-207,,,,lecture,
-242-211,Software Engineering,2,,,,,lecture,
-242-212,Probability and Statistics,2,,,,,lecture,
-242-213,Discrete Mathematics,2,,,,,lecture,
-242-214,Data Communications,2,,,,,lecture,
-,Social Sciences or Humanities,3,,,,,lecture,
-#Table 12 First semester courses for the third-year students,,,,,,,lecture,
-242-301,Advanced Computer Engineering Laboratory I,1,,242-203:242-204,,,lab,
-242-303,"Ethical, Legal and Social Issues in Computer Profession",1,,,,,lecture,
-242-304,Computer Operating Systems,2,,,,,lecture,
-242-305,Database Systems,3,242-207,,,,lecture,
-242-306,Wireless and Mobile computing,2,,,,,lecture,
-242-307,Computer Architecture and Organization,3,,,,,lecture,
-,Branch Technical Subject,3,,,,,lecture,
-,Optional English Language,3,,,,,lecture,
-#Table 13 Second semester courses for the third-year students,,,,,,,lecture,
-242-302 ,Advanced Computer Engineering Laboratory II,1,,242-301,,,lab,
-242-308,Computer Engineering Project Preparation,2,,242-207:242-208,,,project,
-242-309,Microcontroller and Interfacing,3,,,,,lecture,
-242-310,Introduction to Algorithms and Complexity,2,,242-207,,,lecture,
-242-311,Client/Server Computing and Web Technologies,2,,,,,lecture,
-242-312,Computer Security,2,,,,,lecture,
-,Branch Technical Subject,3,,,,,lecture,
-,Optional English Language,3,,,,,lecture,
-#Table 14 Third semester courses for the third-year students,,,,,,,lecture,
-242-400,Practical Training,,,,,,lecture,
-#Table 15 First semester courses for the Fourth-year students,,,,,,,lecture,
-242-401,Computer Engineering Project I,3,,242-203:242-204:242-308,,,project,
-,Branch Technical Subject,3,,,,,lecture,
-,Technical Elective,3,,,,,lecture,
-895-171,Wisdom of Living,3,,,,,lecture,
-,Free Elective,3,,,,,lecture,
-,Optional physical education,1,,,,,lecture,
-#Table 16 Second semester courses for the Fourth-year students,,,,,,,lecture,
-242-402,Computer Engineering Project II,3,,242-401,,,project,
-242-001,Co-Curricular Activities,1,,,,,lecture,
-242-4xx,Branch Technical Subject,3,,,,,lecture,
-242-4xx,Technical Elective,3,,,,,lecture,
-,Free Elective,3,,,,,lecture,
-,Optional physical education,1,,,,,lecture,
+faculty,Engineering,,,,,,,,,
+department,Computer Engineering,,,,,,,,,
+year,2553,,,,,,,,,
+*studied_groups,first-group:second-group,,,,,,,,,
+*branches,information:information-network:computer-control:computer-system-design,,,,,,,,,
+code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,*categories,studied_group,year,semester
+#Table 6 First semester courses for the first group of first-year students,,,,,,,lecture,,1,1
+200-101,Introduction to Engineering,1,,,,,lecture,first-group,1,1
+242-101,Introduction to Computer Programming,3,,,,,lecture:lab,first-group,1,1
+322-101,Basic Mathematics I,3,,,,,lecture,first-group,1,1
+332-103,General Physics I,3,,,,,lecture,first-group,1,1
+332-113,General Physics Laboratory I ,1,,,,,lab,first-group,1,1
+640-101,Healthy Body and Mind,3,,,,,lecture,first-group,1,1
+890-101,Fundamental English Listening and Speaking,3,,,,,lecture,first-group,1,1
+#Table 7 Second semester courses for the first group of first-year students,,,,,,,,,,
+215-111,Engineering Drawing I,3,,,,,lecture,first-group,1,2
+220-102,Engineering Mechanics I,3,,,322-101,,lecture,first-group,1,2
+322-102,Basic Mathematics II,3,322-101,,,,lecture,first-group,1,2
+324-103,General Chemistry,3,,,,,lecture,first-group,1,2
+325-103,General Chemistry Laboratory,1,,,,,lab,first-group,1,2
+332-104,General Physics II,3,332-103,,,332-104,lecture,first-group,1,2
+332-114,General Physics Laboratory II,1,332-113,,,,lab,first-group,1,2
+340-326,"Science, Technology, and Society",3,,,,,lecture,first-group,1,2
+#Table 8 First semester courses for the second group of first-year students,,,,,,,lecture,,,
+215-111,Engineering Drawing I,3,,,,,lecture,second-group,1,1
+322-101,Basic Mathematics I,3,,,,,lecture,second-group,1,1
+324-103,General Chemistry,3,,,,,lecture,second-group,1,1
+332-103,General Physics I,3,,,,,lecture,second-group,1,1
+332-113,General Physics Laboratory I,1,,,,,lab,second-group,1,1
+640-101,Healthy Body and Mind,3,,,,,lecture,second-group,1,1
+890-100,Preparatory Foundation English,3,,,,,lecture,second-group,1,1
+#Table 9 Second semester courses for the second group of first-year students,,,,,,,lecture,,1,
+200-101,Introduction to Engineering,1,,,,,lecture,second-group,1,2
+220-102,Engineering Mechanics I,3,,,322-101,,lecture,second-group,1,2
+242-101,Introduction to Computer Programming,3,,,,,lecture,second-group,1,2
+322-102,Basic Mathematics II,3,322-101,,,,lecture,second-group,1,2
+325-103,General Chemistry Laboratory,1,,,,,lab,second-group,1,2
+332-104,General Physics II,3,332-103,,,332-104,lecture,second-group,1,2
+332-114,General Physics Laboratory II,1,332-113,,,,lab,second-group,1,2
+340-326,"Science, Technology, and Society",3,,,,,lecture,second-group,1,2
+890-101,Fundamental English Listening and Speaking,3,,,,,lecture,second-group,1,2
+#Table 10 First semester courses for the second-year students,,,,,,,,,,
+242-201,Computer Engineering Software Laboratory I,1,,,,,lab,,2,1
+242-202,Computer Engineering Hardware Laboratory I,1,,,,,lab,,2,1
+242-205,Electric Circuits,3,,,,,lecture,,2,1
+242-206,Introduction to Computer Networks,2,,,,,lecture,,2,1
+242-207,Programming Fundamentals I,3,,,,,lecture:lab,,2,1
+242-208,Digital Logic and Design,3,,,,,lecture,,2,1
+322-201,Basic Mathematics III,3,322-102,,,,lecture,,2,1
+890-102,Fundamental English Reading and Writing,3,,,,,lecture,,2,1
+#Table 11 Second semester courses for the second-year students,,,,,,,,,,
+242-203,Computer Engineering Software Laboratory II,1,,242-201,,,lab,,2,2
+242-204,Computer Engineering Hardware Laboratory II,1,,242-202,,,lab,,2,2
+242-209,Basic Electronics,3,,,,,lecture,,2,2
+242-210 ,Programming Fundamentals II,2,242-207,,,,lecture,,2,2
+242-211,Software Engineering,2,,,,,lecture,,2,2
+242-212,Probability and Statistics,2,,,,,lecture,,2,2
+242-213,Discrete Mathematics,2,,,,,lecture,,2,2
+242-214,Data Communications,2,,,,,lecture,,2,2
+,Social Sciences or Humanities,3,,,,,lecture,,2,2
+#Table 12 First semester courses for the third-year students,,,,,,,,,,
+242-301,Advanced Computer Engineering Laboratory I,1,,242-203:242-204,,,lab,,3,1
+242-303,"Ethical, Legal and Social Issues in Computer Profession",1,,,,,lecture,,3,1
+242-304,Computer Operating Systems,2,,,,,lecture,,3,1
+242-305,Database Systems,3,242-207,,,,lecture,,3,1
+242-306,Wireless and Mobile computing,2,,,,,lecture,,3,1
+242-307,Computer Architecture and Organization,3,,,,,lecture,,3,1
+,Branch Technical Subject,3,,,,,lecture,,3,1
+,Optional English Language,3,,,,,lecture,,3,1
+#Table 13 Second semester courses for the third-year students,,,,,,,,,,
+242-302 ,Advanced Computer Engineering Laboratory II,1,,242-301,,,lab,,3,2
+242-308,Computer Engineering Project Preparation,2,,242-207:242-208,,,project,,3,2
+242-309,Microcontroller and Interfacing,3,,,,,lecture,,3,2
+242-310,Introduction to Algorithms and Complexity,2,,242-207,,,lecture,,3,2
+242-311,Client/Server Computing and Web Technologies,2,,,,,lecture,,3,2
+242-312,Computer Security,2,,,,,lecture,,3,2
+,Branch Technical Subject,3,,,,,lecture,,3,2
+,Optional English Language,3,,,,,lecture,,3,2
+#Table 14 Third semester courses for the third-year students,,,,,,,,,,
+242-400,Practical Training,,,,,,,,3,3
+#Table 15 First semester courses for the Fourth-year students,,,,,,,lecture,,,
+242-401,Computer Engineering Project I,3,,242-203:242-204:242-308,,,project,,4,1
+,Branch Technical Subject,3,,,,,lecture,,4,1
+,Technical Elective,3,,,,,lecture,,4,1
+895-171,Wisdom of Living,3,,,,,lecture,,4,1
+,Free Elective,3,,,,,lecture,,4,1
+,Optional physical education,1,,,,,lecture,,4,1
+#Table 16 Second semester courses for the Fourth-year students,,,,,,,,,,
+242-402,Computer Engineering Project II,3,,242-401,,,project,,4,2
+242-001,Co-Curricular Activities,1,,,,,lecture,,4,2
+242-4xx,Branch Technical Subject,3,,,,,lecture,,4,2
+242-4xx,Technical Elective,3,,,,,lecture,,4,2
+,Free Elective,3,,,,,lecture,,4,2
+,Optional physical education,1,,,,,lecture,,4,2
