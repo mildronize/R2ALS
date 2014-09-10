@@ -14,16 +14,20 @@ from r2als import config as cf
 from r2als.scripts import convert_curriculum as cc
 
 default_categories = ['lecture', 'lab','project']
-coe_curriculum_data = {
-    'faculty': 'Engineering',
-    'department': 'Computer Engineering',
-    'year': 2553
-}
+# curriculum_data = {
+#     'faculty': 'Engineering',
+#     'department': 'Computer Engineering',
+#     'year': 2553
+# }
+
 # Not check key yet
-raw_subjects = cc.CsvToModel().process('../data/coe_2553_curriculum.csv')
+raw_curriculum = cc.CsvToModel().process('../data/coe_2553_curriculum.csv', True)
+raw_subjects = raw_curriculum['subjects']
+curriculum_data = raw_curriculum['info']
 
 pp = pprint.PrettyPrinter(indent=4)
 # pp.pprint(raw_subjects )
+
 
 if __name__ == '__main__':
     # if len(argv) != 2:
@@ -51,9 +55,26 @@ if __name__ == '__main__':
 
     print("create CoE 2553 curriculum")
     coe_curriculum = models.Curriculum()
-    for key in coe_curriculum_data.keys():
-        coe_curriculum[key] = coe_curriculum_data[key]
+    # for key in curriculum_data.keys():
+    coe_curriculum['faculty'] = curriculum_data['faculty']
+    coe_curriculum['department'] = curriculum_data['department']
+    coe_curriculum['year'] = curriculum_data['year']
+    print("Add Studied Group")
+    coe_curriculum['studied_groups'].append('all')
+    for studied_group in curriculum_data['studied_groups']:
+        coe_curriculum['studied_groups'].append(studied_group)
     coe_curriculum.save()
+
+    ####################################################
+    #  print("Add Studied Group")
+
+    # studied_group_tmp = models.StudiedGroup()
+    # studied_group_tmp['name'] = 'all' # this is a general group
+    # studied_group_tmp.save()
+    # for studied_group in curriculum_data['studied_groups']:
+    #     studied_group_tmp = models.StudiedGroup()
+    #     studied_group_tmp['name'] = studied_group
+    #     studied_group_tmp.save()
 
     ####################################################
 
@@ -73,6 +94,10 @@ if __name__ == '__main__':
         # add categories
         for category in raw_subject['categories']:
             subject_tmp.categories.append(models.Category.objects(name=category).first())
+
+        if 'studied_group' in raw_subject:
+            subject_tmp.studied_group = raw_subject['studied_group']
+        else : subject_tmp.studied_group = 'all'
 
         subject_tmp.save()
 
@@ -98,14 +123,17 @@ if __name__ == '__main__':
         subject_code.save()
 
 
+    ####################################################
+
     #initial test cases
 
     #add a member
     print("Add Thongdee Mana")
-    member_tmp = models.Member()
-    member_tmp.id = '5510110999'
-    member_tmp.name = 'Thongdee Mana'
-    member_tmp.curriculum = coe_curriculum
-    member_tmp.save()
+    member_thongdee = models.Member()
+    member_thongdee.member_id = '5510110999'
+    member_thongdee.name = 'Thongdee Mana'
+    member_thongdee.curriculum = coe_curriculum
+    member_thongdee.studied_group = 'first-group'
+    member_thongdee.save()
 
     #add dummy data

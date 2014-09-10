@@ -21,8 +21,23 @@ class ConvertCurriculumTest(unittest.TestCase):
         from r2als.scripts import convert_curriculum
         cc = convert_curriculum.CsvToModel()
         self.assertEqual(cc.removeMultiFieldSymbol("*test"),"test")
-        self.assertEqual(cc.removeMultiFieldSymbol("test"),"test")        
+        self.assertEqual(cc.removeMultiFieldSymbol("test"),"test")
 
+    def test_validateFormatCurriculumFile(self):
+        from r2als.scripts import convert_curriculum
+        cc = convert_curriculum.CsvToModel()
+        # test correct
+        self.assertEqual(cc.validateFormatCurriculumFile("faculty", 0 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("department", 1 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("year", 2 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("*studied_groups", 3 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("*branches", 4 ), True)
+        # test wrong
+        self.assertEqual(cc.validateFormatCurriculumFile("faculty", 1 ), False)
+        self.assertEqual(cc.validateFormatCurriculumFile("department", 2 ), False)
+        self.assertEqual(cc.validateFormatCurriculumFile("year", 4 ), False)
+        self.assertEqual(cc.validateFormatCurriculumFile("*studied_groups", 2 ), False)
+        self.assertEqual(cc.validateFormatCurriculumFile("*branches", 0 ), False)
     # def test_remove_special_char(self):
     #     from r2als.scripts import convert_curriculum as cc
     #     self.assertEqual(cc.remove_special_char("\ntest"),"test")

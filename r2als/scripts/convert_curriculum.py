@@ -17,14 +17,19 @@ import csv
 import re
 import sys
 
-COMMENT_SYMBOL = "#"
-SPLIT_SYMBOL = ":"
-MULTI_FIELD_SYMBOL = "*"
+
 
 class CsvToModel:
 
+	COMMENT_SYMBOL = "#"
+	SPLIT_SYMBOL = ":"
+	MULTI_FIELD_SYMBOL = "*"
+	# Format of head
+	HEADER_LISTS = ['faculty','department','year','*studied_groups','*branches']
+	# END_HEADER = "END_HEADER"
+
 	def hasComment(self, str):
-		if str.find(COMMENT_SYMBOL) < 0:
+		if str.find(self.COMMENT_SYMBOL) < 0:
 			return False
 		else:
 			return True
@@ -36,48 +41,58 @@ class CsvToModel:
 		return False
 
 	def hasMultiField(self, str):
-		if str.find(MULTI_FIELD_SYMBOL) < 0:
+		if str.find(self.MULTI_FIELD_SYMBOL) < 0:
 			return False
 		else:
 			return True
 
 	def removeMultiFieldSymbol(self, str):
-		return re.sub('['+MULTI_FIELD_SYMBOL+']', '', str)
+		return re.sub('['+self.MULTI_FIELD_SYMBOL+']', '', str)
 
-	# def removeSpecialChar(self, str):
-	# 	return re.sub('[\n\"]', '', str)
+	def validateFormatCurriculumFile(self, str, index):
+		for i in range(len(self.HEADER_LISTS)):
+			if str == self.HEADER_LISTS[i] and index == i:
+				return True
+		return False
 
-	# def process(self):
-	# 	f_in= open('curriculum.csv', 'r')
-	#
-	# 	keys_string = f_in.readline()
-	# 	keys = keys_string.split(';')
-	# 	for i in range(len(keys)):
-	# 		keys[i] = self.removeSpecialChar(keys[i])
-	#
-	# 	# for key in keys:
-	# 	# 	print(key)
-	# 	lists = []
-	# 	for line in f_in:
-	# 		if self.validateComment(line) == None:
-	# 			values = line.split(';')
-	# 			tmp = {}
-	# 			for i in range(len(keys)):
-	# 				values[i] = self.removeSpecialChar(values[i])
-	# 				tmp[keys[i]] = values[i]
-	# 			lists.append(tmp)
-	# 		else:
-	# 			print(line)
-	# 	return lists
+	# def validateStudiedGroup(self, studied_groups, str):
+	# 	for studied_group in studied_groups:
+	# 		if str == studied_group :
+	# 			return True
+	# 	return False
 
-	def process(self, url):
-		lists = []
+	def process(self, url, has_header):
+		subjects = []
+		info = {}
 		multiField = []
+		if has_header :
+			shift_row = len(self.HEADER_LISTS)
+		else:
+			shift_row = 0
+
 		with open(url, 'r',encoding="utf-8") as f:
 			reader = csv.reader(f)
 			i = 0
 			for row in reader:
-				if i == 0:
+				if i < shift_row:
+					if self.validateFormatCurriculumFile(row[0], i) == False:
+						print(i)
+						print("Header line "+str(i)+" must is '"+self.HEADER_LISTS[i]+"'")
+						return None
+					else :
+						if self.hasMultiField(self.HEADER_LISTS[i]):
+							elements = row[1].split(self.SPLIT_SYMBOL)
+							header = self.removeMultiFieldSymbol(self.HEADER_LISTS[i])
+							info[header] = []
+							for element in elements:
+								print(header)
+								info[header].append(element)
+						else:
+							info[self.HEADER_LISTS[i]] = row[1]
+
+
+				elif i == shift_row :
+					# keys
 					for j in range(len(row)):
 						multiField.append(self.hasMultiField(row[j]))
 						row[j] = self.removeMultiFieldSymbol(row[j])
@@ -90,14 +105,19 @@ class CsvToModel:
 						if row[j] != '':
 							if multiField[j] == True :
 								tmp[keys[j]] = []
-								elements = row[j].split(SPLIT_SYMBOL)
+								elements = row[j].split(self.SPLIT_SYMBOL)
 								for element in elements:
 									tmp[keys[j]].append(element)
 							else :
+								if has_header and keys[j] == 'studied_group' and row[j] not in info['studied_groups']:
+									print("studied group : '"+row[j]+"'isn't allowed in header list("+str(info['studied_groups'])+")")
 								tmp[keys[j]] = row[j]
-					lists.append(tmp)
+					subjects.append(tmp)
 				i = i + 1
-		return lists
+		return {
+			'subjects': subjects,
+			'info': info
+		}
 
 def printInstruction():
 	print("Convert csv file of curriculum to object")
@@ -110,13 +130,12 @@ if __name__ == '__main__':
 		printInstruction()
 		exit()
 
-	#print(str(sys.argv))
 	path = sys.argv[1]
 
 	f_out = open('curriculum.json', 'w')
 
 	pp = pprint.PrettyPrinter(stream=f_out,indent=4)
 
-	lists = CsvToModel().process(path)
+	lists = CsvToModel().process(path, True)
 	pp.pprint(lists)
 	f_out.close()

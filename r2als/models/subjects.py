@@ -15,6 +15,7 @@ class Subject(me.Document):
     passed_prerequisite = me.ListField(me.ReferenceField('Subject'))
     corequisite = me.ListField(me.ReferenceField('Subject'))
     cocurrent = me.ListField(me.ReferenceField('Subject'))
+    studied_group = me.StringField()
 
     # registration_date = me.DateTimeField(
     #     required=True, default=datetime.datetime.now)
@@ -32,8 +33,10 @@ class Curriculum(me.Document):
     faculty = me.StringField(required=True)
     department = me.StringField(required=True)
     year = me.IntField(required=True)
+    studied_groups = me.ListField(me.StringField())
 
-class StudiedGroup(me.Document):
-    meta = {'collection': 'studied_groups'}
 
-    name = me.StringField(required=True)
+# class StudiedGroup(me.Document):
+#     meta = {'collection': 'studied_groups'}
+#
+#     name = me.StringField(required=True)
