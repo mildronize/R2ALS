@@ -15,17 +15,17 @@ from r2als.scripts import convert_curriculum as cc
 
 default_categories = ['lecture', 'lab','project']
 grade_info = [
-    {'name': "A", 'score': 4.0},
-    {'name': "B+", 'score': 3.5},
-    {'name': "B", 'score': 3.0},
-    {'name': "C+", 'score': 2.5},
-    {'name': "C", 'score': 2.0},
-    {'name': "D+", 'score': 1.5},
-    {'name': "D", 'score': 1.0},
-    {'name': "E", 'score': 0.0},
-    {'name': "S"},
-    {'name': "U"},
-    {'name': "W"}
+    {'name': "A", 'score': 4.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+    {'name': "B+", 'score': 3.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+    {'name': "B", 'score': 3.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+    {'name': "C+", 'score': 2.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+    {'name': "C", 'score': 2.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+    {'name': "D+", 'score': 1.5, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
+    {'name': "D", 'score': 1.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
+    {'name': "E", 'score': 0.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
+    {'name': "S", 'isCredit': False, 'canReEnroll': True, 'isEnrolled': True},
+    {'name': "U", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': True},
+    {'name': "W", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': False}
 ]
 # curriculum_data = {
 #     'faculty': 'Engineering',
@@ -41,6 +41,9 @@ curriculum_data = raw_curriculum['info']
 pp = pprint.PrettyPrinter(indent=4)
 # pp.pprint(raw_subjects )
 
+
+def initialCurriculumMember:
+    print("sss")
 
 if __name__ == '__main__':
     # if len(argv) != 2:

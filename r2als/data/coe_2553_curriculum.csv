@@ -88,7 +88,7 @@ code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurr
 #Table 16 Second semester courses for the Fourth-year students,,,,,,,,,,
 242-402,Computer Engineering Project II,3,,242-401,,,project,,4,2
 242-001,Co-Curricular Activities,1,,,,,lecture,,4,2
-242-4xx,Branch Technical Subject,3,,,,,lecture,,4,2
-242-4xx,Technical Elective,3,,,,,lecture,,4,2
+,Branch Technical Subject,3,,,,,lecture,,4,2
+,Technical Elective,3,,,,,lecture,,4,2
 ,Free Elective,3,,,,,lecture,,4,2
 ,Optional physical education,1,,,,,lecture,,4,2
