@@ -2,7 +2,7 @@ import unittest
 
 
 
-class AlgorithmTest(unittest.TestCase):
+class ProcessorTest(unittest.TestCase):
 
     def test_processor(self):
         from r2als import processor

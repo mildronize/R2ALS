@@ -42,8 +42,8 @@ pp = pprint.PrettyPrinter(indent=4)
 # pp.pprint(raw_subjects )
 
 
-def initialCurriculumMember:
-    print("sss")
+# def initialCurriculumMember:
+#     print("sss")
 
 if __name__ == '__main__':
     # if len(argv) != 2:
