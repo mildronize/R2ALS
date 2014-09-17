@@ -16,11 +16,13 @@ class Processor:
     tabuSize = 20
 
     ################ tabu method ################
-
+    def convertList2String(self, lists):
+        strLists =   ",".join(str(x) for x in lists)
+        strLists_bytes = strLists.encode('utf-8')
+        # print(strLists_bytes)
+        return strLists_bytes
     def hashSolution(self, lists):
-        strLists = ",".join(str(x) for x in lists)
-        print(strLists)
-        return hashlib.sha512(strLists).hexdigest()
+        return hashlib.sha512(self.convertList2String(lists)).hexdigest()
     def addTabuLists(self, data):
         # hash data
         if len(self.tabuLists) <= self.tabuSize:
