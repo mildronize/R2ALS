@@ -24,6 +24,7 @@ class Processor:
     def hashSolution(self, lists):
         return hashlib.sha512(self.convertList2String(lists)).hexdigest()
     def addTabuLists(self, data):
+        
         # hash data
         if len(self.tabuLists) <= self.tabuSize:
             self.tabuLists.append(self.hashSolution(data))
