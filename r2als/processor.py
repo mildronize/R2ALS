@@ -57,37 +57,48 @@ class Processor:
         return self.initialSolution
 
     def getNewSolution(self):
-        random.shuffle(self.workingSolution)
+        #random.shuffle(self.workingSolution)
+        firstPointer = random.randint(1, len(self.initialSolution)) - 1
+        while True:
+            secondPointer = random.randint(1, len(self.initialSolution)) - 1
+            if secondPointer != firstPointer:
+                break
+        self.workingSolution[firstPointer], self.workingSolution[secondPointer] = self.workingSolution[secondPointer], self.workingSolution[firstPointer]
 
     def compareScoreBestSolution(self):
         #print("compareScoreBestSolution!")
         if scoring.calculate(self.workingSolution) > scoring.calculate(self.bestSolution):
-            print("Get best solution!")
-            self.bestSolution = copy.copy(self.workingSolution)
+            print("working Solution")
+            self.printScore(self.workingSolution)
+            print("Old best Solution")
             self.printScore(self.bestSolution)
+            self.bestSolution = copy.copy(self.workingSolution)
+            print("======== best Solution")
+            self.printScore(self.bestSolution)
+            print("#"*100)
 
     def start(self):
         print("Starting processor")
         self.workingSolution = self.loadInitialSolution()
         self.bestSolution = copy.copy(self.workingSolution)
-        # print(type(self.workingSolution))
-        # print(type(self.bestSolution))
         self.printScore(self.workingSolution)
+
+        print("#"*100)
 
         while self.isWorking:
             self.getNewSolution()
             if self.hasTabuLists(self.workingSolution):
                 # Ignore this solution
+                print("="*40)
+                print("The hash value in Tabu List:               "+ self.hashSolution(self.workingSolution))
+                print("The hash value in solution will be stored: "+ self.hashSolution(self.workingSolution))
+                print("repeated hash")
+                print("="*40)
                 continue
             else:
                 self.addTabuLists(self.workingSolution)
             self.compareScoreBestSolution()
-            # print("########################")
-            # print("best")
-            # self.printScore(self.bestSolution)
-            # print("working")
-            # self.printScore(self.workingSolution)
-            # input("Press to continue")
+
             if scoring.calculate(self.bestSolution) >= 8:
                 self.isWorking = False
 
