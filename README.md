@@ -12,6 +12,28 @@ Todo
 ### Today (7 Sep 2014) ###
 
 
+Prerequistie
+=====
+```
+sudo aptitude install git python3 python3-venv python3-pip
+```
+
+Installation
+=====
+
+Create a vitual environment
+```pyvenv r2als-env```
+Activate the enviroment
+```source r2als-env/bin/activate```
+Setup project
+```python setup.py develop```
+
+Run the Project
+=====
+Activate the enviroment
+```source r2als-env/bin/activate```
+Run the project
+```r2las/bin/r2als```
 
 Motivation
 =====
