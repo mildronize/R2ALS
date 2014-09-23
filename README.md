@@ -20,7 +20,7 @@ To solve such problem, this project aims to develop a tool that can help the stu
 Prerequistie
 =====
 ```
-sudo aptitude install git python3 python3-venv python3-pip
+sudo aptitude install git python3 python3-venv python3-pip mongodb
 ```
 
 Installation
