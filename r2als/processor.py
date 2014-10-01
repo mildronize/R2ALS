@@ -68,12 +68,12 @@ class Processor:
     def compareScoreBestSolution(self):
         #print("compareScoreBestSolution!")
         if scoring.calculate(self.workingSolution) > scoring.calculate(self.bestSolution):
-            print("working Solution")
+            print("Working Solution ", end=" ")
             self.printScore(self.workingSolution)
-            print("Old best Solution")
+            print("Old best Solution", end=" ")
             self.printScore(self.bestSolution)
             self.bestSolution = copy.copy(self.workingSolution)
-            print("======== best Solution")
+            print("--> best Solution",end=" ")
             self.printScore(self.bestSolution)
             print("#"*100)
 
@@ -89,11 +89,11 @@ class Processor:
             self.getNewSolution()
             if self.hasTabuLists(self.workingSolution):
                 # Ignore this solution
-                print("="*40)
-                print("The hash value in Tabu List:               "+ self.hashSolution(self.workingSolution))
-                print("The hash value in solution will be stored: "+ self.hashSolution(self.workingSolution))
-                print("repeated hash")
-                print("="*40)
+                #print("="*40)
+                #print("The hash value in Tabu List:               "+ self.hashSolution(self.workingSolution))
+                #print("The hash value in solution will be stored: "+ self.hashSolution(self.workingSolution))
+                #print("repeated hash")
+                #print("="*40)
                 continue
             else:
                 self.addTabuLists(self.workingSolution)
