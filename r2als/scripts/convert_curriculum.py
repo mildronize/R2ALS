@@ -100,6 +100,7 @@ class CsvToModel:
 				elif self.hasCommentRow(row):
 					print(row)
 				else :
+					#value
 					tmp = {}
 					for j in range(len(keys)):
 						if row[j] != '':

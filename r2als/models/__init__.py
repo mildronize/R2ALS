@@ -1,6 +1,6 @@
 from .subjects import Subject, Category, Curriculum
 from .members import Member
-from .enrolled_subjects import EnrolledSubject
+from .processed_data import Semester, GradeSubject
 from .regulations import Grade
 
 from mongoengine import connect

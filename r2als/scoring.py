@@ -1,4 +1,6 @@
-
+# return a score of the curriculum
+# Zero score is best
+# Much score is worst
 
 def calculate(data):
     totalScore = 0

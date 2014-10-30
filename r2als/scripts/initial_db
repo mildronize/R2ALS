@@ -41,9 +41,53 @@ curriculum_data = raw_curriculum['info']
 pp = pprint.PrettyPrinter(indent=4)
 # pp.pprint(raw_subjects )
 
+class PrepareInitSolution:
 
-# def initialCurriculumMember:
-#     print("sss")
+    member = None
+    semesterItems = []
+    curriculum = None
+    def __init__(self, curriculum, member):
+        self.member = member
+        self.curriculum = curriculum
+        # === Todo ===: Remove all his subject!
+
+    def addStudiedSubject(self, year=1, semester=1, subjects=[]):
+        # subjects example data:
+        #   [ {'code' : '200-101','grade' : 'C'},
+        #     {'code' : '242-101','grade' : 'C'} ]
+        for subject in subjects:
+            if 'code' not in subject or 'grade' not in subject:
+                print("Error: subject list must have code & grade")
+                exit()
+        semesterItem = {}
+        semesterItem['year'] = year
+        semesterItem['semester'] = semester
+        semesterItem['subjects'] = subjects
+        self.semesterItems.append(semesterItem)
+
+    def start(self):
+
+        for semesterItem in self.semesterItems:
+
+            mSemester = models.Semester()
+            mSemester.member = self.member
+            mSemester.year = semesterItem['year']
+            mSemester.semester = semesterItem['semester']
+            # Read all subject from same curriculum
+            subjects = models.Subject.objects(curriculum = self.curriculum, year = semesterItem['year'], semester = semesterItem['semester'])
+            for subject in subjects:
+                if subject.studied_group == self.member.studied_group or subject.studied_group == "":
+                    # print(subject.name + " "+ subject.studied_group+ " ==> "+ str(subject.year)+"/"+str(subject.semester))
+                    gradeSubject = models.GradeSubject()
+                    # If the subject is enrolled, loading it into GradeSubject object
+                    for subjectSemester in semesterItem['subjects']:
+                        if subject.code == subjectSemester['code']:
+                            gradeSubject.grade = subjectSemester['grade']
+                            break
+                    gradeSubject.save()
+                    mSemester.subjects.append(gradeSubject)
+            mSemester.save()
+
 
 if __name__ == '__main__':
     # if len(argv) != 2:
@@ -95,12 +139,17 @@ if __name__ == '__main__':
     ####################################################
 
     print("create subjects in CoE 2553 curriculum and relationship between subjects")
+    # print(str(len(raw_subjects))+" subjects will be added!")
     for raw_subject in raw_subjects:
 
         subject_tmp = models.Subject()
 
         # add a simple data
-        if 'code' in raw_subject: subject_tmp.code = raw_subject['code']
+        if 'code' in raw_subject:
+            subject_tmp.isSpecific = True
+            subject_tmp.code = raw_subject['code']
+        else:
+            subject_tmp.isSpecific = False
         subject_tmp.name = raw_subject['name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
         # add curriculum
@@ -114,7 +163,7 @@ if __name__ == '__main__':
 
         if 'studied_group' in raw_subject:
             subject_tmp.studied_group = raw_subject['studied_group']
-        # else : subject_tmp.studied_group = 'all'
+        else : subject_tmp.studied_group = ''
 
         if 'year' in raw_subject: subject_tmp.year = int(raw_subject.get('year', '0'))
         else :
@@ -130,6 +179,7 @@ if __name__ == '__main__':
 
         if 'code' in raw_subject:
             subject_code = models.Subject.objects(code=raw_subject['code']).first()
+
         if 'studied_prerequisite' in raw_subject:
             for sp_code in raw_subject['studied_prerequisite']:
                 subject_code.studied_prerequisite.append(models.Subject.objects(code=sp_code).first())
@@ -143,6 +193,7 @@ if __name__ == '__main__':
             for cc_code in raw_subject['cocurrent']:
                 subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
 
+
         subject_code.save()
 
     ####################################################
@@ -150,9 +201,11 @@ if __name__ == '__main__':
     print("Adding grade")
     for grade in grade_info:
         grade_tmp = models.Grade()
-        grade_tmp.name = grade['name']
-        if 'score' in grade:
-            grade_tmp.score = grade['score']
+        # grade_tmp.name = grade['name']
+        # if 'score' in grade:
+        #     grade_tmp.score = grade['score']
+        for key, value in grade.items():
+            grade_tmp[key] = value
         grade_tmp.save()
 
     ####################################################
@@ -169,16 +222,20 @@ if __name__ == '__main__':
     member_thongdee.registered_year = 2557
     member_thongdee.save()
 
-    #add dummy data
+    #add dummy data (thongdee)
+    prepareInitSolution = PrepareInitSolution(coe_curriculum, member_thongdee)
+    # year/semester: 1/1
+    prepareInitSolution.addStudiedSubject(1,1,[
+        {'code' : '200-101','grade' : 'C'},
+        {'code' : '242-101','grade' : 'C'},
+        {'code' : '322-101','grade' : 'W'},
+        {'code' : '332-103','grade' : 'C'},
+        {'code' : '332-113','grade' : 'C'},
+        {'code' : '640-101','grade' : 'C'},
+        {'code' : '890-101','grade' : 'C'}
+    ])
+    prepareInitSolution.addStudiedSubject(2,1,[
+        {'code' : '242-205','grade' : 'C'}
 
-    enrolled_lists_1_1 = [
-        {'subject' : '200-101','grade' : 'C'},
-        {'subject' : '242-101','grade' : 'C'},
-        {'subject' : '322-101','grade' : 'W'},
-        {'subject' : '332-103','grade' : 'C'},
-        {'subject' : '332-113','grade' : 'C'},
-        {'subject' : '640-101','grade' : 'C'},
-        {'subject' : '890-101','grade' : 'C'}
-    ]
-
-    es_thongdee = models.EnrolledSubject()
+    ])
+    prepareInitSolution.start()

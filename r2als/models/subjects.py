@@ -18,6 +18,7 @@ class Subject(me.Document):
     studied_group = me.StringField()
     year = me.IntField()
     semester = me.IntField()
+    isSpecific = me.BooleanField(required=True)
     # registration_date = me.DateTimeField(
     #     required=True, default=datetime.datetime.now)
     # updated_date = me.DateTimeField(
