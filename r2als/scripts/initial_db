@@ -9,9 +9,23 @@ import sys
 import pymongo
 import pprint
 
+# from colorama import init
+# init()
+#
+# from colorama import Fore, Back, Style
+# print(Fore.RED + 'some red text')
+# print(Back.GREEN + 'and with a green background')
+# print(Style.DIM + 'and in dim text')
+# print(Fore.RESET + Back.RESET + Style.RESET_ALL)
+# print('back to normal now')
+
 from r2als import models
 from r2als import config as cf
-from r2als.scripts import convert_curriculum as cc
+# 2 types for importing library
+# 1. from path/directory import package_name(*.py)
+# 2. from path/package_name(*.py) import class_name
+from r2als.scripts.convert_curriculum import CsvToModel
+from r2als.libs.solutions import InitialSolution
 
 default_categories = ['lecture', 'lab','project']
 grade_info = [
@@ -34,59 +48,13 @@ grade_info = [
 # }
 
 # Not check key yet
-raw_curriculum = cc.CsvToModel().process('../data/coe_2553_curriculum.csv', True)
+raw_curriculum = CsvToModel().process('../data/coe_2553_curriculum.csv', True)
 raw_subjects = raw_curriculum['subjects']
 curriculum_data = raw_curriculum['info']
 
+
 pp = pprint.PrettyPrinter(indent=4)
 # pp.pprint(raw_subjects )
-
-class PrepareInitSolution:
-
-    member = None
-    semesterItems = []
-    curriculum = None
-    def __init__(self, curriculum, member):
-        self.member = member
-        self.curriculum = curriculum
-        # === Todo ===: Remove all his subject!
-
-    def addStudiedSubject(self, year=1, semester=1, subjects=[]):
-        # subjects example data:
-        #   [ {'code' : '200-101','grade' : 'C'},
-        #     {'code' : '242-101','grade' : 'C'} ]
-        for subject in subjects:
-            if 'code' not in subject or 'grade' not in subject:
-                print("Error: subject list must have code & grade")
-                exit()
-        semesterItem = {}
-        semesterItem['year'] = year
-        semesterItem['semester'] = semester
-        semesterItem['subjects'] = subjects
-        self.semesterItems.append(semesterItem)
-
-    def start(self):
-
-        for semesterItem in self.semesterItems:
-
-            mSemester = models.Semester()
-            mSemester.member = self.member
-            mSemester.year = semesterItem['year']
-            mSemester.semester = semesterItem['semester']
-            # Read all subject from same curriculum
-            subjects = models.Subject.objects(curriculum = self.curriculum, year = semesterItem['year'], semester = semesterItem['semester'])
-            for subject in subjects:
-                if subject.studied_group == self.member.studied_group or subject.studied_group == "":
-                    # print(subject.name + " "+ subject.studied_group+ " ==> "+ str(subject.year)+"/"+str(subject.semester))
-                    gradeSubject = models.GradeSubject()
-                    # If the subject is enrolled, loading it into GradeSubject object
-                    for subjectSemester in semesterItem['subjects']:
-                        if subject.code == subjectSemester['code']:
-                            gradeSubject.grade = subjectSemester['grade']
-                            break
-                    gradeSubject.save()
-                    mSemester.subjects.append(gradeSubject)
-            mSemester.save()
 
 
 if __name__ == '__main__':
@@ -118,7 +86,10 @@ if __name__ == '__main__':
     # for key in curriculum_data.keys():
     coe_curriculum['faculty'] = curriculum_data['faculty']
     coe_curriculum['department'] = curriculum_data['department']
-    coe_curriculum['year'] = curriculum_data['year']
+    coe_curriculum['year'] = int(curriculum_data['year'])
+    coe_curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
+    pp.pprint(coe_curriculum['year'])
+    pp.pprint(coe_curriculum['required_num_year'])
     print("Add Studied Group")
     # coe_curriculum['studied_groups'].append('all')
     for studied_group in curriculum_data['studied_groups']:
@@ -220,12 +191,16 @@ if __name__ == '__main__':
     member_thongdee.curriculum = coe_curriculum
     member_thongdee.studied_group = 'first-group'
     member_thongdee.registered_year = 2557
+    member_thongdee.last_num_year = 1
+    member_thongdee.last_semester = 1
+
     member_thongdee.save()
 
     #add dummy data (thongdee)
-    prepareInitSolution = PrepareInitSolution(coe_curriculum, member_thongdee)
+    initialSolution = InitialSolution(coe_curriculum, member_thongdee)
     # year/semester: 1/1
-    prepareInitSolution.addStudiedSubject(1,1,[
+
+    initialSolution.addStudiedSubject(1,1,[
         {'code' : '200-101','grade' : 'C'},
         {'code' : '242-101','grade' : 'C'},
         {'code' : '322-101','grade' : 'W'},
@@ -234,8 +209,8 @@ if __name__ == '__main__':
         {'code' : '640-101','grade' : 'C'},
         {'code' : '890-101','grade' : 'C'}
     ])
-    prepareInitSolution.addStudiedSubject(2,1,[
-        {'code' : '242-205','grade' : 'C'}
-
-    ])
-    prepareInitSolution.start()
+    # initialSolution.addStudiedSubject(2,1,[
+    #     {'code' : '242-205','grade' : 'C'}
+    #
+    # ])
+    initialSolution.start()

@@ -30,8 +30,9 @@ class ConvertCurriculumTest(unittest.TestCase):
         self.assertEqual(cc.validateFormatCurriculumFile("faculty", 0 ), True)
         self.assertEqual(cc.validateFormatCurriculumFile("department", 1 ), True)
         self.assertEqual(cc.validateFormatCurriculumFile("year", 2 ), True)
-        self.assertEqual(cc.validateFormatCurriculumFile("*studied_groups", 3 ), True)
-        self.assertEqual(cc.validateFormatCurriculumFile("*branches", 4 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("required_num_year", 3 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("*studied_groups", 4 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("*branches", 5 ), True)
         # test wrong
         self.assertEqual(cc.validateFormatCurriculumFile("faculty", 1 ), False)
         self.assertEqual(cc.validateFormatCurriculumFile("department", 2 ), False)

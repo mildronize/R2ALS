@@ -1,6 +1,7 @@
 faculty,Engineering,,,,,,,,,
 department,Computer Engineering,,,,,,,,,
 year,2553,,,,,,,,,
+required_num_year,4,,,,,,,,,
 *studied_groups,first-group:second-group,,,,,,,,,
 *branches,information:information-network:computer-control:computer-system-design,,,,,,,,,
 code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,*categories,studied_group,year,semester
