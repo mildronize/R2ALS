@@ -9,23 +9,15 @@ import sys
 import pymongo
 import pprint
 
-# from colorama import init
-# init()
-#
-# from colorama import Fore, Back, Style
-# print(Fore.RED + 'some red text')
-# print(Back.GREEN + 'and with a green background')
-# print(Style.DIM + 'and in dim text')
-# print(Fore.RESET + Back.RESET + Style.RESET_ALL)
-# print('back to normal now')
-
+from r2als.libs.logs import LogHandler
+from r2als.libs.solutions import InitialSolution
 from r2als import models
 from r2als import config as cf
 # 2 types for importing library
 # 1. from path/directory import package_name(*.py)
 # 2. from path/package_name(*.py) import class_name
 from r2als.scripts.convert_curriculum import CsvToModel
-from r2als.libs.solutions import InitialSolution
+
 
 default_categories = ['lecture', 'lab','project']
 grade_info = [
@@ -41,11 +33,10 @@ grade_info = [
     {'name': "U", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': True},
     {'name': "W", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': False}
 ]
-# curriculum_data = {
-#     'faculty': 'Engineering',
-#     'department': 'Computer Engineering',
-#     'year': 2553
-# }
+
+pp = pprint.PrettyPrinter(indent=4)
+lh = LogHandler()
+lh.startApp('scripts/initial_db')
 
 # Not check key yet
 raw_curriculum = CsvToModel().process('../data/coe_2553_curriculum.csv', True)
@@ -53,7 +44,7 @@ raw_subjects = raw_curriculum['subjects']
 curriculum_data = raw_curriculum['info']
 
 
-pp = pprint.PrettyPrinter(indent=4)
+
 # pp.pprint(raw_subjects )
 
 
@@ -66,10 +57,10 @@ if __name__ == '__main__':
 
     models.initial({'mongodb.db_name':cf.Config.db_name,'mongodb.host':cf.Config.host,'mongodb.is_reset':cf.Config.is_reset})
 
-    print ("Initial a database")
+    lh.info("starting initial the database")
     ####################################################
 
-    print ("create default categories")
+    lh.info("Creating default categories")
     for category in default_categories:
         category_tmp = models.Category.objects(name=category).first()
         if not category_tmp:
@@ -77,40 +68,26 @@ if __name__ == '__main__':
             category_tmp.name = category
             category_tmp.save()
         else:
-            print("The default categories is exist")
+            lh.info("The default categories is exist")
 
     ####################################################
 
-    print("create CoE 2553 curriculum")
+    lh.info("Creating CoE 2010 curriculum")
     coe_curriculum = models.Curriculum()
     # for key in curriculum_data.keys():
     coe_curriculum['faculty'] = curriculum_data['faculty']
     coe_curriculum['department'] = curriculum_data['department']
     coe_curriculum['year'] = int(curriculum_data['year'])
     coe_curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
-    pp.pprint(coe_curriculum['year'])
-    pp.pprint(coe_curriculum['required_num_year'])
-    print("Add Studied Group")
+    lh.info("Adding Studied Group")
     # coe_curriculum['studied_groups'].append('all')
     for studied_group in curriculum_data['studied_groups']:
         coe_curriculum['studied_groups'].append(studied_group)
     coe_curriculum.save()
 
     ####################################################
-    #  print("Add Studied Group")
 
-    # studied_group_tmp = models.StudiedGroup()
-    # studied_group_tmp['name'] = 'all' # this is a general group
-    # studied_group_tmp.save()
-    # for studied_group in curriculum_data['studied_groups']:
-    #     studied_group_tmp = models.StudiedGroup()
-    #     studied_group_tmp['name'] = studied_group
-    #     studied_group_tmp.save()
-
-    ####################################################
-
-    print("create subjects in CoE 2553 curriculum and relationship between subjects")
-    # print(str(len(raw_subjects))+" subjects will be added!")
+    lh.info("Creating subjects & relationship between subjects")
     for raw_subject in raw_subjects:
 
         subject_tmp = models.Subject()
@@ -138,14 +115,14 @@ if __name__ == '__main__':
 
         if 'year' in raw_subject: subject_tmp.year = int(raw_subject.get('year', '0'))
         else :
-            print(raw_subject['name'] +"doesn't have year")
+            lh.error(raw_subject['name'] +"doesn't have year")
         if 'semester' in raw_subject: subject_tmp.semester = int(raw_subject.get('semester', '0'))
         else :
-            print(raw_subject['name'] +"doesn't have semester")
+            lh.error(raw_subject['name'] +"doesn't have semester")
         subject_tmp.save()
 
     # link all prerequisite subject
-    print("Link all prerequisite subject")
+    lh.info("Linking all their relationship between subjects")
     for raw_subject in raw_subjects:
 
         if 'code' in raw_subject:
@@ -163,13 +140,12 @@ if __name__ == '__main__':
         if 'cocurrent' in raw_subject:
             for cc_code in raw_subject['cocurrent']:
                 subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
-
-
         subject_code.save()
 
     ####################################################
-
-    print("Adding grade")
+    print("")
+    lh.info("Adding some regulation and rule")
+    lh.info("Adding grade")
     for grade in grade_info:
         grade_tmp = models.Grade()
         # grade_tmp.name = grade['name']
@@ -180,11 +156,10 @@ if __name__ == '__main__':
         grade_tmp.save()
 
     ####################################################
-
+    print("")
     #initial test cases
-
+    lh.info("Starting initial test cases")
     #add a member
-    print("Add Thongdee Mana")
     member_thongdee = models.Member()
     member_thongdee.member_id = '5710110999'
     member_thongdee.name = 'Thongdee Mana'
@@ -193,10 +168,11 @@ if __name__ == '__main__':
     member_thongdee.registered_year = 2557
     member_thongdee.last_num_year = 1
     member_thongdee.last_semester = 1
-
+    lh.info("Adding member: " + member_thongdee.name)
     member_thongdee.save()
 
     #add dummy data (thongdee)
+    lh.info("Starting to generate the Initial Solution of him")
     initialSolution = InitialSolution(coe_curriculum, member_thongdee)
     # year/semester: 1/1
 
@@ -214,3 +190,6 @@ if __name__ == '__main__':
     #
     # ])
     initialSolution.start()
+
+
+    lh.close()

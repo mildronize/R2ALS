@@ -52,30 +52,62 @@ class InitialSolution:
 
     def start(self):
 
+
+        # ==========  This section for year & semester which are studied
         # check data before start
         target_checking = toSemesterIndex(self.member.last_num_year, self.member.last_semester)
         for i in range(target_checking + 1):
             if self.validSemesterList[i] == False:
                 print("Error! please add subject all semester which u passed")
                 exit()
+            else:
+                print("year(",self.semesterItems[i]['year'],") & semester(",self.semesterItems[i]['semester'],") ,which are stuided, are processing...")
 
-        for semesterItem in self.semesterItems:
+        for i in range(target_checking, toSemesterIndex(self.curriculum.required_num_year, num_semester)):
+            # comparing SemesterIndex with year , semester
+            if toSemesterIndex(self.semesterItems[i]['year'], self.semesterItems[i]['semester']) != i:
+                print("Error! Somthing wrong about SemesterIndex not match with year(",self.semesterItems[i]['year'],") & semester(",self.semesterItems[i]['semester'],") ")
+                exit()
+            else:
+                print("year(",self.semesterItems[i]['year'],") & semester(",self.semesterItems[i]['semester'],") are processing...")
 
             mSemester = models.Semester()
             mSemester.member = self.member
-            mSemester.year = semesterItem['year']
-            mSemester.semester = semesterItem['semester']
+            mSemester.year = self.semesterItems[i]['year']
+            mSemester.semester = self.semesterItems[i]['semester']
+
             # Read all subject from same curriculum
-            subjects = models.Subject.objects(curriculum = self.curriculum, year = semesterItem['year'], semester = semesterItem['semester'])
+            subjects = models.Subject.objects(curriculum = self.curriculum, year = self.semesterItems[i]['year'], semester =  self.semesterItems[i]['semester'])
             for subject in subjects:
                 if subject.studied_group == self.member.studied_group or subject.studied_group == "":
                     # print(subject.name + " "+ subject.studied_group+ " ==> "+ str(subject.year)+"/"+str(subject.semester))
                     gradeSubject = models.GradeSubject()
                     # If the subject is enrolled, loading it into GradeSubject object
-                    for subjectSemester in semesterItem['subjects']:
+                    for subjectSemester in self.semesterItems[i]['subjects']:
                         if subject.code == subjectSemester['code']:
                             gradeSubject.grade = subjectSemester['grade']
                             break
                     gradeSubject.save()
                     mSemester.subjects.append(gradeSubject)
             mSemester.save()
+
+        # for semesterItem in self.semesterItems:
+        #
+        #     mSemester = models.Semester()
+        #     mSemester.member = self.member
+        #     mSemester.year = semesterItem['year']
+        #     mSemester.semester = semesterItem['semester']
+        #     # Read all subject from same curriculum
+        #     subjects = models.Subject.objects(curriculum = self.curriculum, year = semesterItem['year'], semester = semesterItem['semester'])
+        #     for subject in subjects:
+        #         if subject.studied_group == self.member.studied_group or subject.studied_group == "":
+        #             # print(subject.name + " "+ subject.studied_group+ " ==> "+ str(subject.year)+"/"+str(subject.semester))
+        #             gradeSubject = models.GradeSubject()
+        #             # If the subject is enrolled, loading it into GradeSubject object
+        #             for subjectSemester in semesterItem['subjects']:
+        #                 if subject.code == subjectSemester['code']:
+        #                     gradeSubject.grade = subjectSemester['grade']
+        #                     break
+        #             gradeSubject.save()
+        #             mSemester.subjects.append(gradeSubject)
+        #     mSemester.save()
