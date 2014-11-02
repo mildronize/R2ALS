@@ -1,5 +1,5 @@
 # This is class log handler
-
+import os
 from colorama import init
 from colorama import Fore, Back, Style
 
@@ -10,10 +10,13 @@ class LogHandler:
 
     file = None
     colorRowInfo = 0
+    logDirectory = '../.logs/'
 
     def __init__(self):
         filename = 'LOG_' + str(date.today()) + '.txt'
-        self.file = open('../logs/'+filename, 'a')
+        if not os.path.exists(self.logDirectory):
+            os.makedirs(self.logDirectory)
+        self.file = open(self.logDirectory+filename, 'a')
         # file.write('write test\n')
         init()
 

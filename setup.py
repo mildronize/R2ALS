@@ -8,6 +8,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.md')).read()
 
 requires = [
     'mongoengine',
+    'colorama'
     ]
 
 setup(name='r2als',
