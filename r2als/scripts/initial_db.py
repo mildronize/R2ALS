@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 initial_db
 Description#   Initialize a database and test case
@@ -39,16 +38,15 @@ lh = LogHandler()
 lh.startApp('scripts/initial_db')
 
 # Not check key yet
-raw_curriculum = CsvToModel().process('../data/coe_2553_curriculum.csv', True)
+raw_curriculum = CsvToModel().process('data/coe_2553_curriculum.csv', True)
 raw_subjects = raw_curriculum['subjects']
 curriculum_data = raw_curriculum['info']
 
 
-
 # pp.pprint(raw_subjects )
 
-
-if __name__ == '__main__':
+def main():
+#if __name__ == '__main__':
     # if len(argv) != 2:
     #     usage(argv)
     # config_uri = argv[1]

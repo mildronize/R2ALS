@@ -30,6 +30,6 @@ setup(name='r2als',
       test_suite="r2als",
       entry_points = """\
       [console_scripts]
-      initialize_r2als_db = r2als.scripts.initialize:main
+      initialize_r2als_db = r2als.scripts.initial_db:main
       """,
       )
