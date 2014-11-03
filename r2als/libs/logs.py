@@ -10,10 +10,10 @@ class LogHandler:
 
     file = None
     colorRowInfo = 0
-    logDirectory = '../.logs/'
+    logDirectory = '/tmp/r2als-logs/'
 
     def __init__(self):
-        filename = 'LOG_' + str(date.today()) + '.txt'
+        filename = 'R2ALS-LOG_' + str(date.today()) + '.txt'
         if not os.path.exists(self.logDirectory):
             os.makedirs(self.logDirectory)
         self.file = open(self.logDirectory+filename, 'a')
@@ -22,7 +22,7 @@ class LogHandler:
 
     def terminalFormat(self, mode, text):
         dt = datetime.now()
-        return str(dt.strftime("%H:%M:%S")) + " " + mode.upper() + ": " + text
+        return "["+str(dt.strftime("%H:%M:%S")) + "] " + mode.upper() + ": " + text
 
     def fileFormat(self, mode, text):
         return str(datetime.now()) + ',' + mode[0].upper() + ',"' + text + '"\n'

@@ -18,73 +18,41 @@ from r2als import config as cf
 from r2als.scripts.convert_curriculum import CsvToModel
 
 
-default_categories = ['lecture', 'lab','project']
-grade_info = [
-    {'name': "A", 'score': 4.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-    {'name': "B+", 'score': 3.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-    {'name': "B", 'score': 3.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-    {'name': "C+", 'score': 2.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-    {'name': "C", 'score': 2.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-    {'name': "D+", 'score': 1.5, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
-    {'name': "D", 'score': 1.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
-    {'name': "E", 'score': 0.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
-    {'name': "S", 'isCredit': False, 'canReEnroll': True, 'isEnrolled': True},
-    {'name': "U", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': True},
-    {'name': "W", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': False}
-]
 
 pp = pprint.PrettyPrinter(indent=4)
 lh = LogHandler()
 lh.startApp('scripts/initial_db')
 
-# Not check key yet
-raw_curriculum = CsvToModel().process('data/coe_2553_curriculum.csv', True)
-raw_subjects = raw_curriculum['subjects']
-curriculum_data = raw_curriculum['info']
+def importCurriculum2Model(path):
+    # Not check key yet
+    return CsvToModel().process(path, True)
 
-
-# pp.pprint(raw_subjects )
-
-def main():
-#if __name__ == '__main__':
-    # if len(argv) != 2:
-    #     usage(argv)
-    # config_uri = argv[1]
-    # setup_logging(config_uri)
-    # settings = get_appsettings(config_uri)
-
-    models.initial({'mongodb.db_name':cf.Config.db_name,'mongodb.host':cf.Config.host,'mongodb.is_reset':cf.Config.is_reset})
-
-    lh.info("starting initial the database")
-    ####################################################
-
+def createDefaultCategories(default_categories):
     lh.info("Creating default categories")
-    for category in default_categories:
-        category_tmp = models.Category.objects(name=category).first()
-        if not category_tmp:
-            category_tmp = models.Category()
-            category_tmp.name = category
-            category_tmp.save()
+    for default_category in default_categories:
+        category = models.Category.objects(name=default_category).first()
+        if not category:
+            category = models.Category()
+            category.name = default_category
+            category.save()
         else:
             lh.info("The default categories is exist")
+    return category
 
-    ####################################################
-
-    lh.info("Creating CoE 2010 curriculum")
-    coe_curriculum = models.Curriculum()
-    # for key in curriculum_data.keys():
-    coe_curriculum['faculty'] = curriculum_data['faculty']
-    coe_curriculum['department'] = curriculum_data['department']
-    coe_curriculum['year'] = int(curriculum_data['year'])
-    coe_curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
+def createCurriculum(curriculum_data):
+    curriculum = models.Curriculum()
+    curriculum['faculty'] = curriculum_data['faculty']
+    curriculum['department'] = curriculum_data['department']
+    curriculum['year'] = int(curriculum_data['year'])
+    curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
+    lh.info("Creating curriculum: "+ curriculum_data['department'] + " " + curriculum_data['year'])
     lh.info("Adding Studied Group")
-    # coe_curriculum['studied_groups'].append('all')
     for studied_group in curriculum_data['studied_groups']:
-        coe_curriculum['studied_groups'].append(studied_group)
-    coe_curriculum.save()
+        curriculum['studied_groups'].append(studied_group)
+    curriculum.save()
+    return curriculum
 
-    ####################################################
-
+def createSubject(raw_subjects, curriculum):
     lh.info("Creating subjects & relationship between subjects")
     for raw_subject in raw_subjects:
 
@@ -99,9 +67,8 @@ def main():
         subject_tmp.name = raw_subject['name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
         # add curriculum
-        subject_tmp.curriculum = coe_curriculum
+        subject_tmp.curriculum = curriculum
 
-        # add link to another object
         # add categories
         if 'categories' in raw_subject:
             for category in raw_subject['categories']:
@@ -119,39 +86,73 @@ def main():
             lh.error(raw_subject['name'] +"doesn't have semester")
         subject_tmp.save()
 
-    # link all prerequisite subject
+def linkAllSubject(raw_subjects):
     lh.info("Linking all their relationship between subjects")
     for raw_subject in raw_subjects:
 
         if 'code' in raw_subject:
             subject_code = models.Subject.objects(code=raw_subject['code']).first()
+            if 'studied_prerequisite' in raw_subject:
+                for sp_code in raw_subject['studied_prerequisite']:
+                    subject_code.studied_prerequisite.append(models.Subject.objects(code=sp_code).first())
+            if 'passed_prerequisite' in raw_subject:
+                for pp_code in raw_subject['passed_prerequisite']:
+                    subject_code.passed_prerequisite.append(models.Subject.objects(code=pp_code).first())
+            if 'corequisite' in raw_subject:
+                for cr_code in raw_subject['corequisite']:
+                    subject_code.corequisite.append(models.Subject.objects(code=cr_code).first())
+            if 'cocurrent' in raw_subject:
+                for cc_code in raw_subject['cocurrent']:
+                    subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
+            subject_code.save()
 
-        if 'studied_prerequisite' in raw_subject:
-            for sp_code in raw_subject['studied_prerequisite']:
-                subject_code.studied_prerequisite.append(models.Subject.objects(code=sp_code).first())
-        if 'passed_prerequisite' in raw_subject:
-            for pp_code in raw_subject['passed_prerequisite']:
-                subject_code.passed_prerequisite.append(models.Subject.objects(code=pp_code).first())
-        if 'corequisite' in raw_subject:
-            for cr_code in raw_subject['corequisite']:
-                subject_code.corequisite.append(models.Subject.objects(code=cr_code).first())
-        if 'cocurrent' in raw_subject:
-            for cc_code in raw_subject['cocurrent']:
-                subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
-        subject_code.save()
+def createGrade(grade_info):
+    lh.info("Adding grade")
+    for grade in grade_info:
+        grade_tmp = models.Grade()
+        for key, value in grade.items():
+            grade_tmp[key] = value
+        grade_tmp.save()
+    return grade_tmp
+
+def main():
+#if __name__ == '__main__':
+    # if len(argv) != 2:
+    #     usage(argv)
+    # config_uri = argv[1]
+    # setup_logging(config_uri)
+    # settings = get_appsettings(config_uri)
+
+    raw_curriculum = importCurriculum2Model('data/coe_2553_curriculum.csv')
+    raw_subjects = raw_curriculum['subjects']
+    curriculum_data = raw_curriculum['info']
+
+    models.initial({'mongodb.db_name':cf.Config.db_name,'mongodb.host':cf.Config.host,'mongodb.is_reset':cf.Config.is_reset})
+
+    createDefaultCategories(['lecture', 'lab','project'])
+
+    coe_curriculum_model = createCurriculum(curriculum_data)
+
+    createSubject(raw_subjects, coe_curriculum_model)
+
+    linkAllSubject(raw_subjects)
 
     ####################################################
     print("")
     lh.info("Adding some regulation and rule")
-    lh.info("Adding grade")
-    for grade in grade_info:
-        grade_tmp = models.Grade()
-        # grade_tmp.name = grade['name']
-        # if 'score' in grade:
-        #     grade_tmp.score = grade['score']
-        for key, value in grade.items():
-            grade_tmp[key] = value
-        grade_tmp.save()
+    createGrade([
+        {'name': "A", 'score': 4.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+        {'name': "B+", 'score': 3.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+        {'name': "B", 'score': 3.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+        {'name': "C+", 'score': 2.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+        {'name': "C", 'score': 2.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
+        {'name': "D+", 'score': 1.5, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
+        {'name': "D", 'score': 1.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
+        {'name': "E", 'score': 0.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
+        {'name': "S", 'isCredit': False, 'canReEnroll': True, 'isEnrolled': True},
+        {'name': "U", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': True},
+        {'name': "W", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': False}
+    ])
 
     ####################################################
     print("")
@@ -161,7 +162,7 @@ def main():
     member_thongdee = models.Member()
     member_thongdee.member_id = '5710110999'
     member_thongdee.name = 'Thongdee Mana'
-    member_thongdee.curriculum = coe_curriculum
+    member_thongdee.curriculum = coe_curriculum_model
     member_thongdee.studied_group = 'first-group'
     member_thongdee.registered_year = 2557
     member_thongdee.last_num_year = 1
@@ -171,7 +172,7 @@ def main():
 
     #add dummy data (thongdee)
     lh.info("Starting to generate the Initial Solution of him")
-    initialSolution = InitialSolution(coe_curriculum, member_thongdee)
+    initialSolution = InitialSolution(coe_curriculum_model, member_thongdee)
     # year/semester: 1/1
 
     initialSolution.addStudiedSubject(1,1,[
