@@ -10,4 +10,4 @@ class Grade(me.Document):
     score = me.FloatField()
     isCredit = me.BooleanField(required=True)
     canReEnroll = me.BooleanField(required=True)
-    isEnrolled = me.BooleanField(required=True)
+    mustReEnroll = me.BooleanField(required=True)

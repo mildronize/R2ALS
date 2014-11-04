@@ -140,18 +140,20 @@ def main():
     ####################################################
     print("")
     lh.info("Adding some regulation and rule")
+
+    # mustReEnroll is only main branch in each semester
     createGrade([
-        {'name': "A", 'score': 4.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-        {'name': "B+", 'score': 3.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-        {'name': "B", 'score': 3.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-        {'name': "C+", 'score': 2.5, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-        {'name': "C", 'score': 2.0, 'isCredit': True, 'canReEnroll': False, 'isEnrolled': True},
-        {'name': "D+", 'score': 1.5, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
-        {'name': "D", 'score': 1.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
-        {'name': "E", 'score': 0.0, 'isCredit': True, 'canReEnroll': True, 'isEnrolled': True},
-        {'name': "S", 'isCredit': False, 'canReEnroll': True, 'isEnrolled': True},
-        {'name': "U", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': True},
-        {'name': "W", 'isCredit': False, 'canReEnroll': False, 'isEnrolled': False}
+        {'name': "A",  'score': 4.0, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
+        {'name': "B+", 'score': 3.5, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
+        {'name': "B",  'score': 3.0, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
+        {'name': "C+", 'score': 2.5, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
+        {'name': "C",  'score': 2.0, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
+        {'name': "D+", 'score': 1.5, 'isCredit': True, 'canReEnroll': True, 'mustReEnroll': False},
+        {'name': "D",  'score': 1.0, 'isCredit': True, 'canReEnroll': True, 'mustReEnroll': False},
+        {'name': "E",  'score': 0.0, 'isCredit': True, 'canReEnroll': True, 'mustReEnroll': True},
+        {'name': "S",                'isCredit': False,'canReEnroll': True, 'mustReEnroll': False},
+        {'name': "U",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True},
+        {'name': "W",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True}
     ])
 
     ####################################################

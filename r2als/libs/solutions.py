@@ -1,12 +1,23 @@
+import math
 from r2als import models
 import pprint
+
 from r2als.libs.logs import LogHandler
 pp = pprint.PrettyPrinter(indent=4)
 lh = LogHandler()
 num_semester = 3
 
+# convert Year & Semester to SemesterIndex
 def toSemesterIndex(year, semester):
     return ((year-1) * num_semester + semester) - 1
+
+# convert SemesterIndex to Year
+def toYear(semesterIndex):
+    return math.ceil((semesterIndex + 1) / num_semester)
+
+# convert SemesterIndex to Semester
+def toSemester(semesterIndex):
+    return semesterIndex + 4 - (3 * toYear(semesterIndex))
 
 class InitialSolution:
 
@@ -66,11 +77,13 @@ class InitialSolution:
                 gradeSubject = models.GradeSubject()
                 gradeSubject.subject = subject
                 if 'subjects' in semesterItem:
+                    lh.debug("This semester(",semesterItem['year'],"/"+str(semesterItem['semester'])+") is studied")
                     # If the subject is enrolled, loading it into GradeSubject object
                     for subjectSemester in semesterItem['subjects']:
                         if subject.code == subjectSemester['code']:
                             gradeSubject.grade = subjectSemester['grade']
                             break
+                # else: lh.debug("This semester("+str(semesterItem['year'])+"/"+str(semesterItem['semester'])+") is not studied")
                 gradeSubject.save()
                 mSemester.subjects.append(gradeSubject)
         mSemester.save()
