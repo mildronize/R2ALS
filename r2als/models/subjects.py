@@ -37,6 +37,7 @@ class Curriculum(me.Document):
     year = me.IntField(required=True)
     required_num_year = me.IntField(required=True) # A number of year must be studied
     studied_groups = me.ListField(me.StringField())
+    num_semester = me.IntField(required=True)
 
 
 # class StudiedGroup(me.Document):

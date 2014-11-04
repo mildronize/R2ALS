@@ -27,7 +27,7 @@ class CsvToModel:
 	SPLIT_SYMBOL = ":"
 	MULTI_FIELD_SYMBOL = "*"
 	# Format of head
-	HEADER_LISTS = ['faculty','department','year','required_num_year','*studied_groups','*branches']
+	HEADER_LISTS = ['faculty','department','year','required_num_year','num_semester','*studied_groups','*branches','*categories']
 	# END_HEADER = "END_HEADER"
 
 	def hasComment(self, str):
@@ -79,7 +79,7 @@ class CsvToModel:
 			for row in reader:
 				if i < shift_row:
 					if self.validateFormatCurriculumFile(row[0], i) == False:
-						lh.error("Header line "+str(i)+" must is '"+self.HEADER_LISTS[i]+"'")
+						lh.error("Header line "+str(i+1)+" must is '"+self.HEADER_LISTS[i]+"'")
 						return None
 					else :
 						if self.hasMultiField(self.HEADER_LISTS[i]):
