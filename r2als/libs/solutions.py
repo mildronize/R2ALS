@@ -1,23 +1,11 @@
-import math
+
 from r2als import models
 import pprint
 
 from r2als.libs.logs import LogHandler
+from r2als.libs.functions import SemesterIndex
 pp = pprint.PrettyPrinter(indent=4)
 lh = LogHandler()
-num_semester = 3
-
-# convert Year & Semester to SemesterIndex
-def toSemesterIndex(year, semester):
-    return ((year-1) * num_semester + semester) - 1
-
-# convert SemesterIndex to Year
-def toYear(semesterIndex):
-    return math.ceil((semesterIndex + 1) / num_semester)
-
-# convert SemesterIndex to Semester
-def toSemester(semesterIndex):
-    return semesterIndex + 4 - (3 * toYear(semesterIndex))
 
 class InitialSolution:
 
@@ -25,24 +13,27 @@ class InitialSolution:
     semesterItems = []
     validSemesterList = []
     curriculum = None
+    semesterIndex = None
     def __init__(self, curriculum, member):
         self.member = member
         self.curriculum = curriculum
         # === Todo ===: Remove all his subject!
+        self.semesterIndex = SemesterIndex(curriculum.num_semester)
         lh.startScript('scripts/solutions')
         self.initialEmptySemester()
-        # initial validSemesterList
-        for i in range(num_semester * self.curriculum.required_num_year):
-            self.validSemesterList.append(False)
 
     def initialEmptySemester(self):
         for y in range(1,self.curriculum.required_num_year+1):
-            for s in range(1,num_semester+1):
+            for s in range(1,self.curriculum.num_semester+1):
                 # print(str(y)+" " +str(s))
                 semesterItem = {}
                 semesterItem['year'] = y
                 semesterItem['semester'] = s
                 self.semesterItems.append(semesterItem)
+        # initial validSemesterList
+        for i in range(self.curriculum.num_semester * self.curriculum.required_num_year):
+            self.validSemesterList.append(False)
+        return True
 
     def printSemester(self):
         pp.pprint(self.semesterItems)
@@ -56,12 +47,12 @@ class InitialSolution:
                 lh.error("Subject list must have code & grade")
                 exit()
 
-        if self.validSemesterList[toSemesterIndex(year,semester)] == False:
-            self.validSemesterList[toSemesterIndex(year,semester)] = True
+        if self.validSemesterList[self.semesterIndex.get(year,semester)] == False:
+            self.validSemesterList[self.semesterIndex.get(year,semester)] = True
         else:
             lh.error("This semester is added")
             exit()
-        self.semesterItems[toSemesterIndex(year,semester)]["subjects"] = subjects
+        self.semesterItems[self.semesterIndex.get(year,semester)]["subjects"] = subjects
 
     def addSemesterModel(self, semesterItem):
         mSemester = models.Semester()
@@ -77,7 +68,7 @@ class InitialSolution:
                 gradeSubject = models.GradeSubject()
                 gradeSubject.subject = subject
                 if 'subjects' in semesterItem:
-                    lh.debug("This semester(",semesterItem['year'],"/"+str(semesterItem['semester'])+") is studied")
+                    # lh.debug("This semester(",semesterItem['year'],"/"+str(semesterItem['semester'])+") is studied")
                     # If the subject is enrolled, loading it into GradeSubject object
                     for subjectSemester in semesterItem['subjects']:
                         if subject.code == subjectSemester['code']:
@@ -92,7 +83,7 @@ class InitialSolution:
 
         # ==========  This section for year & semester which are studied ========
         # check data before start
-        target_checking = toSemesterIndex(self.member.last_num_year, self.member.last_semester)
+        target_checking = self.semesterIndex.get(self.member.last_num_year, self.member.last_semester)
 
         for i in range(target_checking + 1):
             if self.validSemesterList[i] == False:
@@ -104,9 +95,9 @@ class InitialSolution:
 
         # ==========  This section for year & semester remaining ========
 
-        for i in range(target_checking + 1, toSemesterIndex(self.curriculum.required_num_year, num_semester) + 1):
+        for i in range(target_checking + 1, self.semesterIndex.get(self.curriculum.required_num_year, self.curriculum.num_semester) + 1):
             # comparing SemesterIndex with year , semester
-            if toSemesterIndex(self.semesterItems[i]['year'], self.semesterItems[i]['semester']) != i:
+            if self.semesterIndex.get(self.semesterItems[i]['year'], self.semesterItems[i]['semester']) != i:
                 lh.error("Somthing wrong about SemesterIndex not match with year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ")
                 exit()
             else:
@@ -118,7 +109,7 @@ class InitialSolution:
     #
     #     # ==========  This section for year & semester which are studied ========
     #     # check data before start
-    #     target_checking = toSemesterIndex(self.member.last_num_year, self.member.last_semester)
+    #     target_checking = self.semesterIndex.get(self.member.last_num_year, self.member.last_semester)
     #     for i in range(target_checking + 1):
     #         if self.validSemesterList[i] == False:
     #             lh.error("Please add subject all semester which u passed")
@@ -128,9 +119,9 @@ class InitialSolution:
     #
     #     # ==========  This section for year & semester remaining ========
     #
-    #     for i in range(target_checking, toSemesterIndex(self.curriculum.required_num_year, num_semester)):
+    #     for i in range(target_checking, self.semesterIndex.get(self.curriculum.required_num_year, self.curriculum.num_semester)):
     #         # comparing SemesterIndex with year , semester
-    #         if toSemesterIndex(self.semesterItems[i]['year'], self.semesterItems[i]['semester']) != i:
+    #         if self.semesterIndex.get(self.semesterItems[i]['year'], self.semesterItems[i]['semester']) != i:
     #             lh.error("Somthing wrong about SemesterIndex not match with year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ")
     #             exit()
     #         else:
