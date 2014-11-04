@@ -11,13 +11,11 @@ import pprint
 from r2als.libs.logs import LogHandler
 from r2als.libs.solutions import InitialSolution
 from r2als import models
-from r2als import config as cf
+from r2als import config
 # 2 types for importing library
 # 1. from path/directory import package_name(*.py)
 # 2. from path/package_name(*.py) import class_name
 from r2als.scripts.convert_curriculum import CsvToModel
-
-
 
 pp = pprint.PrettyPrinter(indent=4)
 lh = LogHandler()
@@ -27,16 +25,16 @@ def importCurriculum2Model(path):
     # Not check key yet
     return CsvToModel().process(path, True)
 
-def createDefaultCategories(default_categories):
-    lh.info("Creating default categories")
-    for default_category in default_categories:
-        category = models.Category.objects(name=default_category).first()
+def createCategories(raw_categories):
+    lh.info("Creating categories")
+    for raw_category in raw_categories:
+        category = models.Category.objects(name=raw_category).first()
         if not category:
             category = models.Category()
-            category.name = default_category
+            category.name = raw_category
             category.save()
         else:
-            lh.info("The default categories is exist")
+            lh.info("The categories is exist")
     return category
 
 def createCurriculum(curriculum_data):
@@ -45,6 +43,7 @@ def createCurriculum(curriculum_data):
     curriculum['department'] = curriculum_data['department']
     curriculum['year'] = int(curriculum_data['year'])
     curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
+    curriculum['num_semester'] = int(curriculum_data['num_semester'])
     lh.info("Creating curriculum: "+ curriculum_data['department'] + " " + curriculum_data['year'])
     lh.info("Adding Studied Group")
     for studied_group in curriculum_data['studied_groups']:
@@ -115,29 +114,14 @@ def createGrade(grade_info):
         grade_tmp.save()
     return grade_tmp
 
-def main():
-#if __name__ == '__main__':
-    # if len(argv) != 2:
-    #     usage(argv)
-    # config_uri = argv[1]
-    # setup_logging(config_uri)
-    # settings = get_appsettings(config_uri)
+def initialCoECurriculumData(curriculumPath):
 
-    raw_curriculum = importCurriculum2Model('data/coe_2553_curriculum.csv')
-    raw_subjects = raw_curriculum['subjects']
-    curriculum_data = raw_curriculum['info']
+    raw_curriculum = importCurriculum2Model(config.data_path + curriculumPath)
+    createCategories(raw_curriculum['info']['categories'])
+    curriculum_model = createCurriculum(raw_curriculum['info'])
+    createSubject(raw_curriculum['subjects'], curriculum_model)
+    linkAllSubject(raw_curriculum['subjects'])
 
-    models.initial({'mongodb.db_name':cf.Config.db_name,'mongodb.host':cf.Config.host,'mongodb.is_reset':cf.Config.is_reset})
-
-    createDefaultCategories(['lecture', 'lab','project'])
-
-    coe_curriculum_model = createCurriculum(curriculum_data)
-
-    createSubject(raw_subjects, coe_curriculum_model)
-
-    linkAllSubject(raw_subjects)
-
-    ####################################################
     print("")
     lh.info("Adding some regulation and rule")
 
@@ -156,8 +140,24 @@ def main():
         {'name': "W",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True}
     ])
 
-    ####################################################
+    return curriculum_model
+
+
+def main(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
+#if __name__ == '__main__':
+    # if len(argv) != 2:
+    #     usage(argv)
+    # config_uri = argv[1]
+    # setup_logging(config_uri)
+    # settings = get_appsettings(config_uri)
+    if isTest == False: db_name = config.db_name
+    else: db_name = config.db_name_test
+    models.initial({'mongodb.db_name':config.db_name_test,'mongodb.host':config.host,'mongodb.is_reset':config.is_reset})
+
+    coe_curriculum_model = initialCoECurriculumData(curriculumPath)
+
     print("")
+
     #initial test cases
     lh.info("Starting initial test cases")
     #add a member
@@ -191,6 +191,5 @@ def main():
     #
     # ])
     initialSolution.start()
-
 
     lh.close()
