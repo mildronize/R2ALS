@@ -8,7 +8,8 @@ import sys
 import pymongo
 import pprint
 
-from r2als.libs.logs import LogHandler
+
+from r2als.libs.logs import Log
 from r2als.libs.solutions import InitialSolution
 from r2als import models
 from r2als import config
@@ -18,15 +19,18 @@ from r2als import config
 from r2als.scripts.convert_curriculum import CsvToModel
 
 pp = pprint.PrettyPrinter(indent=4)
-lh = LogHandler()
-lh.startApp('scripts/initial_db')
+# lh = LogHandler()
+
+ # setup `logging` module
+l = Log('initial_db').getLogger()
+# l.startApp('scripts/initial_db')
 
 def importCurriculum2Model(path):
     # Not check key yet
     return CsvToModel().process(path, True)
 
 def createCategories(raw_categories):
-    lh.info("Creating categories")
+    l.info("Creating categories")
     for raw_category in raw_categories:
         category = models.Category.objects(name=raw_category).first()
         if not category:
@@ -34,7 +38,7 @@ def createCategories(raw_categories):
             category.name = raw_category
             category.save()
         else:
-            lh.info("The categories is exist")
+            l.info("The categories is exist")
     return category
 
 def createCurriculum(curriculum_data):
@@ -44,15 +48,15 @@ def createCurriculum(curriculum_data):
     curriculum['year'] = int(curriculum_data['year'])
     curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
     curriculum['num_semester'] = int(curriculum_data['num_semester'])
-    lh.info("Creating curriculum: "+ curriculum_data['department'] + " " + curriculum_data['year'])
-    lh.info("Adding Studied Group")
+    l.info("Creating curriculum: "+ curriculum_data['department'] + " " + curriculum_data['year'])
+    l.info("Adding Studied Group")
     for studied_group in curriculum_data['studied_groups']:
         curriculum['studied_groups'].append(studied_group)
     curriculum.save()
     return curriculum
 
 def createSubject(raw_subjects, curriculum):
-    lh.info("Creating subjects & relationship between subjects")
+    l.info("Creating subjects & relationship between subjects")
     for raw_subject in raw_subjects:
 
         subject_tmp = models.Subject()
@@ -79,14 +83,14 @@ def createSubject(raw_subjects, curriculum):
 
         if 'year' in raw_subject: subject_tmp.year = int(raw_subject.get('year', '0'))
         else :
-            lh.error(raw_subject['name'] +"doesn't have year")
+            l.error(raw_subject['name'] +"doesn't have year")
         if 'semester' in raw_subject: subject_tmp.semester = int(raw_subject.get('semester', '0'))
         else :
-            lh.error(raw_subject['name'] +"doesn't have semester")
+            l.error(raw_subject['name'] +"doesn't have semester")
         subject_tmp.save()
 
 def linkAllSubject(raw_subjects):
-    lh.info("Linking all their relationship between subjects")
+    l.info("Linking all their relationship between subjects")
     for raw_subject in raw_subjects:
 
         if 'code' in raw_subject:
@@ -106,13 +110,22 @@ def linkAllSubject(raw_subjects):
             subject_code.save()
 
 def createGrade(grade_info):
-    lh.info("Adding grade")
+    l.info("Adding grade")
     for grade in grade_info:
         grade_tmp = models.Grade()
         for key, value in grade.items():
             grade_tmp[key] = value
         grade_tmp.save()
     return grade_tmp
+
+def add_member(member_info):
+    member_tmp = models.Member()
+    for key, value in member_info.items():
+        member_tmp[key] = value
+    member_tmp.save()
+    l.info("Adding member: " + member_info['name'])
+    member_tmp.save()
+    return member_tmp
 
 def initialCoECurriculumData(curriculumPath):
 
@@ -123,7 +136,7 @@ def initialCoECurriculumData(curriculumPath):
     linkAllSubject(raw_curriculum['subjects'])
 
     print("")
-    lh.info("Adding some regulation and rule")
+    l.info("Adding some regulation and rule")
 
     # mustReEnroll is only main branch in each semester
     createGrade([
@@ -142,7 +155,6 @@ def initialCoECurriculumData(curriculumPath):
 
     return curriculum_model
 
-
 def main(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
 #if __name__ == '__main__':
     # if len(argv) != 2:
@@ -159,21 +171,20 @@ def main(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
     print("")
 
     #initial test cases
-    lh.info("Starting initial test cases")
+    l.info("Starting initial test cases")
     #add a member
-    member_thongdee = models.Member()
-    member_thongdee.member_id = '5710110999'
-    member_thongdee.name = 'Thongdee Mana'
-    member_thongdee.curriculum = coe_curriculum_model
-    member_thongdee.studied_group = 'first-group'
-    member_thongdee.registered_year = 2557
-    member_thongdee.last_num_year = 1
-    member_thongdee.last_semester = 1
-    lh.info("Adding member: " + member_thongdee.name)
-    member_thongdee.save()
+    member_thongdee = add_member({
+        'member_id':'5710110999',
+        'name' : 'Thongdee Mana',
+        'curriculum' : coe_curriculum_model,
+        'studied_group' : 'first-group',
+        'registered_year' : 2557,
+        'last_num_year' : 1,
+        'last_semester' : 1,
+    })
 
     #add dummy data (thongdee)
-    lh.info("Starting to generate the Initial Solution of him")
+    l.info("Starting to generate the Initial Solution of him")
     initialSolution = InitialSolution(coe_curriculum_model, member_thongdee)
     # year/semester: 1/1
 
@@ -191,5 +202,3 @@ def main(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
     #
     # ])
     initialSolution.start()
-
-    lh.close()

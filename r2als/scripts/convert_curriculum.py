@@ -17,8 +17,8 @@ import csv
 import re
 import sys
 
-from r2als.libs.logs import LogHandler
-lh = LogHandler()
+from r2als.libs.logs import Log
+l = Log('convert_curriculum').getLogger()
 
 
 class CsvToModel:
@@ -64,7 +64,6 @@ class CsvToModel:
 	# 	return False
 
 	def process(self, url, has_header):
-		lh.startScript('scripts/convert_curriculum')
 		subjects = []
 		info = {}
 		multiField = []
@@ -79,7 +78,7 @@ class CsvToModel:
 			for row in reader:
 				if i < shift_row:
 					if self.validateFormatCurriculumFile(row[0], i) == False:
-						lh.error("Header line "+str(i+1)+" must is '"+self.HEADER_LISTS[i]+"'")
+						l.error("Header line "+str(i+1)+" must is '"+self.HEADER_LISTS[i]+"'")
 						return None
 					else :
 						if self.hasMultiField(self.HEADER_LISTS[i]):
@@ -99,7 +98,7 @@ class CsvToModel:
 						row[j] = self.removeMultiFieldSymbol(row[j])
 					keys = row
 				elif self.hasCommentRow(row):
-					lh.info("Importing : " + row[0])
+					l.info("Importing : " + row[0])
 				else :
 					#value
 					tmp = {}
@@ -112,7 +111,7 @@ class CsvToModel:
 									tmp[keys[j]].append(element)
 							else :
 								if has_header and keys[j] == 'studied_group' and row[j] not in info['studied_groups']:
-									lh.error("studied group : '"+row[j]+"'isn't allowed in header list("+str(info['studied_groups'])+")")
+									l.error("studied group : '"+row[j]+"'isn't allowed in header list("+str(info['studied_groups'])+")")
 								tmp[keys[j]] = row[j]
 					subjects.append(tmp)
 				i = i + 1
@@ -128,7 +127,7 @@ def printInstruction():
 if __name__ == '__main__':
 	#print(len(sys.argv))
 
-	lh.startApp('scripts/convert_curriculum')
+
 
 	if len(sys.argv) != 2:
 		printInstruction()

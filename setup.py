@@ -8,7 +8,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.md')).read()
 
 requires = [
     'mongoengine',
-    'colorama'
+    'rainbow_logging_handler'
     ]
 
 setup(name='r2als',

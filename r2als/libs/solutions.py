@@ -2,10 +2,10 @@
 from r2als import models
 import pprint
 
-from r2als.libs.logs import LogHandler
+from r2als.libs.logs import Log
 from r2als.libs.functions import SemesterIndex
 pp = pprint.PrettyPrinter(indent=4)
-lh = LogHandler()
+l = Log('libs/solutions').getLogger()
 
 class InitialSolution:
 
@@ -19,7 +19,6 @@ class InitialSolution:
         self.curriculum = curriculum
         # === Todo ===: Remove all his subject!
         self.semesterIndex = SemesterIndex(curriculum.num_semester)
-        lh.startScript('scripts/solutions')
         self.initialEmptySemester()
 
     def initialEmptySemester(self):
@@ -44,13 +43,13 @@ class InitialSolution:
         #     {'code' : '242-101','grade' : 'C'} ]
         for subject in subjects:
             if 'code' not in subject or 'grade' not in subject:
-                lh.error("Subject list must have code & grade")
+                l.error("Subject list must have code & grade")
                 exit()
 
         if self.validSemesterList[self.semesterIndex.get(year,semester)] == False:
             self.validSemesterList[self.semesterIndex.get(year,semester)] = True
         else:
-            lh.error("This semester is added")
+            l.error("This semester is added")
             exit()
         self.semesterItems[self.semesterIndex.get(year,semester)]["subjects"] = subjects
 
@@ -68,13 +67,13 @@ class InitialSolution:
                 gradeSubject = models.GradeSubject()
                 gradeSubject.subject = subject
                 if 'subjects' in semesterItem:
-                    # lh.debug("This semester(",semesterItem['year'],"/"+str(semesterItem['semester'])+") is studied")
+                    # l.debug("This semester(",semesterItem['year'],"/"+str(semesterItem['semester'])+") is studied")
                     # If the subject is enrolled, loading it into GradeSubject object
                     for subjectSemester in semesterItem['subjects']:
                         if subject.code == subjectSemester['code']:
                             gradeSubject.grade = subjectSemester['grade']
                             break
-                # else: lh.debug("This semester("+str(semesterItem['year'])+"/"+str(semesterItem['semester'])+") is not studied")
+                # else: l.debug("This semester("+str(semesterItem['year'])+"/"+str(semesterItem['semester'])+") is not studied")
                 gradeSubject.save()
                 mSemester.subjects.append(gradeSubject)
         mSemester.save()
@@ -87,10 +86,10 @@ class InitialSolution:
 
         for i in range(target_checking + 1):
             if self.validSemesterList[i] == False:
-                lh.error("Please add subject all semester which you passed")
+                l.error("Please add subject all semester which you passed")
                 exit()
             else:
-                lh.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ,which are stuided, are processing...")
+                l.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ,which are stuided, are processing...")
                 self.addSemesterModel(self.semesterItems[i])
 
         # ==========  This section for year & semester remaining ========
@@ -98,10 +97,10 @@ class InitialSolution:
         for i in range(target_checking + 1, self.semesterIndex.get(self.curriculum.required_num_year, self.curriculum.num_semester) + 1):
             # comparing SemesterIndex with year , semester
             if self.semesterIndex.get(self.semesterItems[i]['year'], self.semesterItems[i]['semester']) != i:
-                lh.error("Somthing wrong about SemesterIndex not match with year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ")
+                l.error("Somthing wrong about SemesterIndex not match with year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ")
                 exit()
             else:
-                lh.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") are processing...")
+                l.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") are processing...")
                 self.addSemesterModel(self.semesterItems[i])
 
 
@@ -112,20 +111,20 @@ class InitialSolution:
     #     target_checking = self.semesterIndex.get(self.member.last_num_year, self.member.last_semester)
     #     for i in range(target_checking + 1):
     #         if self.validSemesterList[i] == False:
-    #             lh.error("Please add subject all semester which u passed")
+    #             l.error("Please add subject all semester which u passed")
     #             exit()
     #         else:
-    #             lh.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ,which are stuided, are processing...")
+    #             l.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ,which are stuided, are processing...")
     #
     #     # ==========  This section for year & semester remaining ========
     #
     #     for i in range(target_checking, self.semesterIndex.get(self.curriculum.required_num_year, self.curriculum.num_semester)):
     #         # comparing SemesterIndex with year , semester
     #         if self.semesterIndex.get(self.semesterItems[i]['year'], self.semesterItems[i]['semester']) != i:
-    #             lh.error("Somthing wrong about SemesterIndex not match with year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ")
+    #             l.error("Somthing wrong about SemesterIndex not match with year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ")
     #             exit()
     #         else:
-    #             lh.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") are processing...")
+    #             l.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") are processing...")
     #
     #         mSemester = models.Semester()
     #         mSemester.member = self.member
