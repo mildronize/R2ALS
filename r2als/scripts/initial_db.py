@@ -158,7 +158,7 @@ def initialCoECurriculumData(curriculumPath):
 def initailModel(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
     if isTest == False: db_name = config.db_name
     else: db_name = config.db_name_test
-    models.initial({'mongodb.db_name':config.db_name_test,'mongodb.host':config.host,'mongodb.is_reset':config.is_reset})
+    models.initial({'mongodb.db_name':db_name,'mongodb.host':config.host,'mongodb.is_reset':config.is_reset})
 
 def main(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
 #if __name__ == '__main__':

@@ -1,5 +1,6 @@
 
 from r2als import models
+from mongoengine import Q
 import pprint
 
 from r2als.libs.logs import Log
@@ -16,9 +17,62 @@ class InitialSolution:
         self.semesterIndex = None
         self.member = member
         self.curriculum = curriculum
+        self.importedSubject = []
         # === Todo ===: Remove all his subject!
         self.semesterIndex = SemesterIndex(curriculum.num_semester)
         self.initialEmptySemester()
+
+    def isCorrectInitialSolution(self):
+        for y in range(1,self.curriculum.required_num_year+1):
+            for s in range(1,self.curriculum.num_semester+1):
+                if self.validSemesterList[self.semesterIndex.get(y,s)] == False: return True
+                mSemester = models.Semester.objects(year = y, semester = s, member = self.member).first()
+                if len(self.semesterItems[self.semesterIndex.get(y,s)]['subjects']) != len(mSemester.subjects):
+                    l.error('Semester '+str(y)+'/'+str(s)+': Number of subject is not match')
+                    l.debug('raw subject: ')
+                    tmp = ''
+                    for subject in self.semesterItems[self.semesterIndex.get(y,s)]['subjects']:
+                        tmp += subject['code'] + ' '
+                    l.debug(tmp)
+                    l.debug('subject in db: ')
+                    tmp = ''
+                    for mSubject in mSemester.subjects:
+                        tmp += mSubject.subject.code + ' '
+                    l.debug(tmp)
+                    return False
+                else:
+                    targeting_match = len(mSemester.subjects)
+                    counting_match = 0
+                    for mSubject in mSemester.subjects:
+                        for raw_subject in self.semesterItems[self.semesterIndex.get(y,s)]['subjects']:
+                            if mSubject.code == raw_subject.code:
+                                counting_match += 1
+                                break
+                    if counting_match == targeting_match:
+                        return True
+                    else:
+                        l.error('Semester '+str(y)+'/'+str(s)+': Subject is not match')
+                        return False
+
+        return True
+
+    def countAllSubject(self):
+        subjects = models.Subject.objects( Q(curriculum = self.curriculum) & ( Q(studied_group=self.member.studied_group) | Q(studied_group='')) )
+        # l.debug(len(subjects))
+        # i = 1
+        # for subject in subjects:
+        #     l.debug(str(subject.year) + '/' + str(subject.semester) + ':(' + str(i) + ') ' + subject.name)
+        #     i = i + 1
+        # l.info("There are " + str(len(subjects))+" subjects")
+        return len(subjects)
+
+    def countOnlyMemberSubject(self):
+        semesters = models.Semester.objects( member = self.member)
+        total = 0
+        for semester in semesters:
+            total += len(semester.subjects)
+        # l.info(self.member.name +" has "+ str(total)+" subjects")
+        return total
 
     def initialEmptySemester(self):
         for y in range(1,self.curriculum.required_num_year+1):
@@ -53,6 +107,18 @@ class InitialSolution:
             exit()
         self.semesterItems[self.semesterIndex.get(year,semester)]["subjects"] = subjects
 
+    def hasImportedSubject(self, subject_code):
+        if subject_code in self.importedSubject: return True
+        else: return False
+
+    def addImportedSubject(self, subject_code):
+        if self.hasImportedSubject(subject_code) :
+            l.error('The subject '+subject_code+'is exist !')
+            return False
+        else:
+            self.importedSubject.append(subject_code)
+            return True
+
     def addSemesterModel(self, semesterItem):
         mSemester = models.Semester()
         mSemester.member = self.member
@@ -60,22 +126,31 @@ class InitialSolution:
         mSemester.semester = semesterItem['semester']
 
         # Read all subject from same curriculum
-        subjects = models.Subject.objects(curriculum = self.curriculum, year = semesterItem['year'], semester = semesterItem['semester'])
-        for subject in subjects:
-            if subject.studied_group == self.member.studied_group or subject.studied_group == "":
-                # print(subject.name + " "+ subject.studied_group+ " ==> "+ str(subject.year)+"/"+str(subject.semester))
-                gradeSubject = models.GradeSubject()
-                gradeSubject.subject = subject
-                if 'subjects' in semesterItem:
-                    # l.debug("This semester(",semesterItem['year'],"/"+str(semesterItem['semester'])+") is studied")
-                    # If the subject is enrolled, loading it into GradeSubject object
-                    for subjectSemester in semesterItem['subjects']:
-                        if subject.code == subjectSemester['code']:
-                            gradeSubject.grade = subjectSemester['grade']
-                            break
-                # else: l.debug("This semester("+str(semesterItem['year'])+"/"+str(semesterItem['semester'])+") is not studied")
-                gradeSubject.save()
-                mSemester.subjects.append(gradeSubject)
+
+        # for studied semester index
+        if 'subjects' in semesterItem:
+            for raw_subject in semesterItem['subjects']:
+                subject = models.Subject.objects( Q(curriculum = self.curriculum, code = raw_subject['code']) & ( Q(studied_group=self.member.studied_group) | Q(studied_group='')) ).first()
+                if subject is None:
+                    l.error('Not found the subject ' + raw_subject.code + 'in subjects collection(db)')
+                else:
+                    gradeSubject = models.GradeSubject()
+                    gradeSubject.subject = subject
+                    gradeSubject.grade = raw_subject['grade']
+                    gradeSubject.save()
+                    mSemester.subjects.append(gradeSubject)
+                    self.addImportedSubject(raw_subject['code'])
+
+        # for not studied semester index
+        else:
+            subjects = models.Subject.objects( Q(curriculum = self.curriculum, year = semesterItem['year'], semester = semesterItem['semester']) & ( Q(studied_group=self.member.studied_group) | Q(studied_group='')) )
+            for subject in subjects:
+                if not self.hasImportedSubject(subject.code):
+                    gradeSubject = models.GradeSubject()
+                    gradeSubject.subject = subject
+                    gradeSubject.save()
+                    mSemester.subjects.append(gradeSubject)
+                    self.addImportedSubject(subject.code)
         mSemester.save()
 
     def start(self):
@@ -100,7 +175,7 @@ class InitialSolution:
                 l.error("Somthing wrong about SemesterIndex not match with year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") ")
                 exit()
             else:
-                l.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") are processing...")
+                # l.info("year("+str(self.semesterItems[i]['year'])+") & semester("+str(self.semesterItems[i]['semester'])+") are processing...")
                 self.addSemesterModel(self.semesterItems[i])
 
 
