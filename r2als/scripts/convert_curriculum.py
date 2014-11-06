@@ -23,12 +23,13 @@ l = Log('convert_curriculum').getLogger()
 
 class CsvToModel:
 
-	COMMENT_SYMBOL = "#"
-	SPLIT_SYMBOL = ":"
-	MULTI_FIELD_SYMBOL = "*"
-	# Format of head
-	HEADER_LISTS = ['faculty','department','year','required_num_year','num_semester','*studied_groups','*branches','*categories']
-	# END_HEADER = "END_HEADER"
+	def __init__(self):
+		self.COMMENT_SYMBOL = "#"
+		self.SPLIT_SYMBOL = ":"
+		self.MULTI_FIELD_SYMBOL = "*"
+		# Format of head
+		self.HEADER_LISTS = ['faculty','department','year','required_num_year','num_semester','*studied_groups','*branches','*categories']
+		# END_HEADER = "END_HEADER"
 
 	def hasComment(self, str):
 		if str.find(self.COMMENT_SYMBOL) < 0:

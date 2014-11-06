@@ -9,12 +9,11 @@ l = Log('libs/solutions').getLogger()
 
 class InitialSolution:
 
-    member = None
-    semesterItems = []
-    validSemesterList = []
-    curriculum = None
-    semesterIndex = None
+
     def __init__(self, curriculum, member):
+        self.semesterItems = []
+        self.validSemesterList = []
+        self.semesterIndex = None
         self.member = member
         self.curriculum = curriculum
         # === Todo ===: Remove all his subject!
@@ -49,6 +48,7 @@ class InitialSolution:
         if self.validSemesterList[self.semesterIndex.get(year,semester)] == False:
             self.validSemesterList[self.semesterIndex.get(year,semester)] = True
         else:
+            l.debug(self.validSemesterList)
             l.error("This semester is added")
             exit()
         self.semesterItems[self.semesterIndex.get(year,semester)]["subjects"] = subjects

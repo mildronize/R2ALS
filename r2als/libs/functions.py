@@ -2,7 +2,6 @@ import math
 
 class SemesterIndex:
 
-    num_semester = 3
     def __init__(self, num_semester):
         self.num_semester = num_semester
 
