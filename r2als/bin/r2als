@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+from r2als.libs.logs import LogHandler
+
+from r2als import models
+from r2als import processor
+
+from r2als import config as cf
+import profile
+
+
+import configparser
+
+if __name__ == '__main__':
+    #settings = {'mongodb.db_name':'r2alsdb','mongodb.host':'localhost'}
+    models.initial({'mongodb.db_name':cf.Config.db_name,'mongodb.host':cf.Config.host})
+
+    lh = LogHandler()
+    lh.startApp('bin/r2als')
+
+    # for i in range(10):
+    #     tabuSize = i*10
+    #     print("#"*30)
+    #     print("Tabu Size: "+ str(tabuSize))
+    #     p = processor.Processor(tabuSize)
+    #     profile.run('p.start()')
+    #     print("#"*30)
+    #     input("press enter")
+    p = processor.Processor(10)
+    profile.run('p.start()')
+
+    lh.close()
