@@ -7,11 +7,15 @@ class SolutionsTest(unittest.TestCase):
     def test_InitialSolution(self):
         from r2als.scripts import initial_db
         from r2als.libs.solutions import InitialSolution
+        from r2als import models
         curriculumPath='coe_2553_curriculum.csv'
         # initial db for testing
-        initial_db.initailModel(isTest=True, curriculumPath=curriculumPath)
+        from r2als.scripts import initial_db
+        initial_db.initailModel(isTest=True)
+        print("\n\n\n\n\n\nxxxx0:", models.Grade.objects.count())
+        # coe_curriculum_model = initial_db.initialCoECurriculumData(curriculumPath=curriculumPath)
+        print("\n\n\n\n\n\nxxxx1:", models.Grade.objects.count())
 
-        coe_curriculum_model = initial_db.initialCoECurriculumData(curriculumPath=curriculumPath)
 
         testing_members = [
             {
@@ -95,11 +99,13 @@ class SolutionsTest(unittest.TestCase):
                 initialSolution.addStudiedSubject(semester_info['year'], semester_info['semester'], semester_info['subjects'])
 
             initialSolution.start()
+            initialSolution.countImportedSubject()
+            print("\n\n\n\n\n\nxxxx2:", models.Grade.objects.count())
+
             self.assertEqual(initialSolution.countAllSubject(), initialSolution.countOnlyMemberSubject())
             self.assertEqual(initialSolution.isCorrectInitialSolution(),True)
 
             # Run all data
             # todo : testing each case , There are 3 cases
-
 
     # InitialSolution

@@ -67,6 +67,7 @@ def createSubject(raw_subjects, curriculum):
             subject_tmp.code = raw_subject['code']
         else:
             subject_tmp.isSpecific = False
+            subject_tmp.code = ""
         subject_tmp.name = raw_subject['name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
         # add curriculum
@@ -75,7 +76,11 @@ def createSubject(raw_subjects, curriculum):
         # add categories
         if 'categories' in raw_subject:
             for category in raw_subject['categories']:
-                subject_tmp.categories.append(models.Category.objects(name=category).first())
+                mCategory = models.Category.objects(name=category).first()
+                if mCategory is not None:
+                    subject_tmp.categories.append(mCategory)
+                else:
+                    l.error('Not found "'+category+'" in collection')
 
         if 'studied_group' in raw_subject:
             subject_tmp.studied_group = raw_subject['studied_group']
@@ -109,14 +114,25 @@ def linkAllSubject(raw_subjects):
                     subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
             subject_code.save()
 
+
 def createGrade(grade_info):
     l.info("Adding grade")
     for grade in grade_info:
+        g = models.Grade.objects(name=grade['name']).first()
+        if g:
+            print("found:", g.name)
+            continue
         grade_tmp = models.Grade()
         for key, value in grade.items():
-            grade_tmp[key] = value
+            setattr(grade_tmp, key, value)
+
+        print("gd:", grade_tmp.__dict__)
+
         grade_tmp.save()
-    return grade_tmp
+        print("model grade:", models.Grade.objects.count())
+    for g in models.Grade.objects:
+        print("g:", g.name)
+    # return grade_tmp
 
 def add_member(member_info):
     member_tmp = models.Member()
@@ -128,16 +144,18 @@ def add_member(member_info):
     return member_tmp
 
 def initialCoECurriculumData(curriculumPath):
-
+    print("\n\n\n\n\n\n grade-1:", models.Grade.objects.count())
     raw_curriculum = importCurriculum2Model(config.data_path + curriculumPath)
     createCategories(raw_curriculum['info']['categories'])
+    print("\n\n\n\n\n\n grade0:", models.Grade.objects.count())
     curriculum_model = createCurriculum(raw_curriculum['info'])
-    createSubject(raw_curriculum['subjects'], curriculum_model)
-    linkAllSubject(raw_curriculum['subjects'])
+    # createSubject(raw_curriculum['subjects'], curriculum_model)
+    # linkAllSubject(raw_curriculum['subjects'])
 
     print("")
     l.info("Adding some regulation and rule")
 
+    print("\n\n\n\n\n\n grade1:", models.Grade.objects.count())
     # mustReEnroll is only main branch in each semester
     createGrade([
         {'name': "A",  'score': 4.0, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
@@ -153,21 +171,26 @@ def initialCoECurriculumData(curriculumPath):
         {'name': "W",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True}
     ])
 
+    print("\n\n\n\n\n\n grade2:", models.Grade.objects.count())
     return curriculum_model
 
-def initailModel(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
-    if isTest == False: db_name = config.db_name
-    else: db_name = config.db_name_test
-    models.initial({'mongodb.db_name':db_name,'mongodb.host':config.host,'mongodb.is_reset':config.is_reset})
+# def initailModel(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
+#     if isTest == False: db_name = config.db_name
+#     else: db_name = config.db_name_test
+#     models.initial({'mongodb.db_name':db_name,'mongodb.host':config.host,'mongodb.is_reset':config.is_reset})
+
 
 def main(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
 #if __name__ == '__main__':
-    # if len(argv) != 2:
-    #     usage(argv)
+    if len(sys.argv) != 2:
+        # usage(sys.argv)
+        sys.exit()
+
+    configuration = config.Configurator(sys.argv[1])
     # config_uri = argv[1]
     # setup_logging(config_uri)
     # settings = get_appsettings(config_uri)
-    initailModel(isTest, curriculumPath)
+    models.initial(configuration.settings)
 
     coe_curriculum_model = initialCoECurriculumData(curriculumPath)
 
