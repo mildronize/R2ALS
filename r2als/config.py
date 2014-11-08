@@ -6,16 +6,14 @@ Developer#     Thada Wangthammang
 import os
 
 # global variable
-db_name = 'r2alsdb'
-db_name_test = 'r2alsdb_test'
-host = 'localhost'
-is_reset = True
-root_path = os.path.dirname(os.path.dirname(__file__))+'/'
-data_path = root_path + 'data/'
-
-
+# db_name = 'r2alsdb'
+# db_name_test = 'r2alsdb_test'
+# host = 'localhost'
+# is_reset = True
 import configparser
 
+root_path = os.path.dirname(os.path.dirname(__file__))+'/'
+data_path = root_path + 'data/'
 
 class Configurator:
     settings = dict()
@@ -28,7 +26,7 @@ class Configurator:
         config_parser = configparser.ConfigParser()
         config_parser.read(self.config_file)
 
-        sections = ['r2als']
+        sections = ['r2als','Paths']
 
         boolean_conf = ['is_reset']
         integer_conf = ['']

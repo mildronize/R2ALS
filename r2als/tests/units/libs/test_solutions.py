@@ -8,71 +8,79 @@ class SolutionsTest(unittest.TestCase):
         from r2als.scripts import initial_db
         from r2als.libs.solutions import InitialSolution
         from r2als import models
-        curriculumPath='coe_2553_curriculum.csv'
+        from r2als import config
         # initial db for testing
-        from r2als.scripts import initial_db
-        initial_db.initailModel(isTest=True)
-        print("\n\n\n\n\n\nxxxx0:", models.Grade.objects.count())
-        # coe_curriculum_model = initial_db.initialCoECurriculumData(curriculumPath=curriculumPath)
-        print("\n\n\n\n\n\nxxxx1:", models.Grade.objects.count())
+        configuration = config.Configurator(config.root_path + 'test.ini')
+        configuration.set('mongodb.is_remove_collections', True)
+        models.initial(configuration.settings)
+        models.Member.drop_collection()
+        models.Semester.drop_collection()
+        models.GradeSubject.drop_collection()
 
-
+        coe_curriculum_model = models.Curriculum.objects(department="Computer Engineering",year =2553).first()
+        if coe_curriculum_model is None:
+            print('Not found the curriculum')
+            exit()
+        for cur in models.Curriculum.objects():
+            print(cur.department,cur.year)
         testing_members = [
+            # {
+            #     'info': {
+            #         'member_id':'5710110999',
+            #         'name' : 'Thongdee Mana',
+            #         'curriculum' : coe_curriculum_model,
+            #         'studied_group' : 'first-group',
+            #         'registered_year' : 2557,
+            #         'last_year' : 1,
+            #         'last_semester' : 1,
+            #         },
+            #     'semesters' : [{
+            #         'year': 1,
+            #         'semester': 1,
+            #         'subjects': [
+            #             {'code' : '895-171','grade' : 'C'}, # subject from another semester
+            #             {'code' : '200-101','grade' : 'C'},
+            #             {'code' : '242-101','grade' : 'C'},
+            #             {'code' : '322-101','grade' : 'C'},
+            #             {'code' : '332-103','grade' : 'C'},
+            #             {'code' : '332-113','grade' : 'C'},
+            #             {'code' : '640-101','grade' : 'C'},
+            #             {'code' : '890-101','grade' : 'C'},
+            #             ]
+            #         }]
+            # },
+            # {
+            #     'info': {
+            #         'member_id':'5710110998',
+            #         'name' : 'Thongyib kondee',
+            #         'curriculum' : coe_curriculum_model,
+            #         'studied_group' : 'first-group',
+            #         'registered_year' : 2557,
+            #         'last_year' : 1,
+            #         'last_semester' : 1,
+            #         },
+            #     'semesters' : [{
+            #         'year': 1,
+            #         'semester': 1,
+            #         'subjects': [
+            #             {'code' : '200-101','grade' : 'C'},
+            #             {'code' : '242-101','grade' : 'C'},
+            #             {'code' : '322-101','grade' : 'C'},
+            #             {'code' : '332-103','grade' : 'C'},
+            #             {'code' : '332-113','grade' : 'C'},
+            #             {'code' : '640-101','grade' : 'C'},
+            #             # not complete enrollment
+            #             ]
+            #         }]
+            # }
             {
-                'info': {
-                    'member_id':'5710110999',
-                    'name' : 'Thongdee Mana',
-                    'curriculum' : coe_curriculum_model,
-                    'studied_group' : 'first-group',
-                    'registered_year' : 2557,
-                    'last_num_year' : 1,
-                    'last_semester' : 1,
-                    },
-                'semesters' : [{
-                    'year': 1,
-                    'semester': 1,
-                    'subjects': [
-                        {'code' : '200-101','grade' : 'C'},
-                        {'code' : '242-101','grade' : 'C'},
-                        {'code' : '322-101','grade' : 'C'},
-                        {'code' : '332-103','grade' : 'C'},
-                        {'code' : '332-113','grade' : 'C'},
-                        {'code' : '640-101','grade' : 'C'},
-                        {'code' : '890-101','grade' : 'C'},
-                        {'code' : '895-171','grade' : 'C'}, # subject from another semester
-                        ]
-                    }]
-            },{
-                'info': {
-                    'member_id':'5710110998',
-                    'name' : 'Thongyib kondee',
-                    'curriculum' : coe_curriculum_model,
-                    'studied_group' : 'first-group',
-                    'registered_year' : 2557,
-                    'last_num_year' : 1,
-                    'last_semester' : 1,
-                    },
-                'semesters' : [{
-                    'year': 1,
-                    'semester': 1,
-                    'subjects': [
-                        {'code' : '200-101','grade' : 'C'},
-                        {'code' : '242-101','grade' : 'C'},
-                        {'code' : '322-101','grade' : 'C'},
-                        {'code' : '332-103','grade' : 'C'},
-                        {'code' : '332-113','grade' : 'C'},
-                        {'code' : '640-101','grade' : 'C'},
-                        # not complete enrollment
-                        ]
-                    }]
-            },{
                 'info': {
                     'member_id':'5710110997',
                     'name' : 'Sangkaya Thaithai',
                     'curriculum' : coe_curriculum_model,
                     'studied_group' : 'first-group',
                     'registered_year' : 2557,
-                    'last_num_year' : 1,
+                    'last_year' : 1,
                     'last_semester' : 1,
                     },
                 'semesters' : [{
@@ -91,6 +99,7 @@ class SolutionsTest(unittest.TestCase):
             }
         ]
 
+
         for testing_member in testing_members:
             member = initial_db.add_member(testing_member['info'])
             initialSolution = InitialSolution(coe_curriculum_model, member)
@@ -99,11 +108,11 @@ class SolutionsTest(unittest.TestCase):
                 initialSolution.addStudiedSubject(semester_info['year'], semester_info['semester'], semester_info['subjects'])
 
             initialSolution.start()
-            initialSolution.countImportedSubject()
-            print("\n\n\n\n\n\nxxxx2:", models.Grade.objects.count())
+            # initialSolution.countImportedSubject()
 
-            self.assertEqual(initialSolution.countAllSubject(), initialSolution.countOnlyMemberSubject())
             self.assertEqual(initialSolution.isCorrectInitialSolution(),True)
+            self.assertEqual(initialSolution.countAllSubject(), initialSolution.countOnlyMemberSubject())
+
 
             # Run all data
             # todo : testing each case , There are 3 cases

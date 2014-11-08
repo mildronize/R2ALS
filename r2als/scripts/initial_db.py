@@ -114,24 +114,14 @@ def linkAllSubject(raw_subjects):
                     subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
             subject_code.save()
 
-
 def createGrade(grade_info):
     l.info("Adding grade")
     for grade in grade_info:
-        g = models.Grade.objects(name=grade['name']).first()
-        if g:
-            print("found:", g.name)
-            continue
         grade_tmp = models.Grade()
         for key, value in grade.items():
             setattr(grade_tmp, key, value)
-
-        print("gd:", grade_tmp.__dict__)
-
         grade_tmp.save()
-        print("model grade:", models.Grade.objects.count())
-    for g in models.Grade.objects:
-        print("g:", g.name)
+    # print(models.Grade.objects().count())
     # return grade_tmp
 
 def add_member(member_info):
@@ -141,21 +131,19 @@ def add_member(member_info):
     member_tmp.save()
     l.info("Adding member: " + member_info['name'])
     member_tmp.save()
+    member_tmp.reload()
     return member_tmp
 
 def initialCoECurriculumData(curriculumPath):
-    print("\n\n\n\n\n\n grade-1:", models.Grade.objects.count())
     raw_curriculum = importCurriculum2Model(config.data_path + curriculumPath)
     createCategories(raw_curriculum['info']['categories'])
-    print("\n\n\n\n\n\n grade0:", models.Grade.objects.count())
     curriculum_model = createCurriculum(raw_curriculum['info'])
-    # createSubject(raw_curriculum['subjects'], curriculum_model)
-    # linkAllSubject(raw_curriculum['subjects'])
+    createSubject(raw_curriculum['subjects'], curriculum_model)
+    linkAllSubject(raw_curriculum['subjects'])
 
     print("")
     l.info("Adding some regulation and rule")
 
-    print("\n\n\n\n\n\n grade1:", models.Grade.objects.count())
     # mustReEnroll is only main branch in each semester
     createGrade([
         {'name': "A",  'score': 4.0, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
@@ -170,8 +158,6 @@ def initialCoECurriculumData(curriculumPath):
         {'name': "U",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True},
         {'name': "W",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True}
     ])
-
-    print("\n\n\n\n\n\n grade2:", models.Grade.objects.count())
     return curriculum_model
 
 # def initailModel(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
@@ -191,40 +177,39 @@ def main(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
     # setup_logging(config_uri)
     # settings = get_appsettings(config_uri)
     models.initial(configuration.settings)
+    print(configuration.settings)
 
     coe_curriculum_model = initialCoECurriculumData(curriculumPath)
 
-    print("")
-
     #initial test cases
-    l.info("Starting initial test cases")
-    #add a member
-    member_thongdee = add_member({
-        'member_id':'5710110999',
-        'name' : 'Thongdee Mana',
-        'curriculum' : coe_curriculum_model,
-        'studied_group' : 'first-group',
-        'registered_year' : 2557,
-        'last_num_year' : 1,
-        'last_semester' : 1,
-    })
-
-    #add dummy data (thongdee)
-    l.info("Starting to generate the Initial Solution of him")
-    initialSolution = InitialSolution(coe_curriculum_model, member_thongdee)
-    # year/semester: 1/1
-
-    initialSolution.addStudiedSubject(1,1,[
-        {'code' : '200-101','grade' : 'C'},
-        {'code' : '242-101','grade' : 'C'},
-        {'code' : '322-101','grade' : 'W'},
-        {'code' : '332-103','grade' : 'C'},
-        {'code' : '332-113','grade' : 'C'},
-        {'code' : '640-101','grade' : 'C'},
-        {'code' : '890-101','grade' : 'C'}
-    ])
-    # initialSolution.addStudiedSubject(2,1,[
-    #     {'code' : '242-205','grade' : 'C'}
+    # l.info("Starting initial test cases")
+    # #add a member
+    # member_thongdee = add_member({
+    #     'member_id':'5710110999',
+    #     'name' : 'Thongdee Mana',
+    #     'curriculum' : coe_curriculum_model,
+    #     'studied_group' : 'first-group',
+    #     'registered_year' : 2557,
+    #     'last_num_year' : 1,
+    #     'last_semester' : 1,
+    # })
     #
+    # #add dummy data (thongdee)
+    # l.info("Starting to generate the Initial Solution of him")
+    # initialSolution = InitialSolution(coe_curriculum_model, member_thongdee)
+    # # year/semester: 1/1
+    #
+    # initialSolution.addStudiedSubject(1,1,[
+    #     {'code' : '200-101','grade' : 'C'},
+    #     {'code' : '242-101','grade' : 'C'},
+    #     {'code' : '322-101','grade' : 'W'},
+    #     {'code' : '332-103','grade' : 'C'},
+    #     {'code' : '332-113','grade' : 'C'},
+    #     {'code' : '640-101','grade' : 'C'},
+    #     {'code' : '890-101','grade' : 'C'}
     # ])
-    initialSolution.start()
+    # # initialSolution.addStudiedSubject(2,1,[
+    # #     {'code' : '242-205','grade' : 'C'}
+    # #
+    # # ])
+    # initialSolution.start()
