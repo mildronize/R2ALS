@@ -1,4 +1,4 @@
-from .subjects import Subject, Category, Curriculum
+from .subjects import Subject, Category, Curriculum, Prerequisite, StudiedGroup
 from .members import Member
 from .processed_data import Semester, GradeSubject
 from .regulations import Grade
