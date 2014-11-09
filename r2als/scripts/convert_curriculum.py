@@ -28,7 +28,7 @@ class CsvToModel:
 		self.SPLIT_SYMBOL = ":"
 		self.MULTI_FIELD_SYMBOL = "*"
 		# Format of head
-		self.HEADER_LISTS = ['faculty','department','year','required_num_year','num_semester','*studied_groups','*branches','*categories']
+		self.HEADER_LISTS = ['faculty','department','year','required_num_year','num_semester','*studied_groups','*branches','*categories','*prerequisites']
 		# END_HEADER = "END_HEADER"
 
 	def hasComment(self, str):
@@ -52,9 +52,9 @@ class CsvToModel:
 	def removeMultiFieldSymbol(self, str):
 		return re.sub('['+self.MULTI_FIELD_SYMBOL+']', '', str)
 
-	def validateFormatCurriculumFile(self, str, index):
+	def validateFormatCurriculumFile(self, text, index):
 		for i in range(len(self.HEADER_LISTS)):
-			if str == self.HEADER_LISTS[i] and index == i:
+			if text == self.HEADER_LISTS[i] and index == i:
 				return True
 		return False
 
