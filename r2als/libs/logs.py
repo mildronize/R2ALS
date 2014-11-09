@@ -9,8 +9,8 @@ class Log:
     def __init__(self, module_name):
         self.logger_tmp = None
         logger = logging.getLogger(module_name)
-        # logging.basicConfig(filename='/tmp/r2als.log',level=logging.DEBUG,format='%(asctime)s %(levelname)s %(message)s')
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(filename='/tmp/r2als.log',level=logging.DEBUG,format='%(asctime)s %(levelname)s %(message)s')
+        # logging.basicConfig(level=logging.DEBUG)
         formatter = logging.Formatter("[%(asctime)s] %(name)s %(funcName)s():%(lineno)d\t%(message)s")  # same as default
 
          # setup `RainbowLoggingHandler`

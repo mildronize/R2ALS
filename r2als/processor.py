@@ -16,11 +16,8 @@ class Processor:
     tabuLists = []
     tabuSize = 0
 
-    def __init__(self, tabuSize=None):
-        if tabuSize is None:
-            self.tabuSize = 20
-        else:
-             self.tabuSize = tabuSize
+    def __init__(self, tabuSize=20):
+        self.tabuSize = tabuSize
 
     ################ tabu method ################
     def convertList2String(self, lists):
@@ -88,12 +85,6 @@ class Processor:
         while self.isWorking:
             self.getNewSolution()
             if self.hasTabuLists(self.workingSolution):
-                # Ignore this solution
-                #print("="*40)
-                #print("The hash value in Tabu List:               "+ self.hashSolution(self.workingSolution))
-                #print("The hash value in solution will be stored: "+ self.hashSolution(self.workingSolution))
-                #print("repeated hash")
-                #print("="*40)
                 continue
             else:
                 self.addTabuLists(self.workingSolution)
