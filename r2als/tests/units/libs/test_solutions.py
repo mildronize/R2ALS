@@ -1,15 +1,10 @@
 import unittest
+from r2als import models
+from r2als import config
 
 class SolutionsTest(unittest.TestCase):
 
-
-    # test class InitialSolution
-    def test_InitialSolution(self):
-        from r2als.scripts import initial_db
-        from r2als.libs.solutions import InitialSolution
-        from r2als import models
-        from r2als import config
-        # initial db for testing
+    def setUp(self):
         configuration = config.Configurator(config.root_path + 'test.ini')
         configuration.set('mongodb.is_remove_collections', True)
         models.initial(configuration.settings)
@@ -17,12 +12,14 @@ class SolutionsTest(unittest.TestCase):
         models.Semester.drop_collection()
         models.GradeSubject.drop_collection()
 
+    # test class InitialSolution
+    def test_InitialSolution(self):
+        from r2als.scripts import initial_db
+        from r2als.libs.solutions import InitialSolution
         coe_curriculum_model = models.Curriculum.objects(department="Computer Engineering",year =2553).first()
         if coe_curriculum_model is None:
             print('Not found the curriculum')
             exit()
-        for cur in models.Curriculum.objects():
-            print(cur.department,cur.year)
         testing_members = [
             # {
             #     'info': {
