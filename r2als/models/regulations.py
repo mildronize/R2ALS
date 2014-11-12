@@ -11,3 +11,4 @@ class Grade(me.Document):
     isCredit = me.BooleanField(required=True)
     canReEnroll = me.BooleanField(required=True)
     mustReEnroll = me.BooleanField(required=True)
+    curriculum = me.ReferenceField('Curriculum')

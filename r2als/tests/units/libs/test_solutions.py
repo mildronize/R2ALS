@@ -10,7 +10,6 @@ class SolutionsTest(unittest.TestCase):
         models.initial(configuration.settings)
         models.Member.drop_collection()
         models.Semester.drop_collection()
-        models.GradeSubject.drop_collection()
 
     # test class InitialSolution
     def test_InitialSolution(self):
@@ -99,7 +98,7 @@ class SolutionsTest(unittest.TestCase):
 
         for testing_member in testing_members:
             member = initial_db.add_member(testing_member['info'])
-            initialSolution = InitialSolution(coe_curriculum_model, member)
+            initialSolution = InitialSolution(member)
             # year/semester: 1/1
             for semester_info in testing_member['semesters']:
                 initialSolution.addStudiedSubject(semester_info['year'], semester_info['semester'], semester_info['subjects'])

@@ -6,7 +6,7 @@ import datetime
 class Member(me.Document):
     meta = {'collection': 'members'}
 
-    member_id = me.StringField(required=True)
+    member_id = me.StringField(required=True,primary_key=True)
     name = me.StringField(required=True)
     curriculum = me.ReferenceField('Curriculum')
     studied_group = me.StringField()

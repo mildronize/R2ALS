@@ -29,17 +29,17 @@ def importCurriculum2Model(path):
     # Not check key yet
     return CsvToModel().process(path, True)
 
-def createCategories(raw_categories):
-    l.info("Creating categories")
-    for raw_category in raw_categories:
-        category = models.Category.objects(name=raw_category).first()
-        if not category:
-            category = models.Category()
-            category.name = raw_category
-            category.save()
-        else:
-            l.info("The categories is exist")
-    return category
+# def createCategories(raw_categories):
+#     l.info("Creating categories")
+#     for raw_category in raw_categories:
+#         category = models.Category.objects(name=raw_category).first()
+#         if not category:
+#             category = models.Category()
+#             category.name = raw_category
+#             category.save()
+#         else:
+#             l.info("The categories is exist")
+#     return category
 
 def createCurriculum(curriculum_data):
     curriculum = models.Curriculum()
@@ -49,12 +49,34 @@ def createCurriculum(curriculum_data):
     curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
     curriculum['num_semester'] = int(curriculum_data['num_semester'])
     l.info("Creating curriculum: "+ curriculum_data['department'] + " " + curriculum_data['year'])
-    l.info("Adding Studied Group")
+    l.info("Creating Studied Group for the curriculum")
     for studied_group in curriculum_data['studied_groups']:
         curriculum['studied_groups'].append(studied_group)
+    l.info("Adding categories for the curriculum")
+    for categories in curriculum_data['categories']:
+        curriculum['categories'].append(categories)
     curriculum.save()
     curriculum.reload()
     return curriculum
+
+def createStudiedGroup(studied_group, raw_subject, curriculum):
+    mStudiedGroup = models.StudiedGroup()
+    if 'studied_group' in raw_subject:
+        mStudiedGroup.name = raw_subject['studied_group']
+    elif studied_group is not '':
+        mStudiedGroup.name = studied_group
+    if 'year' in raw_subject:
+        mStudiedGroup.year = int(raw_subject.get('year'))
+    elif 'code' in raw_subject:
+        l.error('The subject "%s" with having code ,that is specific subject, must have year field', raw_subject['name'])
+    if 'semester' in raw_subject:
+        mStudiedGroup.semester = int(raw_subject.get('semester'))
+    elif 'code' in raw_subject:
+        l.error('The subject "%s" with having code ,that is specific subject, must have semester field', raw_subject['name'])
+    mStudiedGroup.curriculum = curriculum
+    mStudiedGroup.save()
+    mStudiedGroup.reload()
+    return mStudiedGroup
 
 def createSubject(raw_subjects, curriculum):
     l.info("Creating subjects & relationship between subjects")
@@ -70,31 +92,33 @@ def createSubject(raw_subjects, curriculum):
             subject_tmp = models.Subject()
             subject_tmp.isSpecific = False
             subject_tmp.code = ""
-        # pp.pprint(subject_tmp.__dict__)
-        mStudiedGroup = models.StudiedGroup()
+        # add curriculum
+        subject_tmp.curriculum = curriculum
+
         if 'studied_group' in raw_subject:
-            mStudiedGroup.name = raw_subject['studied_group']
-        if 'year' in raw_subject:
-            mStudiedGroup.year = int(raw_subject.get('year'))
-        if 'semester' in raw_subject:
-            mStudiedGroup.semester = int(raw_subject.get('semester'))
-        subject_tmp.studied_groups.append(mStudiedGroup)
+            # specific studied_group
+            subject_tmp.studied_groups.append(createStudiedGroup('', raw_subject, curriculum))
+            # subject_tmp.add_studied_groups(raw_subject['studied_group'], raw_subject['year'], raw_subject['semester'])
+        else:
+            # for all studied_group
+            for studied_group in curriculum.studied_groups:
+                # subject_tmp.add_studied_groups(studied_group, raw_subject['year'], raw_subject['semester'])
+                subject_tmp.studied_groups.append(createStudiedGroup(studied_group, raw_subject, curriculum))
 
         subject_tmp.name = raw_subject['name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
-        # add curriculum
-        subject_tmp.curriculum = curriculum
 
         # add categories
         if 'categories' in raw_subject:
             for category in raw_subject['categories']:
-                mCategory = models.Category.objects(name=category).first()
-                if mCategory is not None:
-                    subject_tmp.categories.append(mCategory)
-                else:
-                    l.error('Not found "'+category+'" in collection')
-
+                subject_tmp.categories.append(category)
         subject_tmp.save()
+
+def updateStudiedGroup(curriculum):
+    for subject in models.Subject.objects(curriculum = curriculum):
+        for studied_group in subject.studied_groups:
+            studied_group.subject = subject
+            studied_group.save()
 
 def linkAllSubject(raw_curriculum):
     l.info("Linking all their relationship between subjects")
@@ -157,10 +181,11 @@ def add_member(member_info):
     return member_tmp
 
 def initialCoECurriculumData(curriculumPath):
-    raw_curriculum = importCurriculum2Model(config.data_path + curriculumPath)
-    createCategories(raw_curriculum['info']['categories'])
+    raw_curriculum = importCurriculum2Model(curriculumPath)
+    # createCategories(raw_curriculum['info']['categories'])
     curriculum_model = createCurriculum(raw_curriculum['info'])
     createSubject(raw_curriculum['subjects'], curriculum_model)
+    updateStudiedGroup(curriculum_model)
     linkAllSubject(raw_curriculum)
 
     linkAllReverseSubject(curriculum_model)
@@ -191,18 +216,18 @@ def initialCoECurriculumData(curriculumPath):
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
-    print('usage: %s <config_uri>\n'
-          '(example: "%s development.ini")' % (cmd, cmd))
+    print('usage: %s <config_uri> <curriculum_path>\n'
+          '(example: "%s development.ini data/coe.csv")' % (cmd, cmd))
     sys.exit(1)
 
 
 def main():
 #if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         usage(sys.argv)
         sys.exit()
 
-    curriculumPath='coe_2553_curriculum.csv'
+    curriculumPath = sys.argv[2]
     configuration = config.Configurator(sys.argv[1])
     # config_uri = argv[1]
     # setup_logging(config_uri)
@@ -213,17 +238,37 @@ def main():
     coe_curriculum_model = initialCoECurriculumData(curriculumPath)
 
     # print(models.Subject.objects(curriculum=coe_curriculum_model).count())
+    # subjects = models.Subject.objects(curriculum=coe_curriculum_model)
+    # Q(code='324-103') | Q(code='322-101') &
+    subject_tmp = models.Subject(code='324-103')
+    studied_groups = models.StudiedGroup.objects(name = 'first-group',
+                                                 curriculum = coe_curriculum_model,
+                                                 ).order_by('year','semester')
+    # subjects = sorted(subjects, key=attrgetter('studied_groups.year'))
+    # .order_by('studied_groups__year','studied_groups__semester')
+    # print(len(studied_groups))
+    for studied_group in studied_groups:
+        l.info('(%s/%s) [%s] %s',
+               studied_group.year,
+               studied_group.semester,
+               studied_group.name,
+               studied_group.subject.name)
 
-    # subjects = models.Subject.objects(Q(code='220-102') | Q(code='322-101'))
-    # print(subjects.count())
-    # for subject in subjects:
-    #     l.info('%s %s',subject.name,len(subject.prerequisites))
-    #
+        # l.info('(%s/%s) [%s] %s',subject.get_studied_group('second-group').year,s_ubject.get_studied_group('second-group').semester,subject.get_studied_group('second-group').name,subject.name)
+        # print("-----")
+        # l.info('(%s/%s) [%s] %s',subject.studied_groups['first-group'].year)
+        # pp.pprint(subject.__dict__)
     #     for prerequisite in subject.prerequisites:
     #         l.info('%s is prerequisite = %s (%s)',subject.name ,prerequisite.subject.name, prerequisite.name)
     #     l.info('%s %s',subject.name,len(subject.reverse_prerequisites))
     #     for reverse_prerequisite in subject.reverse_prerequisites:
     #         l.info('%s is reverse-prereq = %s (%s)',subject.name ,reverse_prerequisite.subject.name, reverse_prerequisite.name)
+
+    # studiedGroups =  models.StudiedGroup.objects( curriculum = coe_curriculum_model, name='first-group').order_by('year', 'semester')
+    # for studiedGroup in studiedGroups:
+    #     l.info('(%s/%s) %s',studiedGroup.year,studiedGroup.semester,studiedGroup.subject.name)
+
+    # subjects = models.Subject.objects(curriculum = coe_curriculum_model)
 
 
     #initial test cases
