@@ -13,7 +13,6 @@ import os
 import configparser
 
 root_path = os.path.dirname(os.path.dirname(__file__))+'/'
-data_path = root_path + 'data/'
 
 class Configurator:
     settings = dict()
