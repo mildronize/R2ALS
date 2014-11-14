@@ -6,6 +6,8 @@ import time
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
+excluded_filenames = []
+
 def when_file_changed(filename):
     """
         unitstest Monitoring with coverage filtering
@@ -26,9 +28,10 @@ def when_file_changed(filename):
         if not basename.startswith("test_"):
             package = filename.replace("./", "").replace(".py", "")
         else:
-            package = filename.replace("./tests/units", "").replace(".py", "")
-            package = projectname() + package.replace("/test_", "/")
-        package = package.replace("/", ".")
+            package = filename.replace("tests/units/", "").replace(".py", "")
+            package = package.replace("/test_", "/")
+
+        package = package.replace("./", "").replace("/", ".")
         return package
 
     def test_file(filename):
@@ -56,18 +59,25 @@ class ModifiedHandler(PatternMatchingEventHandler):
 
     check = True
 
+    def has_excluded_filenames(self, path):
+        for filename in excluded_filenames:
+            if filename in path:
+                return True
+        return False
+
     def on_created(self, event):
         """" For Vim :w - not modify that deleted and created file instead. """
-        when_file_changed(event.src_path)
+        if not self.has_excluded_filenames(event.src_path):
+            when_file_changed(event.src_path)
 
     def on_modified(self, event):
         """ For other text-editor ex.sublime """
-
-        if self.check:
-            when_file_changed(event.src_path)
-            self.check = False
-        else:
-            self.check = True
+        if not self.has_excluded_filenames(event.src_path):
+            if self.check:
+                when_file_changed(event.src_path)
+                self.check = False
+            else:
+                self.check = True
 
 if __name__ == '__main__':
     args = sys.argv[1:]

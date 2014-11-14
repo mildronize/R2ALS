@@ -98,11 +98,9 @@ def createSubject(raw_subjects, curriculum):
         if 'studied_group' in raw_subject:
             # specific studied_group
             subject_tmp.studied_groups.append(createStudiedGroup('', raw_subject, curriculum))
-            # subject_tmp.add_studied_groups(raw_subject['studied_group'], raw_subject['year'], raw_subject['semester'])
         else:
             # for all studied_group
             for studied_group in curriculum.studied_groups:
-                # subject_tmp.add_studied_groups(studied_group, raw_subject['year'], raw_subject['semester'])
                 subject_tmp.studied_groups.append(createStudiedGroup(studied_group, raw_subject, curriculum))
 
         subject_tmp.name = raw_subject['name']
@@ -137,18 +135,6 @@ def linkAllSubject(raw_curriculum):
                         for code in raw_subject[prerequisite_name]:
                             mPrerequisite = models.Prerequisite(name = prerequisite_name, subject = models.Subject.objects(code=code).first())
                             subject_code.prerequisites.append(mPrerequisite)
-            # if 'studied_prerequisite' in raw_subject:
-            #     for sp_code in raw_subject['studied_prerequisite']:
-            #         subject_code.studied_prerequisite.append(models.Subject.objects(code=sp_code).first())
-            # if 'passed_prerequisite' in raw_subject:
-            #     for pp_code in raw_subject['passed_prerequisite']:
-            #         subject_code.passed_prerequisite.append(models.Subject.objects(code=pp_code).first())
-            # if 'corequisite' in raw_subject:
-            #     for cr_code in raw_subject['corequisite']:
-            #         subject_code.corequisite.append(models.Subject.objects(code=cr_code).first())
-            # if 'cocurrent' in raw_subject:
-            #     for cc_code in raw_subject['cocurrent']:
-            #         subject_code.corequisite.append(models.Subject.objects(code=cc_code).first())
             subject_code.save()
 
 def linkAllReverseSubject(mCurriculum):
@@ -170,15 +156,34 @@ def createGrade(grade_info):
     # print(models.Grade.objects().count())
     # return grade_tmp
 
-def add_member(member_info):
+def add_member(member):
     member_tmp = models.Member()
-    for key, value in member_info.items():
+    for key, value in member['info'].items():
         member_tmp[key] = value
     member_tmp.save()
-    l.info("Adding member: " + member_info['name'])
+    l.info("Adding member: " + member['info']['name'])
+    # adding EnrolledSemester
+    for semester in member['semesters']:
+        enrolledSemester = models.EnrolledSemester()
+        enrolledSemester.year = semester['year']
+        enrolledSemester.semester = semester['semester']
+
+        for subject in semester['subjects']:
+            gradeSubject = models.GradeSubject()
+            mSubject = models.Subject.objects(code = subject['code']).first()
+            if mSubject is not None:
+                gradeSubject.subject = mSubject
+            else:
+                l.error('Not found subject "%s"' % subject['code'])
+            mGrade = models.Grade.objects(name = subject['grade']).first()
+            if mGrade is not None:
+                gradeSubject.grade = mGrade
+            else:
+                l.error('Not found grade "%s"' % subject['grade'])
+            enrolledSemester.subjects.append(gradeSubject)
+
+        member_tmp.enrolled_semesters.append(enrolledSemester)
     member_tmp.save()
-    member_tmp.reload()
-    return member_tmp
 
 def initialCoECurriculumData(curriculumPath):
     raw_curriculum = importCurriculum2Model(curriculumPath)
@@ -209,11 +214,6 @@ def initialCoECurriculumData(curriculumPath):
     ])
     return curriculum_model
 
-# def initailModel(isTest=False, curriculumPath='coe_2553_curriculum.csv'):
-#     if isTest == False: db_name = config.db_name
-#     else: db_name = config.db_name_test
-#     models.initial({'mongodb.db_name':db_name,'mongodb.host':config.host,'mongodb.is_reset':config.is_reset})
-
 def usage(argv):
     cmd = os.path.basename(argv[0])
     print('usage: %s <config_uri> <curriculum_path>\n'
@@ -229,24 +229,15 @@ def main():
 
     curriculumPath = sys.argv[2]
     configuration = config.Configurator(sys.argv[1])
-    # config_uri = argv[1]
-    # setup_logging(config_uri)
-    # settings = get_appsettings(config_uri)
     models.initial(configuration.settings)
     print(configuration.settings)
 
     coe_curriculum_model = initialCoECurriculumData(curriculumPath)
 
-    # print(models.Subject.objects(curriculum=coe_curriculum_model).count())
-    # subjects = models.Subject.objects(curriculum=coe_curriculum_model)
-    # Q(code='324-103') | Q(code='322-101') &
     subject_tmp = models.Subject(code='324-103')
     studied_groups = models.StudiedGroup.objects(name = 'first-group',
                                                  curriculum = coe_curriculum_model,
                                                  ).order_by('year','semester')
-    # subjects = sorted(subjects, key=attrgetter('studied_groups.year'))
-    # .order_by('studied_groups__year','studied_groups__semester')
-    # print(len(studied_groups))
     for studied_group in studied_groups:
         l.info('(%s/%s) [%s] %s',
                studied_group.year,
@@ -254,52 +245,84 @@ def main():
                studied_group.name,
                studied_group.subject.name)
 
-        # l.info('(%s/%s) [%s] %s',subject.get_studied_group('second-group').year,s_ubject.get_studied_group('second-group').semester,subject.get_studied_group('second-group').name,subject.name)
-        # print("-----")
-        # l.info('(%s/%s) [%s] %s',subject.studied_groups['first-group'].year)
-        # pp.pprint(subject.__dict__)
-    #     for prerequisite in subject.prerequisites:
-    #         l.info('%s is prerequisite = %s (%s)',subject.name ,prerequisite.subject.name, prerequisite.name)
-    #     l.info('%s %s',subject.name,len(subject.reverse_prerequisites))
-    #     for reverse_prerequisite in subject.reverse_prerequisites:
-    #         l.info('%s is reverse-prereq = %s (%s)',subject.name ,reverse_prerequisite.subject.name, reverse_prerequisite.name)
-
-    # studiedGroups =  models.StudiedGroup.objects( curriculum = coe_curriculum_model, name='first-group').order_by('year', 'semester')
-    # for studiedGroup in studiedGroups:
-    #     l.info('(%s/%s) %s',studiedGroup.year,studiedGroup.semester,studiedGroup.subject.name)
-
-    # subjects = models.Subject.objects(curriculum = coe_curriculum_model)
-
-
     #initial test cases
-    # l.info("Starting initial test cases")
-    # #add a member
-    # member_thongdee = add_member({
-    #     'member_id':'5710110999',
-    #     'name' : 'Thongdee Mana',
-    #     'curriculum' : coe_curriculum_model,
-    #     'studied_group' : 'first-group',
-    #     'registered_year' : 2557,
-    #     'last_num_year' : 1,
-    #     'last_semester' : 1,
-    # })
-    #
-    # #add dummy data (thongdee)
-    # l.info("Starting to generate the Initial Solution of him")
-    # initialSolution = InitialSolution(coe_curriculum_model, member_thongdee)
-    # # year/semester: 1/1
-    #
-    # initialSolution.addStudiedSubject(1,1,[
-    #     {'code' : '200-101','grade' : 'C'},
-    #     {'code' : '242-101','grade' : 'C'},
-    #     {'code' : '322-101','grade' : 'W'},
-    #     {'code' : '332-103','grade' : 'C'},
-    #     {'code' : '332-113','grade' : 'C'},
-    #     {'code' : '640-101','grade' : 'C'},
-    #     {'code' : '890-101','grade' : 'C'}
-    # ])
-    # # initialSolution.addStudiedSubject(2,1,[
-    # #     {'code' : '242-205','grade' : 'C'}
-    # #
-    # # ])
-    # initialSolution.start()
+    l.info("======== Starting initial test cases")
+    #add a member
+    testing_members = [
+        {
+            'info': {
+                'member_id':'5710110999',
+                'name' : 'Thongdee Mana',
+                'curriculum' : coe_curriculum_model,
+                'studied_group' : 'first-group',
+                'registered_year' : 2557,
+                'last_year' : 1,
+                'last_semester' : 1,
+                },
+            'semesters' : [{
+                'year': 1,
+                'semester': 1,
+                'subjects': [
+                    {'code' : '895-171','grade' : 'C'}, # subject from another semester
+                    {'code' : '200-101','grade' : 'C'},
+                    {'code' : '242-101','grade' : 'C'},
+                    {'code' : '322-101','grade' : 'C'},
+                    {'code' : '332-103','grade' : 'C'},
+                    {'code' : '332-113','grade' : 'C'},
+                    {'code' : '640-101','grade' : 'C'},
+                    {'code' : '890-101','grade' : 'C'},
+                    ]
+                }]
+        },
+        {
+            'info': {
+                'member_id':'5710110998',
+                'name' : 'Thongyib kondee',
+                'curriculum' : coe_curriculum_model,
+                'studied_group' : 'first-group',
+                'registered_year' : 2557,
+                'last_year' : 1,
+                'last_semester' : 1,
+                },
+            'semesters' : [{
+                'year': 1,
+                'semester': 1,
+                'subjects': [
+                    {'code' : '200-101','grade' : 'C'},
+                    {'code' : '242-101','grade' : 'C'},
+                    {'code' : '322-101','grade' : 'C'},
+                    {'code' : '332-103','grade' : 'C'},
+                    {'code' : '332-113','grade' : 'C'},
+                    {'code' : '640-101','grade' : 'C'},
+                    # not complete enrollment
+                    ]
+                }]
+        },
+        {
+            'info': {
+                'member_id':'5710110997',
+                'name' : 'Sangkaya Thaithai',
+                'curriculum' : coe_curriculum_model,
+                'studied_group' : 'first-group',
+                'registered_year' : 2557,
+                'last_year' : 1,
+                'last_semester' : 1,
+                },
+            'semesters' : [{
+                'year': 1,
+                'semester': 1,
+                'subjects': [
+                    {'code' : '200-101','grade' : 'C'},
+                    {'code' : '242-101','grade' : 'C'},
+                    {'code' : '322-101','grade' : 'C'},
+                    {'code' : '332-103','grade' : 'W'}, # Drop this subject
+                    {'code' : '332-113','grade' : 'C'},
+                    {'code' : '640-101','grade' : 'C'},
+                    {'code' : '890-101','grade' : 'C'},
+                    ]
+                }]
+        }
+    ]
+
+    for testing_member in testing_members:
+        add_member(testing_member)
