@@ -1,6 +1,7 @@
 
 import mongoengine as me
 import datetime
+from .members import SemesterId
 
 prerequisite_names = ['studied_prerequisite',
                       'passed_prerequisite',
@@ -17,8 +18,9 @@ class SubjectGroup(me.Document):
     meta = {'collection': 'subject_groups'}
 
     name = me.StringField(required=True)
-    year = me.IntField()
-    semester = me.IntField()
+    # year = me.IntField()
+    # semester = me.IntField()
+    semester_id = me.EmbeddedDocumentField(SemesterId)
     subject = me.ReferenceField('Subject')
     curriculum = me.ReferenceField('Curriculum')
     # subject temp info

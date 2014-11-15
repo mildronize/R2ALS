@@ -16,4 +16,5 @@ class SemesterIndex:
     # convert SemesterIndex to Semester
     def toSemester(self, semesterIndex):
         return semesterIndex + 4 - (3 * self.toYear(semesterIndex))
-        
+
+    # def compare semester 

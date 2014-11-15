@@ -21,11 +21,11 @@ class SolutionsTest(unittest.TestCase):
         if member is None:
             print('Not found the member')
             exit()
-        mSemesters = InitialSolution(member)
+        mSemesters = InitialSolution(member).start()
 
         # count subject from curriculum
-        num_subject_from_curriculum = models.StudiedGroup.objects(curriculum = member.curriculum,
-                                                                  name = member.studied_group).count()
+        num_subject_from_curriculum = models.SubjectGroup.objects(curriculum = member.curriculum,
+                                                                  name = member.subject_group).count()
 
         # count subject from InitialSolution (Generate)
         num_subject_from_generate = 0
@@ -37,10 +37,10 @@ class SolutionsTest(unittest.TestCase):
 
         # test num of subject each semester
         for mSemester in mSemesters:
-            num_subject_from_curriculum = models.StudiedGroup.objects(curriculum = member.curriculum,
-                                                      name = member.studied_group,
-                                                      year = mSemester.year,
-                                                      semester = mSemester.semester).count()
+            num_subject_from_curriculum = models.SubjectGroup.objects(curriculum = member.curriculum,
+                                                                      name = member.subject_group,
+                                                                      semester_id__year = mSemester.semester_id.year,
+                                                                      semester_id__semester = mSemester.semester_id.semester).count()
             num_subject_from_generate = len(mSemester.subjects)
             self.assertEqual(num_subject_from_curriculum,
                              num_subject_from_generate)

@@ -25,7 +25,7 @@ class InitialSolution:
         self.maxSemesterIndex = self.si.get(self.curriculum.required_num_year, self.curriculum.num_semester)
         self.numSemesterIndex = self.maxSemesterIndex + 1
         # self.initialEmptySemester()
-        self.start()
+        # self.start()
 
     # def isCorrectInitialSolution(self):
     #     for y in range(1,self.curriculum.required_num_year+1):
@@ -133,15 +133,19 @@ class InitialSolution:
     def addSemesterModel(self, index):
         mSemester = models.Semester()
         mSemester.member = self.member
-        mSemester.year = self.si.toYear(index)
-        mSemester.semester = self.si.toSemester(index)
+
+        mSemester.semester_id = models.SemesterId(year = self.si.toYear(index),
+                                                  semester = self.si.toSemester(index))
+        # mSemester.year = self.si.toYear(index)
+        # mSemester.semester = self.si.toSemester(index)
 
         # Read all subject from same curriculum
         # for studied semester index
         if index < self.numStudiedSemesterIndex:
 
             for enrolled_semester in self.member.enrolled_semesters:
-                if enrolled_semester.year == mSemester.year and enrolled_semester.semester == mSemester.semester:
+                if enrolled_semester.semester_id.year == mSemester.semester_id.year and \
+                enrolled_semester.semester_id.semester == mSemester.semester_id.semester:
                     mSemester.subjects = copy.copy(enrolled_semester.subjects)
                     break
 
@@ -167,8 +171,8 @@ class InitialSolution:
             # subjects = models.Subject.objects( Q(curriculum = self.curriculum, year = mSemester.year, semester = mSemester.semester) & ( Q(subject_group=self.member.subject_group) | Q(subject_group='')) )
             mSubjectGroups = models.SubjectGroup.objects(curriculum = self.curriculum,
                                                         name = self.member.subject_group,
-                                                        year = mSemester.year,
-                                                        semester = mSemester.semester)
+                                                        semester_id__year = mSemester.semester_id.year,
+                                                        semester_id__semester = mSemester.semester_id.semester)
             l.debug(len(mSubjectGroups))
             for mSubjectGroup in mSubjectGroups:
                 if not self.hasImportedSubject(str(mSubjectGroup.subject['id'])):
@@ -188,8 +192,8 @@ class InitialSolution:
             # numSubjects = models.Subject.objects(Q(year = y, semester = s, curriculum = self.curriculum)  & ( Q(subject_group=self.member.subject_group) | Q(subject_group='') )).count()
             numSubjects = models.SubjectGroup.objects(curriculum = self.curriculum,
                                                       name = self.member.subject_group ,
-                                                      year = y,
-                                                      semester = s).count()
+                                                      semester_id__year = y,
+                                                      semester_id__semester = s).count()
             mSemesters.append(self.addSemesterModel(i))
             if i < self.numStudiedSemesterIndex:
                 # ==========  This section for year & semester which are studied ========
@@ -197,4 +201,7 @@ class InitialSolution:
             else:
                 # ==========  This section for year & semester remaining ========
                 l.info("semster (%d/%d) are processing[%d]",y,s,numSubjects)
+        for mSemester in mSemesters:
+            pp.pprint(mSemester.semester_id.year)
+        print(len(mSemesters))
         return mSemesters

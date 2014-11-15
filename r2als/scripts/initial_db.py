@@ -13,6 +13,7 @@ from r2als.libs.logs import Log
 from r2als.libs.solutions import InitialSolution
 from r2als import models
 from r2als import config
+from r2als.libs.functions import SemesterIndex
 # 2 types for importing library
 # 1. from path/directory import package_name(*.py)
 # 2. from path/package_name(*.py) import class_name
@@ -65,14 +66,16 @@ def create_SubjectGroup(subject_group, raw_subject, curriculum):
         mSubjectGroup.name = raw_subject['subject_group']
     elif subject_group is not '':
         mSubjectGroup.name = subject_group
+    mSemesterId = models.SemesterId()
     if 'year' in raw_subject:
-        mSubjectGroup.year = int(raw_subject.get('year'))
+        mSemesterId.year = int(raw_subject.get('year'))
     elif 'code' in raw_subject:
         l.error('The subject "%s" with having code ,that is specific subject, must have year field', raw_subject['name'])
     if 'semester' in raw_subject:
-        mSubjectGroup.semester = int(raw_subject.get('semester'))
+        mSemesterId.semester = int(raw_subject.get('semester'))
     elif 'code' in raw_subject:
         l.error('The subject "%s" with having code ,that is specific subject, must have semester field', raw_subject['name'])
+    mSubjectGroup.semester_id = mSemesterId
     mSubjectGroup.curriculum = curriculum
     mSubjectGroup.save()
     mSubjectGroup.reload()
@@ -165,8 +168,10 @@ def add_Member(member):
     # adding EnrolledSemester
     for semester in member['semesters']:
         enrolledSemester = models.EnrolledSemester()
-        enrolledSemester.year = semester['year']
-        enrolledSemester.semester = semester['semester']
+        enrolledSemester.semester_id = models.SemesterId(year = semester['year'],
+                                                            semester= semester['semester'])
+        # enrolledSemester.year = semester['year']
+        # enrolledSemester.semester = semester['semester']
 
         for subject in semester['subjects']:
             gradeSubject = models.GradeSubject()
@@ -235,11 +240,11 @@ def main():
 
     subject_groups = models.SubjectGroup.objects(name = 'first-group',
                                                  curriculum = coe_curriculum_model,
-                                                 ).order_by('year','semester')
+                                                 ).order_by('semester_id__year','semester_id__semester')
     for subject_group in subject_groups:
         l.info('(%s/%s) [%s] %s',
-               subject_group.year,
-               subject_group.semester,
+               subject_group.semester_id.year,
+               subject_group.semester_id.semester,
                subject_group.name,
                subject_group.subject.name)
 
