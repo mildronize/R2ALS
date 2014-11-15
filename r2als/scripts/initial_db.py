@@ -25,7 +25,7 @@ pp = pprint.PrettyPrinter(indent=4)
 l = Log('initial_db').getLogger()
 # l.startApp('scripts/initial_db')
 
-def importCurriculum2Model(path):
+def import_curriculum_to_model(path):
     # Not check key yet
     return CsvToModel().process(path, True)
 
@@ -41,7 +41,7 @@ def importCurriculum2Model(path):
 #             l.info("The categories is exist")
 #     return category
 
-def createCurriculum(curriculum_data):
+def create_Curriculum(curriculum_data):
     curriculum = models.Curriculum()
     curriculum['faculty'] = curriculum_data['faculty']
     curriculum['department'] = curriculum_data['department']
@@ -59,7 +59,7 @@ def createCurriculum(curriculum_data):
     curriculum.reload()
     return curriculum
 
-def createSubjectGroup(subject_group, raw_subject, curriculum):
+def create_SubjectGroup(subject_group, raw_subject, curriculum):
     mSubjectGroup = models.SubjectGroup()
     if 'subject_group' in raw_subject:
         mSubjectGroup.name = raw_subject['subject_group']
@@ -78,7 +78,7 @@ def createSubjectGroup(subject_group, raw_subject, curriculum):
     mSubjectGroup.reload()
     return mSubjectGroup
 
-def createSubject(raw_subjects, curriculum):
+def create_Subject(raw_subjects, curriculum):
     l.info("Creating subjects & relationship between subjects")
     for raw_subject in raw_subjects:
         # add a simple data
@@ -97,11 +97,11 @@ def createSubject(raw_subjects, curriculum):
 
         if 'subject_group' in raw_subject:
             # specific subject_group
-            subject_tmp.subject_groups.append(createSubjectGroup('', raw_subject, curriculum))
+            subject_tmp.subject_groups.append(create_SubjectGroup('', raw_subject, curriculum))
         else:
             # for all subject_group
             for subject_group in curriculum.subject_groups:
-                subject_tmp.subject_groups.append(createSubjectGroup(subject_group, raw_subject, curriculum))
+                subject_tmp.subject_groups.append(create_SubjectGroup(subject_group, raw_subject, curriculum))
 
         subject_tmp.name = raw_subject['name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
@@ -112,13 +112,13 @@ def createSubject(raw_subjects, curriculum):
                 subject_tmp.categories.append(category)
         subject_tmp.save()
 
-def updateSubjectGroup(curriculum):
+def update_SubjectGroup(curriculum):
     for subject in models.Subject.objects(curriculum = curriculum):
         for subject_group in subject.subject_groups:
             subject_group.subject = subject
             subject_group.save()
 
-def linkAllSubject(raw_curriculum):
+def link_all_Subject(raw_curriculum):
     l.info("Linking all their relationship between subjects")
     processed_raw_subject = []
     for raw_subject in raw_curriculum['subjects']:
@@ -137,7 +137,7 @@ def linkAllSubject(raw_curriculum):
                             subject_code.prerequisites.append(mPrerequisite)
             subject_code.save()
 
-def linkAllReverseSubject(mCurriculum):
+def link_all_reverse_Subject(mCurriculum):
     l.info("Creating all their reverse relationship between subjects")
     subjects = models.Subject.objects(curriculum=mCurriculum, isSpecific = True)
     for subject in subjects:
@@ -146,7 +146,7 @@ def linkAllReverseSubject(mCurriculum):
             prerequisites.subject.reverse_prerequisites.append(mPrerequisite)
             prerequisites.subject.save()
 
-def createGrade(grade_info):
+def create_Grade(grade_info):
     l.info("Adding grade")
     for grade in grade_info:
         grade_tmp = models.Grade()
@@ -156,7 +156,7 @@ def createGrade(grade_info):
     # print(models.Grade.objects().count())
     # return grade_tmp
 
-def add_member(member):
+def add_Member(member):
     member_tmp = models.Member()
     for key, value in member['info'].items():
         member_tmp[key] = value
@@ -185,21 +185,21 @@ def add_member(member):
         member_tmp.enrolled_semesters.append(enrolledSemester)
     member_tmp.save()
 
-def initialCoECurriculumData(curriculumPath):
-    raw_curriculum = importCurriculum2Model(curriculumPath)
+def initial_coe_curriculum_data(curriculumPath):
+    raw_curriculum = import_curriculum_to_model(curriculumPath)
     # createCategories(raw_curriculum['info']['categories'])
-    curriculum_model = createCurriculum(raw_curriculum['info'])
-    createSubject(raw_curriculum['subjects'], curriculum_model)
-    updateSubjectGroup(curriculum_model)
-    linkAllSubject(raw_curriculum)
+    curriculum_model = create_Curriculum(raw_curriculum['info'])
+    create_Subject(raw_curriculum['subjects'], curriculum_model)
+    update_SubjectGroup(curriculum_model)
+    link_all_Subject(raw_curriculum)
 
-    linkAllReverseSubject(curriculum_model)
+    link_all_reverse_Subject(curriculum_model)
 
     print("")
     l.info("Adding some regulation and rule")
 
     # mustReEnroll is only main branch in each semester
-    createGrade([
+    create_Grade([
         {'name': "A",  'score': 4.0, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
         {'name': "B+", 'score': 3.5, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
         {'name': "B",  'score': 3.0, 'isCredit': True, 'canReEnroll': False,'mustReEnroll': False},
@@ -231,7 +231,7 @@ def main():
     configuration = config.Configurator(sys.argv[1])
     models.initial(configuration.settings)
 
-    coe_curriculum_model = initialCoECurriculumData(curriculumPath)
+    coe_curriculum_model = initial_coe_curriculum_data(curriculumPath)
 
     subject_groups = models.SubjectGroup.objects(name = 'first-group',
                                                  curriculum = coe_curriculum_model,
@@ -323,4 +323,4 @@ def main():
     ]
 
     for testing_member in testing_members:
-        add_member(testing_member)
+        add_Member(testing_member)
