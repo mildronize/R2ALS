@@ -3,11 +3,11 @@ department,Computer Engineering,,,,,,,,,
 year,2553,,,,,,,,,
 required_num_year,4,,,,,,,,,
 num_semester,3,,,,,,,,,
-*studied_groups,first-group:second-group,,,,,,,,,
+*subject_groups,first-group:second-group,,,,,,,,,
 *branches,information:information-network:computer-control:computer-system-design,,,,,,,,,
 *categories,lecture:lab:project:calculation,,,,,,,,,
 *prerequisites,studied_prerequisite:passed_prerequisite:corequisite:cocurrent,,,,,,,,,
-code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,*categories,studied_group,year,semester
+code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,*categories,subject_group,year,semester
 #Table 6 First semester courses for the first group of first-year students,,,,,,,lecture,,1,1
 200-101,Introduction to Engineering,1,,,,,lecture,first-group,1,1
 242-101,Introduction to Computer Programming,3,,,,,lecture:lab,first-group,1,1

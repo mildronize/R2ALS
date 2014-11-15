@@ -43,7 +43,7 @@ class InitialSolution:
     #                 pp.pprint(self.member.__dict__)
     #                 exit()
     #
-    #             numSubjects = models.StudiedGroup.objects(curriculum = self.curriculum, year = y, semester = s,name='first-group').count()
+    #             numSubjects = models.SubjectGroup.objects(curriculum = self.curriculum, year = y, semester = s,name='first-group').count()
     #             # studied semester
     #             if index < self.numStudiedSemesterIndex:
     #                 l.debug('checking Semester '+str(y)+'/'+str(s)+': Studied Semester')
@@ -73,8 +73,8 @@ class InitialSolution:
     #     return True
 
     # def countAllSubject(self):
-    #     # subjects = models.Subject.objects( Q(curriculum = self.curriculum) & ( Q(studied_group=self.member.studied_group) | Q(studied_group='')) )
-    #     return models.StudiedGroup.objects(curriculum = self.curriculum, name='first-group').count()
+    #     # subjects = models.Subject.objects( Q(curriculum = self.curriculum) & ( Q(subject_group=self.member.subject_group) | Q(subject_group='')) )
+    #     return models.SubjectGroup.objects(curriculum = self.curriculum, name='first-group').count()
     #
     # def countOnlyMemberSubject(self):
     #     semesters = models.Semester.objects(member = self.member)
@@ -149,34 +149,34 @@ class InitialSolution:
             # semesterItem = semesterItems[index]
             # for raw_subject in semesterItem['subjects']:
             #
-            #     studiedGroup = models.StudiedGroup.objects(curriculum = self.curriculum,
+            #     mSubjectGroup = models.SubjectGroup.objects(curriculum = self.curriculum,
             #                                                name = 'first-group' ,
             #                                                code = raw_subject['code']).first()
             #     # if raw_subject['code'] in subject_groups.subject.code
-            #     if studiedGroup is None:
+            #     if mSubjectGroup is None:
             #         l.error('Unknown the subject ' + raw_subject['code'] + ' in subjects collection(db)')
             #     else:
             #         gradeSubject = models.GradeSubject()
-            #         gradeSubject.subject = studiedGroup.subject
+            #         gradeSubject.subject = mSubjectGroup.subject
             #         gradeSubject.grade = raw_subject['grade']
             #         # gradeSubject.save()
             #         mSemester.subjects.append(gradeSubject)
-            #         self.addImportedSubject(str(studiedGroup.subject['id']))
+            #         self.addImportedSubject(str(mSubjectGroup.subject['id']))
         # for not studied semester index
         else:
-            # subjects = models.Subject.objects( Q(curriculum = self.curriculum, year = mSemester.year, semester = mSemester.semester) & ( Q(studied_group=self.member.studied_group) | Q(studied_group='')) )
-            studiedGroups = models.StudiedGroup.objects(curriculum = self.curriculum,
-                                                        name = self.member.studied_group,
+            # subjects = models.Subject.objects( Q(curriculum = self.curriculum, year = mSemester.year, semester = mSemester.semester) & ( Q(subject_group=self.member.subject_group) | Q(subject_group='')) )
+            mSubjectGroups = models.SubjectGroup.objects(curriculum = self.curriculum,
+                                                        name = self.member.subject_group,
                                                         year = mSemester.year,
                                                         semester = mSemester.semester)
-            l.debug(len(studiedGroups))
-            for studiedGroup in studiedGroups:=
-                if not self.hasImportedSubject(str(studiedGroup.subject['id'])):
+            l.debug(len(mSubjectGroups))
+            for mSubjectGroup in mSubjectGroups:
+                if not self.hasImportedSubject(str(mSubjectGroup.subject['id'])):
                     gradeSubject = models.GradeSubject()
-                    gradeSubject.subject = studiedGroup.subject
+                    gradeSubject.subject = mSubjectGroup.subject
                     # gradeSubject.save()
                     mSemester.subjects.append(gradeSubject)
-                    self.addImportedSubject(str(studiedGroup.subject['id']))
+                    self.addImportedSubject(str(mSubjectGroup.subject['id']))
         # mSemester.save()
         return mSemester
 
@@ -185,9 +185,9 @@ class InitialSolution:
         for i in range(self.numSemesterIndex):
             y = self.si.toYear(i)
             s = self.si.toSemester(i)
-            # numSubjects = models.Subject.objects(Q(year = y, semester = s, curriculum = self.curriculum)  & ( Q(studied_group=self.member.studied_group) | Q(studied_group='') )).count()
-            numSubjects = models.StudiedGroup.objects(curriculum = self.curriculum,
-                                                      name = self.member.studied_group ,
+            # numSubjects = models.Subject.objects(Q(year = y, semester = s, curriculum = self.curriculum)  & ( Q(subject_group=self.member.subject_group) | Q(subject_group='') )).count()
+            numSubjects = models.SubjectGroup.objects(curriculum = self.curriculum,
+                                                      name = self.member.subject_group ,
                                                       year = y,
                                                       semester = s).count()
             mSemesters.append(self.addSemesterModel(i))

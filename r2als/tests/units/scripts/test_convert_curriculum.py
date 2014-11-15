@@ -32,14 +32,14 @@ class ConvertCurriculumTest(unittest.TestCase):
         self.assertEqual(cc.validateFormatCurriculumFile("year", 2 ), True)
         self.assertEqual(cc.validateFormatCurriculumFile("required_num_year", 3 ), True)
         self.assertEqual(cc.validateFormatCurriculumFile("num_semester", 4 ), True)
-        self.assertEqual(cc.validateFormatCurriculumFile("*studied_groups", 5 ), True)
+        self.assertEqual(cc.validateFormatCurriculumFile("*subject_groups", 5 ), True)
         self.assertEqual(cc.validateFormatCurriculumFile("*branches", 6 ), True)
         self.assertEqual(cc.validateFormatCurriculumFile("*categories", 7 ), True)
         # test wrong
         self.assertEqual(cc.validateFormatCurriculumFile("faculty", 1 ), False)
         self.assertEqual(cc.validateFormatCurriculumFile("department", 2 ), False)
         self.assertEqual(cc.validateFormatCurriculumFile("year", 4 ), False)
-        self.assertEqual(cc.validateFormatCurriculumFile("*studied_groups", 2 ), False)
+        self.assertEqual(cc.validateFormatCurriculumFile("*subject_groups", 2 ), False)
         self.assertEqual(cc.validateFormatCurriculumFile("*branches", 0 ), False)
     # def test_remove_special_char(self):
     #     from r2als.scripts import convert_curriculum as cc

@@ -50,8 +50,8 @@ def createCurriculum(curriculum_data):
     curriculum['num_semester'] = int(curriculum_data['num_semester'])
     l.info("Creating curriculum: "+ curriculum_data['department'] + " " + curriculum_data['year'])
     l.info("Creating Studied Group for the curriculum")
-    for studied_group in curriculum_data['studied_groups']:
-        curriculum['studied_groups'].append(studied_group)
+    for subject_group in curriculum_data['subject_groups']:
+        curriculum['subject_groups'].append(subject_group)
     l.info("Adding categories for the curriculum")
     for categories in curriculum_data['categories']:
         curriculum['categories'].append(categories)
@@ -59,24 +59,24 @@ def createCurriculum(curriculum_data):
     curriculum.reload()
     return curriculum
 
-def createStudiedGroup(studied_group, raw_subject, curriculum):
-    mStudiedGroup = models.StudiedGroup()
-    if 'studied_group' in raw_subject:
-        mStudiedGroup.name = raw_subject['studied_group']
-    elif studied_group is not '':
-        mStudiedGroup.name = studied_group
+def createSubjectGroup(subject_group, raw_subject, curriculum):
+    mSubjectGroup = models.SubjectGroup()
+    if 'subject_group' in raw_subject:
+        mSubjectGroup.name = raw_subject['subject_group']
+    elif subject_group is not '':
+        mSubjectGroup.name = subject_group
     if 'year' in raw_subject:
-        mStudiedGroup.year = int(raw_subject.get('year'))
+        mSubjectGroup.year = int(raw_subject.get('year'))
     elif 'code' in raw_subject:
         l.error('The subject "%s" with having code ,that is specific subject, must have year field', raw_subject['name'])
     if 'semester' in raw_subject:
-        mStudiedGroup.semester = int(raw_subject.get('semester'))
+        mSubjectGroup.semester = int(raw_subject.get('semester'))
     elif 'code' in raw_subject:
         l.error('The subject "%s" with having code ,that is specific subject, must have semester field', raw_subject['name'])
-    mStudiedGroup.curriculum = curriculum
-    mStudiedGroup.save()
-    mStudiedGroup.reload()
-    return mStudiedGroup
+    mSubjectGroup.curriculum = curriculum
+    mSubjectGroup.save()
+    mSubjectGroup.reload()
+    return mSubjectGroup
 
 def createSubject(raw_subjects, curriculum):
     l.info("Creating subjects & relationship between subjects")
@@ -95,13 +95,13 @@ def createSubject(raw_subjects, curriculum):
         # add curriculum
         subject_tmp.curriculum = curriculum
 
-        if 'studied_group' in raw_subject:
-            # specific studied_group
-            subject_tmp.studied_groups.append(createStudiedGroup('', raw_subject, curriculum))
+        if 'subject_group' in raw_subject:
+            # specific subject_group
+            subject_tmp.subject_groups.append(createSubjectGroup('', raw_subject, curriculum))
         else:
-            # for all studied_group
-            for studied_group in curriculum.studied_groups:
-                subject_tmp.studied_groups.append(createStudiedGroup(studied_group, raw_subject, curriculum))
+            # for all subject_group
+            for subject_group in curriculum.subject_groups:
+                subject_tmp.subject_groups.append(createSubjectGroup(subject_group, raw_subject, curriculum))
 
         subject_tmp.name = raw_subject['name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
@@ -112,11 +112,11 @@ def createSubject(raw_subjects, curriculum):
                 subject_tmp.categories.append(category)
         subject_tmp.save()
 
-def updateStudiedGroup(curriculum):
+def updateSubjectGroup(curriculum):
     for subject in models.Subject.objects(curriculum = curriculum):
-        for studied_group in subject.studied_groups:
-            studied_group.subject = subject
-            studied_group.save()
+        for subject_group in subject.subject_groups:
+            subject_group.subject = subject
+            subject_group.save()
 
 def linkAllSubject(raw_curriculum):
     l.info("Linking all their relationship between subjects")
@@ -190,7 +190,7 @@ def initialCoECurriculumData(curriculumPath):
     # createCategories(raw_curriculum['info']['categories'])
     curriculum_model = createCurriculum(raw_curriculum['info'])
     createSubject(raw_curriculum['subjects'], curriculum_model)
-    updateStudiedGroup(curriculum_model)
+    updateSubjectGroup(curriculum_model)
     linkAllSubject(raw_curriculum)
 
     linkAllReverseSubject(curriculum_model)
@@ -233,15 +233,15 @@ def main():
 
     coe_curriculum_model = initialCoECurriculumData(curriculumPath)
 
-    studied_groups = models.StudiedGroup.objects(name = 'first-group',
+    subject_groups = models.SubjectGroup.objects(name = 'first-group',
                                                  curriculum = coe_curriculum_model,
                                                  ).order_by('year','semester')
-    for studied_group in studied_groups:
+    for subject_group in subject_groups:
         l.info('(%s/%s) [%s] %s',
-               studied_group.year,
-               studied_group.semester,
-               studied_group.name,
-               studied_group.subject.name)
+               subject_group.year,
+               subject_group.semester,
+               subject_group.name,
+               subject_group.subject.name)
 
     #initial test cases
     l.info("======== Starting initial test cases")
@@ -252,7 +252,7 @@ def main():
                 'member_id':'5710110999',
                 'name' : 'Thongdee Mana',
                 'curriculum' : coe_curriculum_model,
-                'studied_group' : 'first-group',
+                'subject_group' : 'first-group',
                 'registered_year' : 2557,
                 'last_year' : 1,
                 'last_semester' : 1,
@@ -277,7 +277,7 @@ def main():
                 'member_id':'5710110998',
                 'name' : 'Thongyib kondee',
                 'curriculum' : coe_curriculum_model,
-                'studied_group' : 'first-group',
+                'subject_group' : 'first-group',
                 'registered_year' : 2557,
                 'last_year' : 1,
                 'last_semester' : 1,
@@ -301,7 +301,7 @@ def main():
                 'member_id':'5710110997',
                 'name' : 'Sangkaya Thaithai',
                 'curriculum' : coe_curriculum_model,
-                'studied_group' : 'first-group',
+                'subject_group' : 'first-group',
                 'registered_year' : 2557,
                 'last_year' : 1,
                 'last_semester' : 1,

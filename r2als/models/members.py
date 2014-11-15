@@ -32,7 +32,7 @@ class Member(me.Document):
     member_id = me.StringField(required=True,primary_key=True)
     name = me.StringField(required=True)
     curriculum = me.ReferenceField('Curriculum')
-    studied_group = me.StringField()
+    subject_group = me.StringField()
     registered_year = me.IntField(required=True)
     last_year = me.IntField(required=True)
     last_semester = me.IntField(required=True)
