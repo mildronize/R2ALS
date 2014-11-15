@@ -230,11 +230,9 @@ def main():
     curriculumPath = sys.argv[2]
     configuration = config.Configurator(sys.argv[1])
     models.initial(configuration.settings)
-    print(configuration.settings)
 
     coe_curriculum_model = initialCoECurriculumData(curriculumPath)
 
-    subject_tmp = models.Subject(code='324-103')
     studied_groups = models.StudiedGroup.objects(name = 'first-group',
                                                  curriculum = coe_curriculum_model,
                                                  ).order_by('year','semester')

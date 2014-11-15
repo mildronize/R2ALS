@@ -12,14 +12,9 @@ import sys
 
 if __name__ == '__main__':
     #settings = {'mongodb.db_name':'r2alsdb','mongodb.host':'localhost'}
-    if len(sys.argv) < 2:
-        #sys.stderr.write( "Use: " + sys.argv[0] + " configure_file")
-        sys.exit(errno.EINVAL)
-
-    configuration = config.Configurator(sys.argv[1])
-
-    models.initial(configuration.settings)
-
+    # if len(sys.argv) < 2:
+    #     #sys.stderr.write( "Use: " + sys.argv[0] + " configure_file")
+    #     sys.exit(errno.EINVAL)
 
     # for i in range(10):
     #     tabuSize = i*10
@@ -30,4 +25,5 @@ if __name__ == '__main__':
     #     print("#"*30)
     #     input("press enter")
     p = processor.Processor(10)
-    profile.run('p.start()')
+    # profile.run('p.start()')
+    p.start()

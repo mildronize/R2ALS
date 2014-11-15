@@ -1,14 +1,16 @@
-from r2als import scoring
 import random
 import hashlib
 import copy
+from r2als import config
+from r2als import models
+from r2als import scoring
+from r2als.libs.solutions import InitialSolution
 
 class Processor:
 
     # This is simple progress of Tabu Search
 
-    workingSolution = None
-    initialSolution = [9,8,7,6,5,4,3,2,1,0]
+    # initialSolution = [9,8,7,6,5,4,3,2,1,0]
     bestSolution = None
     isWorking = True
     # TABU
@@ -17,6 +19,9 @@ class Processor:
     tabuSize = 0
 
     def __init__(self, tabuSize=20):
+        configuration = config.Configurator(config.root_path + 'development.ini')
+        configuration.set('mongodb.is_drop_database', False)
+        models.initial(configuration.settings)
         self.tabuSize = tabuSize
 
     ################ tabu method ################
@@ -50,8 +55,8 @@ class Processor:
 
     ################ solution method ################
 
-    def loadInitialSolution(self):
-        return self.initialSolution
+    def loadInitialSolution(self, member):
+        return InitialSolution(member)
 
     def getNewSolution(self):
         #random.shuffle(self.workingSolution)
@@ -76,21 +81,27 @@ class Processor:
 
     def start(self):
         print("Starting processor")
-        self.workingSolution = self.loadInitialSolution()
-        self.bestSolution = copy.copy(self.workingSolution)
-        self.printScore(self.workingSolution)
 
-        print("#"*100)
+        member = models.Member.objects(member_id = '5710110997').first()
+        if member is None:
+            print('Not found the member')
+            exit()
 
-        while self.isWorking:
-            self.getNewSolution()
-            if self.hasTabuLists(self.workingSolution):
-                continue
-            else:
-                self.addTabuLists(self.workingSolution)
-            self.compareScoreBestSolution()
-
-            if scoring.calculate(self.bestSolution) >= 8:
-                self.isWorking = False
+        self.workingSolution = self.loadInitialSolution(member)
+        # self.bestSolution = copy.copy(self.workingSolution)
+        # self.printScore(self.workingSolution)
+        #
+        # print("#"*100)
+        #
+        # while self.isWorking:
+        #     self.getNewSolution()
+        #     if self.hasTabuLists(self.workingSolution):
+        #         continue
+        #     else:
+        #         self.addTabuLists(self.workingSolution)
+        #     self.compareScoreBestSolution()
+        #
+        #     if scoring.calculate(self.bestSolution) >= 8:
+        #         self.isWorking = False
 
         print("End processor")

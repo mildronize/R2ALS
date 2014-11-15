@@ -25,6 +25,7 @@ class InitialSolution:
         self.maxSemesterIndex = self.si.get(self.curriculum.required_num_year, self.curriculum.num_semester)
         self.numSemesterIndex = self.maxSemesterIndex + 1
         # self.initialEmptySemester()
+        self.start()
 
     # def isCorrectInitialSolution(self):
     #     for y in range(1,self.curriculum.required_num_year+1):
@@ -169,7 +170,7 @@ class InitialSolution:
                                                         year = mSemester.year,
                                                         semester = mSemester.semester)
             l.debug(len(studiedGroups))
-            for studiedGroup in studiedGroups:
+            for studiedGroup in studiedGroups:=
                 if not self.hasImportedSubject(str(studiedGroup.subject['id'])):
                     gradeSubject = models.GradeSubject()
                     gradeSubject.subject = studiedGroup.subject

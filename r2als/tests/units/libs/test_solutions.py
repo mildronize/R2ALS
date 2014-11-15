@@ -6,10 +6,8 @@ class SolutionsTest(unittest.TestCase):
 
     def setUp(self):
         configuration = config.Configurator(config.root_path + 'test.ini')
-        configuration.set('mongodb.is_remove_collections', True)
+        configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
-        # models.Member.drop_collection()
-        # models.Semester.drop_collection()
 
     # def tearDown(self):
 
@@ -19,12 +17,11 @@ class SolutionsTest(unittest.TestCase):
     # test class InitialSolution
     def test_InitialSolution(self):
         from r2als.libs.solutions import InitialSolution
-        member = models.Member.objects(member_id = '5710110999').first()
+        member = models.Member.objects(member_id = '5710110997').first()
         if member is None:
             print('Not found the member')
             exit()
-        initialSolution = InitialSolution(member)
-        mSemesters = initialSolution.start()
+        mSemesters = InitialSolution(member)
 
         # count subject from curriculum
         num_subject_from_curriculum = models.StudiedGroup.objects(curriculum = member.curriculum,
