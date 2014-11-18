@@ -1,0 +1,75 @@
+{
+    "cells": [
+        {
+            "id": "rect1",
+            "type": "basic.Rect",
+            "attrs": { "text": {
+                         "text": "Subject",
+                         "fill": "white",
+                         "font-family": "sans-serif" },
+                      "rect": {
+                         "fill": "#3498DB",
+                         "stroke": "#3498DB",
+                         "stroke-width": 0,
+                         "rx": 5,
+                         "ry": 5 } },
+            "position":{"x":100,"y":70},
+            "size":{"width":100,"height":40},
+            "angle": 0,
+            "z": 0
+        },
+        {
+            "id": "rect2",
+            "type": "basic.Rect",
+            "attrs": { "rect": { "fill": "green" }, "text": { "text": "Subject", "fill": "white" } },
+            "position":{"x":400,"y":70},
+            "size":{"width":100,"height":40},
+            "angle": 0,
+            "z": 0
+        },
+        {
+            "id": "rect3",
+            "type": "basic.Rect",
+            "attrs": { "rect": { "fill": "green" }, "text": { "text": "Subject", "fill": "white" } },
+            "position":{"x":200,"y":130},
+            "size":{"width":100,"height":40},
+            "angle": 0,
+            "z": 0
+        },
+        {
+            "id": "rect4",
+            "type": "basic.Rect",
+            "attrs": { "rect": { "fill": "green" }, "text": { "text": "Subject", "fill": "white" } },
+            "position":{"x":200,"y":30},
+            "size":{"width":100,"height":40},
+            "angle": 0,
+            "z": 0
+        },
+        {
+            "id": "link1-2",
+            "type": "link",
+            "source": { "id": "rect1"},
+            "target": { "id": "rect2"},
+            "z": 0,
+            "router": { "name": "manhattan" },
+            "connector": { "name": "rounded" },
+            "attrs": {
+                ".marker-source": { "d": "M 10 0 L 0 5 L 10 10 z" }
+            }
+        }
+        ,
+        {
+            "id": "link3-4",
+            "type": "link",
+            "source": { "id": "rect3"},
+            "target": { "id": "rect4"},
+            "z": 0,
+            "router": { "name": "manhattan" },
+            "connector": { "name": "rounded" },
+            "attrs": {
+                ".marker-source": { "d": "M 10 0 L 0 5 L 10 10 z" },
+                ".marker-target": { "d": "M 10 0 L 0 5 L 10 10 z "}
+            }
+        }
+    ]
+}
