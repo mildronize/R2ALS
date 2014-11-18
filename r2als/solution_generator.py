@@ -11,6 +11,7 @@ class SolutionGenerator:
         self.start()
 
     def algorithm_likes_human(self):
+        
 
 
     def start(self):

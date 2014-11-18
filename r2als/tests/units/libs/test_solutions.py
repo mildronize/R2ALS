@@ -1,10 +1,10 @@
 import unittest
 from r2als import models
-from r2als import config
 
 class SolutionsTest(unittest.TestCase):
 
     def setUp(self):
+        from r2als import config
         configuration = config.Configurator(config.root_path + 'test.ini')
         configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
