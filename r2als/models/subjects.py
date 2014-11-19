@@ -25,7 +25,7 @@ class SubjectGroup(me.Document):
     curriculum = me.ReferenceField('Curriculum')
     # subject temp info
     code = me.StringField()
-
+    subject_id = me.ObjectIdField('Subject')
 
     def clean(self):
         """Ensures that the SubjectGroup name found in the curriculum"""
@@ -33,7 +33,9 @@ class SubjectGroup(me.Document):
         # print(available_names)
         if self.name not in available_names:
             raise me.ValidationError('The name "'+self.name+'"'+ ' must in '+str(available_names))
-        if self.subject is not None: self.code = self.subject.code
+        if self.subject is not None:
+            self.code = self.subject.code
+            self.subject_id = self.subject.id
 
 class Curriculum(me.Document):
     meta = {'collection': 'curriculums'}
@@ -51,6 +53,7 @@ class Subject(me.Document):
 
     code = me.StringField()
     name = me.StringField(required=True)
+    short_name = me.StringField(required=True)
     credit = me.IntField(required=True)
     categories = me.ListField(me.StringField(required=True))
     curriculum = me.ReferenceField('Curriculum')

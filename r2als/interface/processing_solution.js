@@ -47,7 +47,7 @@ function read() {
       dataType: "json",
       cache: false,
       crossDomain : true,
-      url: "./joint_semesters.json",
+      url: "./processing_solution.json",
       success: function (jsonString, textStatus, errorThrown) {
         graph.clear();
         graph.fromJSON(jsonString);

@@ -34,6 +34,38 @@ class GradeSubject(me.EmbeddedDocument):
     # semester = me.IntField()
     semester_id = me.EmbeddedDocumentField(SemesterId)
 
+class SemestersList(me.Document):
+    meta = {'collection': 'semesters_lists'}
+    member = me.ReferenceField('Member', primary_key= True)
+    semesters = me.ListField(me.ReferenceField('Semester'))
+
+    def countNumEnrolledSubject(self):
+        # count all subject without grade 'W'
+        num_subject = 0
+        for semester in self.semesters:
+            for gradeSubject in semester.subjects:
+                # print(semester.semester_id.year, semester.semester_id.semester,gradeSubject.subject.short_name)
+                if 'grade' in gradeSubject:
+                    if gradeSubject.grade.isEnrolled:
+                        num_subject += 1
+                        # print(num_subject,': ',gradeSubject.subject.short_name)
+                else:
+                    num_subject += 1
+                    # print(num_subject,': ',gradeSubject.subject.short_name)
+        return num_subject
+
+    def findNotEnrolledSubjects(self):
+        # return a list of subject with grade 'W'
+        lists = list()
+        for semester in self.semesters:
+            for gradeSubject in semester.subjects:
+                if 'grade' in gradeSubject:
+                    if gradeSubject.grade.mustReEnroll:
+                        gradeSubject.semester_id = semester.semester_id
+                        lists.append(gradeSubject)
+        return lists
+
+
 class Semester(me.Document):
     meta = {'collection': 'semesters'}
 

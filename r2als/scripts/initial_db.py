@@ -107,6 +107,7 @@ def create_Subject(raw_subjects, curriculum):
                 subject_tmp.subject_groups.append(create_SubjectGroup(subject_group, raw_subject, curriculum))
 
         subject_tmp.name = raw_subject['name']
+        subject_tmp.short_name = raw_subject['short_name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
 
         # add categories
@@ -215,7 +216,7 @@ def initial_coe_curriculum_data(curriculumPath):
         {'name': "E",  'score': 0.0, 'isCredit': True, 'canReEnroll': True, 'mustReEnroll': True},
         {'name': "S",                'isCredit': False,'canReEnroll': True, 'mustReEnroll': False},
         {'name': "U",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True},
-        {'name': "W",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True}
+        {'name': "W",                'isCredit': False,'canReEnroll': False,'mustReEnroll': True, 'isEnrolled': False}
     ])
     return curriculum_model
 
@@ -317,7 +318,7 @@ def main():
                 'subjects': [
                     {'code' : '200-101','grade' : 'C'},
                     {'code' : '242-101','grade' : 'C'},
-                    {'code' : '322-101','grade' : 'C'},
+                    {'code' : '322-101','grade' : 'E'},
                     {'code' : '332-103','grade' : 'W'}, # Drop this subject
                     {'code' : '332-113','grade' : 'C'},
                     {'code' : '640-101','grade' : 'C'},

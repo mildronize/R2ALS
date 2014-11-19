@@ -24,7 +24,14 @@ class InitialSolution:
         self.numStudiedSemesterIndex = self.maxStudiedSemesterIndex + 1
         self.maxSemesterIndex = self.si.get(self.curriculum.required_num_year, self.curriculum.num_semester)
         self.numSemesterIndex = self.maxSemesterIndex + 1
+
+        self.remainSubjects = []
+        self.initialRemainSubjects()
+
         # self.initialEmptySemester()
+    def initialRemainSubjects(self):
+        for i in range(self.member.curriculum.num_semester):
+            self.remainSubjects.append([])
 
     def countImportedSubject(self):
         # l.debug(len(self.importedSubject))
@@ -43,38 +50,53 @@ class InitialSolution:
             self.importedSubject.append(subject_id)
             return True
 
-    def addSemesterModel(self, index):
+    def addRemainSubjects(self, semester, gradeSubject):
+        self.remainSubjects[semester-1].append(gradeSubject)
+
+    def countRemainSubjects(self):
+        tmp = 0
+        for remainSubject in self.remainSubjects:
+            tmp += len(remainSubject)
+        return tmp
+
+    def addSemesterModel(self, index, isRemaining = False):
         mSemester = models.Semester()
         mSemester.member = self.member
         mSemester.semester_id = models.SemesterId(year = self.si.toYear(index),
                                                   semester = self.si.toSemester(index))
 
-        # Read all subject from same curriculum
-        # for studied semester index
-        if index < self.numStudiedSemesterIndex:
+        if not isRemaining:
+            # Read all subject from same curriculum
+            # for studied semester index
+            if index < self.numStudiedSemesterIndex:
 
-            for enrolled_semester in self.member.enrolled_semesters:
-                if enrolled_semester.semester_id.year == mSemester.semester_id.year and \
-                enrolled_semester.semester_id.semester == mSemester.semester_id.semester:
-                    mSemester.subjects = copy.copy(enrolled_semester.subjects)
-                    break
-        # for not studied semester index
+                for enrolled_semester in self.member.enrolled_semesters:
+                    if enrolled_semester.semester_id.year == mSemester.semester_id.year and \
+                    enrolled_semester.semester_id.semester == mSemester.semester_id.semester:
+                        mSemester.subjects = copy.copy(enrolled_semester.subjects)
+                        break
+            # for not studied semester index
+            else:
+                mSubjectGroups = models.SubjectGroup.objects(curriculum = self.curriculum,
+                                                             name = self.member.subject_group,
+                                                             semester_id__year = mSemester.semester_id.year,
+                                                             semester_id__semester = mSemester.semester_id.semester)
+                for mSubjectGroup in mSubjectGroups:
+                    if not self.hasImportedSubject(str(mSubjectGroup.subject['id'])):
+                        gradeSubject = models.GradeSubject()
+                        gradeSubject.subject = mSubjectGroup.subject
+                        mSemester.subjects.append(gradeSubject)
+                        self.addImportedSubject(str(mSubjectGroup.subject['id']))
         else:
-            mSubjectGroups = models.SubjectGroup.objects(curriculum = self.curriculum,
-                                                         name = self.member.subject_group,
-                                                         semester_id__year = mSemester.semester_id.year,
-                                                         semester_id__semester = mSemester.semester_id.semester)
-            for mSubjectGroup in mSubjectGroups:
-                if not self.hasImportedSubject(str(mSubjectGroup.subject['id'])):
-                    gradeSubject = models.GradeSubject()
-                    gradeSubject.subject = mSubjectGroup.subject
-                    mSemester.subjects.append(gradeSubject)
-                    self.addImportedSubject(str(mSubjectGroup.subject['id']))
+            for gradeSubject in self.remainSubjects[index-self.numSemesterIndex]:
+                mSemester.subjects.append(models.GradeSubject(subject = gradeSubject.subject))
 
         return mSemester
 
     def start(self):
-        mSemesters = []
+        # mSemesters = []
+        semestersList = models.SemestersList()
+        mSemesters = semestersList.semesters
         for i in range(self.numSemesterIndex):
             y = self.si.toYear(i)
             s = self.si.toSemester(i)
@@ -82,14 +104,29 @@ class InitialSolution:
                                                       name = self.member.subject_group ,
                                                       semester_id__year = y,
                                                       semester_id__semester = s).count()
-            mSemesters.append(self.addSemesterModel(i))
+            mSemesters.append(self.addSemesterModel(i, False))
             if i < self.numStudiedSemesterIndex:
                 # ==========  This section for year & semester which are studied ========
                 l.info("semster (%d/%d) which are stuided, are processing[%d]",y,s,numSubjects)
             else:
                 # ==========  This section for year & semester remaining ========
                 l.info("semster (%d/%d) are processing[%d]",y,s,numSubjects)
-        return mSemesters
+        for gradeSubject in semestersList.findNotEnrolledSubjects():
+            print(gradeSubject.subject.short_name)
+            self.addRemainSubjects(gradeSubject.semester_id.semester, gradeSubject)
+        print(self.countRemainSubjects())
+        # add extra semester
+        # if len(self.remainSubjects[]) > 0:
+        if self.countRemainSubjects() > 0:
+
+            for i in range(self.numSemesterIndex, \
+                           self.numSemesterIndex + self.curriculum.num_semester):
+                y = self.si.toYear(i)
+                s = self.si.toSemester(i)
+                mSemesters.append(self.addSemesterModel(i, True))
+
+        semestersList.member = self.member
+        return semestersList
 
 # def isCorrectInitialSolution(self):
 #     for y in range(1,self.curriculum.required_num_year+1):
