@@ -62,8 +62,8 @@ class InitialSolution:
     def addSemesterModel(self, index, isRemaining = False):
         mSemester = models.Semester()
         mSemester.member = self.member
-        mSemester.semester_id = models.SemesterId(year = self.si.toYear(index),
-                                                  semester = self.si.toSemester(index))
+        mSemester.year = self.si.toYear(index)
+        mSemester.semester = self.si.toSemester(index)
 
         if not isRemaining:
             # Read all subject from same curriculum
@@ -71,16 +71,16 @@ class InitialSolution:
             if index < self.numStudiedSemesterIndex:
 
                 for enrolled_semester in self.member.enrolled_semesters:
-                    if enrolled_semester.semester_id.year == mSemester.semester_id.year and \
-                    enrolled_semester.semester_id.semester == mSemester.semester_id.semester:
+                    if enrolled_semester.year == mSemester.year and \
+                    enrolled_semester.semester == mSemester.semester:
                         mSemester.subjects = copy.copy(enrolled_semester.subjects)
                         break
             # for not studied semester index
             else:
                 mSubjectGroups = models.SubjectGroup.objects(curriculum = self.curriculum,
                                                              name = self.member.subject_group,
-                                                             semester_id__year = mSemester.semester_id.year,
-                                                             semester_id__semester = mSemester.semester_id.semester)
+                                                             year = mSemester.year,
+                                                             semester = mSemester.semester)
                 for mSubjectGroup in mSubjectGroups:
                     if not self.hasImportedSubject(str(mSubjectGroup.subject['id'])):
                         gradeSubject = models.GradeSubject()
@@ -102,8 +102,8 @@ class InitialSolution:
             s = self.si.toSemester(i)
             numSubjects = models.SubjectGroup.objects(curriculum = self.curriculum,
                                                       name = self.member.subject_group ,
-                                                      semester_id__year = y,
-                                                      semester_id__semester = s).count()
+                                                      year = y,
+                                                      semester = s).count()
             mSemesters.append(self.addSemesterModel(i, False))
             if i < self.numStudiedSemesterIndex:
                 # ==========  This section for year & semester which are studied ========
@@ -113,7 +113,7 @@ class InitialSolution:
                 l.info("semster (%d/%d) are processing[%d]",y,s,numSubjects)
         for gradeSubject in semestersList.findNotEnrolledSubjects():
             print(gradeSubject.subject.short_name)
-            self.addRemainSubjects(gradeSubject.semester_id.semester, gradeSubject)
+            self.addRemainSubjects(gradeSubject.semester, gradeSubject)
         print(self.countRemainSubjects())
         # add extra semester
         # if len(self.remainSubjects[]) > 0:

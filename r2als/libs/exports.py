@@ -11,14 +11,19 @@ class ExportJson:
 
     def __init__(self, member, mSemesters):
         l.info('hello ExportJson')
+        self.member = member
         self.json_object = dict()
+        self.si = SemesterIndex(member.curriculum.num_semester)
         self.json_object['subjects'] = self.exportListSubject(mSemesters)
-
         self.json_object['links'] = self.exportLink(mSemesters)
         print(len(self.json_object['links']))
         self.json_object['num_semester'] = member.curriculum.num_semester
+
         # plus one year because it is spare semester
         self.json_object['num_year'] = member.curriculum.required_num_year + 1
+
+        self.json_object['last_year'] = member.last_year
+        self.json_object['last_semester'] = member.last_semester
         # self.json_object['member'] = dict()
         # self.json_object['member']['name'] = member.name
         l.info(member.name)
@@ -41,20 +46,33 @@ class ExportJson:
             lists.append(self.findTotalCredit(mSemesters[i]))
         return lists
 
+    def namingSubject(self, mSemesters, cur_year, cur_semester, original_id):
+        cmp_semester = self.si.compare_semester(cur_year, cur_semester,
+                                                self.member.last_year,
+                                                self.member.last_semester)
+        if cmp_semester < 0 or cmp_semester == 0:
+            # studied semester
+            tmp_subject_id = original_id
+            last_semester_id = self.si.get(self.member.last_year,
+                                           self.member.last_semester)
+            for i in range(last_semester_id + 1, len(mSemesters)):
+                for gradeSubject in mSemesters[i].subjects:
+                    if tmp_subject_id == str(gradeSubject.subject.id):
+                        tmp_subject_id += '_old'
+                        return tmp_subject_id
+        return original_id
+
     def exportListSubject(self, mSemesters):
         lists = []
         for mSemester in mSemesters:
-            year = mSemester.semester_id.year
-            semester = mSemester.semester_id.semester
+            year = mSemester.year
+            semester = mSemester.semester
             for gradeSubject in mSemester.subjects:
                 # if self.hasPrerequisite(gradeSubject):
                 subject = dict()
                 subject['year'] = year
                 subject['semester'] = semester
-                subject['id']  = str(gradeSubject.subject.id)
-                for list_obj in lists:
-                    if subject['id'] == list_obj['id']:
-                        subject['id'] += '_re'
+                subject['id'] = self.namingSubject(mSemesters, year, semester, str(gradeSubject.subject.id))
                 subject['name']  = gradeSubject.subject.short_name
                 subject['hasPrerequisite']  = self.hasPrerequisite(gradeSubject)
                 subject['credit']  = gradeSubject.subject.credit
@@ -67,8 +85,8 @@ class ExportJson:
     def exportLink(self, mSemesters):
         lists = []
         for mSemester in mSemesters:
-            year = mSemester.semester_id.year
-            semester = mSemester.semester_id.semester
+            year = mSemester.year
+            semester = mSemester.semester
             for gradeSubject in mSemester.subjects:
                 source = gradeSubject.subject.id
                 for prerequisite in gradeSubject.subject.prerequisites:
@@ -91,7 +109,7 @@ class ExportJointjs:
         self.width = 100
         self.height = 40
 
-        self.offset_start_x = 50
+        self.offset_start_x = 150 # 50
         self.offset_start_y = 30
 
         self.offset_width = 50
@@ -101,9 +119,11 @@ class ExportJointjs:
 
         self.jointjs_object = dict()
         self.si = SemesterIndex(json_object['num_semester'])
+        self.last_year = json_object['last_year']
+        self.last_semester = json_object['last_semester']
         self.list_num_subject = self.initialZeroList(json_object['num_year'], json_object['num_semester'])
         self.jointjs_object['cells'] = self.start(json_object, json_object['num_year'], json_object['num_semester'])
-        
+
     def initialZeroList(self, num_year, num_semester):
         lists = list()
         for i in range(num_year * num_semester):
@@ -180,8 +200,13 @@ class ExportJointjs:
 
         x = coordinate['x']
         y = coordinate['y']
-        if subjec_id.find('_re')  > 0:
-            rect_fill = "orange"
+
+        cmp_semester = self.si.compare_semester(obj['year'], obj['semester'],
+                                                self.last_year,
+                                                self.last_semester)
+        if cmp_semester < 0 or cmp_semester == 0:
+            # if subjec_id.find('_old')  > 0:
+            rect_fill = "#666666"
         else:
             if obj['hasPrerequisite']:
                 rect_fill = "green"

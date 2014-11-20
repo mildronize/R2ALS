@@ -3,10 +3,10 @@ import mongoengine as me
 import datetime
 # import math
 
-class SemesterId(me.EmbeddedDocument):
-#     semester_id = me.IntField()
-    year = me.IntField()
-    semester = me.IntField()
+# class SemesterId(me.EmbeddedDocument):
+# #     semester_id = me.IntField()
+#     year = me.IntField()
+#     semester = me.IntField()
 #     num_semester = me.IntField(required=True)
 #
 #     def clean(self):
@@ -30,9 +30,9 @@ class GradeSubject(me.EmbeddedDocument):
 
     subject = me.ReferenceField('Subject')
     grade = me.ReferenceField('Grade')
-    # year = me.IntField()
-    # semester = me.IntField()
-    semester_id = me.EmbeddedDocumentField(SemesterId)
+    year = me.IntField()
+    semester = me.IntField()
+    # semester_id = me.EmbeddedDocumentField(SemesterId)
 
 class SemestersList(me.Document):
     meta = {'collection': 'semesters_lists'}
@@ -61,7 +61,8 @@ class SemestersList(me.Document):
             for gradeSubject in semester.subjects:
                 if 'grade' in gradeSubject:
                     if gradeSubject.grade.mustReEnroll:
-                        gradeSubject.semester_id = semester.semester_id
+                        gradeSubject.year = semester.year
+                        gradeSubject.semester = semester.semester
                         lists.append(gradeSubject)
         return lists
 
@@ -71,17 +72,17 @@ class Semester(me.Document):
 
     subjects = me.ListField(me.EmbeddedDocumentField(GradeSubject))
     member = me.ReferenceField('Member')
-    # year = me.IntField(required=True)
-    # semester = me.IntField(required=True)
-    semester_id = me.EmbeddedDocumentField(SemesterId)
+    year = me.IntField(required=True)
+    semester = me.IntField(required=True)
+    # semester_id = me.EmbeddedDocumentField(SemesterId)
 
 class EnrolledSemester(me.EmbeddedDocument):
     meta = {'collection': 'semesters'}
 
     subjects = me.ListField(me.EmbeddedDocumentField(GradeSubject))
-    # year = me.IntField(required=True)
-    # semester = me.IntField(required=True)
-    semester_id = me.EmbeddedDocumentField(SemesterId)
+    year = me.IntField(required=True)
+    semester = me.IntField(required=True)
+    # semester_id = me.EmbeddedDocumentField(SemesterId)
 
 class Member(me.Document):
     meta = {'collection': 'members'}

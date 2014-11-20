@@ -17,16 +17,16 @@ class SemesterIndex:
     def toSemester(self, semester_index):
         return semester_index + 4 - (3 * self.toYear(semester_index))
 
-    def compare_SemesterId(self, semester_id_1, semester_id_2):
-        if semester_id_1.year > semester_id_2.year:
+    def compare_semester(self, year1, semester1, year2, semester2):
+        if year1 > year2:
             return 1
-        elif semester_id_1.year < semester_id_2.year:
+        elif year1 < year2:
             return -1
         else:
             # equal
-            if semester_id_1.semester > semester_id_2.semester:
+            if semester1 > semester2:
                 return 1
-            elif semester_id_1.semester < semester_id_2.semester:
+            elif semester1 < semester2:
                 return -1
             else:
                 return 0
