@@ -6,6 +6,15 @@ from r2als.libs.functions import SemesterIndex
 l = Log('prerequisites').getLogger()
 
 # gradeSubject = gs
+def selector(prerequisite_name, gradeSubject_1, gradeSubject_2, member):
+    if prerequisite_name == "studied_prerequisite":
+        return StudiedPrerequisite(gradeSubject_1, gradeSubject_2, member)
+    elif prerequisite_name == "passed_prerequisite":
+        return PassedPrerequisite(gradeSubject_1, gradeSubject_2, member)
+    elif prerequisite_name == "corequisite":
+        return Corequisite(gradeSubject_1, gradeSubject_2, member)
+    elif prerequisite_name == "cocurrent":
+        return Cocurrent(gradeSubject_1, gradeSubject_2, member)
 
 class Prerequisite:
     # subject 1 ,subject 2 must be models.gradeSubject
@@ -22,11 +31,13 @@ class Prerequisite:
         return False
 
     def check_semester(self, less, equal):
-        if self.si.compare_SemesterId(self.gs_1.semester_id,
-                                      self.gs_2.semester_id) > 0:
+        cmp_semester = self.si.compare_semester(self.gs_1.year,
+                                                self.gs_1.semester,
+                                                self.gs_2.year,
+                                                self.gs_2.semester)
+        if cmp_semester > 0:
             return False
-        elif self.si.compare_SemesterId(self.gs_1.semester_id,
-                                        self.gs_2.semester_id) < 0:
+        elif cmp_semester < 0:
             return less
         else:
             return equal
@@ -39,11 +50,13 @@ class StudiedPrerequisite(Prerequisite):
         # StudiedPrerequisite
         if self.check_semester(less = True, equal = False) == False:
             return False
-        print(self.gs_1.__dict__)
-        if self.gs_1.grade.name == 'W':
-            return False
-        else:
-            return True
+
+        if 'grade' in self.gs_1:
+            if self.gs_1.grade.name == 'W':
+                return False
+            else:
+                return True
+        return True
 
 class PassedPrerequisite(Prerequisite):
 
@@ -52,14 +65,16 @@ class PassedPrerequisite(Prerequisite):
         if self.check_semester(less = True, equal = False) == False:
             return False
         # PassedPrerequisite
-        if 'score' in self.gs_1.grade:
-            if self.gs_1.grade.score >= 1.00 :
+        if 'grade' in self.gs_1:
+            if 'score' in self.gs_1.grade:
+                if self.gs_1.grade.score >= 1.00 :
+                    return True
+                else:
+                    return False
+            elif self.gs_1.grade.name == 'S':
                 return True
-            else:
-                return False
-        elif self.gs_1.grade.name == 'S':
-            return True
-        else: return False
+            else: return False
+        return True
 
 class Corequisite(Prerequisite):
 
@@ -69,11 +84,14 @@ class Corequisite(Prerequisite):
         if self.check_semester(less = True, equal = True) == False:
             return False
 
-        if self.gs_1.grade.name == 'W':
-            return False
-        else:
-            return True
+        if 'grade' in self.gs_1:
+            if self.gs_1.grade.name == 'W':
+                return False
+            else:
+                return True
+        return True
 
+# remark!!!!!!!!!!!!!
 class Cocurrent(Prerequisite):
 
     def isEnrolledSubject(self, gs):
@@ -91,7 +109,8 @@ class Cocurrent(Prerequisite):
         # case 1 : subject1 was enrolled & subject2 got 'W' must re-enroll
         # case 2 : subject1 got 'W' must re-enroll & subject2 was enrolled
 
+        return True
 
-
-        if self.check_semester(less = False, equal = True) == False:
-            return False
+        # if self.check_semester(less = False, equal = True) == False:
+        #     return False
+        #

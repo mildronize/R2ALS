@@ -3,20 +3,19 @@ from r2als import models
 
 def gs(year, semester, grade):
     #create grade subject
-    mSmesterId = models.SemesterId(year = year, semester = semester)
-    if grade == '': return  models.GradeSubject(semester_id = mSmesterId)
+    if grade == '': return models.GradeSubject(year = year, semester = semester)
     else:
         grade = models.Grade.objects(name = grade).first()
         if grade is not None:
-            return  models.GradeSubject(grade = grade,
-                                        semester_id = mSmesterId)
+            return models.GradeSubject(grade = grade,
+                                       year = year, semester = semester)
         else: print('Not found the grade')
 
 class PrerequisiteTest(unittest.TestCase):
 
     def setUp(self):
         from r2als import config
-        configuration = config.Configurator(config.root_path + 'test.ini')
+        configuration = config.Configurator(config.root_path + 'development.ini')
         configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
 
@@ -30,7 +29,7 @@ class StudiedPrerequisiteTest(unittest.TestCase):
 
     def setUp(self):
         from r2als import config
-        configuration = config.Configurator(config.root_path + 'test.ini')
+        configuration = config.Configurator(config.root_path + 'development.ini')
         configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
 
@@ -60,7 +59,7 @@ class PassedPrerequisiteTest(unittest.TestCase):
 
     def setUp(self):
         from r2als import config
-        configuration = config.Configurator(config.root_path + 'test.ini')
+        configuration = config.Configurator(config.root_path + 'development.ini')
         configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
 
@@ -90,7 +89,7 @@ class CorequisiteTest(unittest.TestCase):
 
     def setUp(self):
         from r2als import config
-        configuration = config.Configurator(config.root_path + 'test.ini')
+        configuration = config.Configurator(config.root_path + 'development.ini')
         configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
 
@@ -120,7 +119,7 @@ class CocurrentTest(unittest.TestCase):
 
     def setUp(self):
         from r2als import config
-        configuration = config.Configurator(config.root_path + 'test.ini')
+        configuration = config.Configurator(config.root_path + 'development.ini')
         configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
 

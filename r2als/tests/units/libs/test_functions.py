@@ -51,3 +51,14 @@ class FunctionsTest(unittest.TestCase):
         self.assertEqual(semesterIndex.toSemester(9),1)
         self.assertEqual(semesterIndex.toSemester(10),2)
         self.assertEqual(semesterIndex.toSemester(11),3)
+
+    def test_compare_semester(self):
+        from r2als.libs.functions import SemesterIndex
+        semesterIndex = SemesterIndex(3)
+        self.assertEqual(semesterIndex.compare_semester(1,1,1,1), 0)
+        self.assertEqual(semesterIndex.compare_semester(2,2,2,2), 0)
+        self.assertEqual(semesterIndex.compare_semester(2,1,1,1), 1)
+        self.assertEqual(semesterIndex.compare_semester(1,1,2,1), -1)
+        self.assertEqual(semesterIndex.compare_semester(2,1,2,2), -1)
+        self.assertEqual(semesterIndex.compare_semester(3,1,2,2), 1)
+        self.assertEqual(semesterIndex.compare_semester(3,2,3,1), 1)
