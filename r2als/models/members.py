@@ -66,7 +66,6 @@ class SemestersList(me.Document):
                         lists.append(gradeSubject)
         return lists
 
-
 class Semester(me.Document):
     meta = {'collection': 'semesters'}
 

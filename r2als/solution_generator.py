@@ -129,7 +129,6 @@ class MoveSameChainBackwardOnly(SolutionGeneratorMethod):
         else:
             l.error('Not found subject %s', gradeSubject.subject.name)
 
-
     def runSameChain(self, previous_gradeSubject, gradeSubject):
         # l.info("Create new runSameChain : %s", subject.short_name)
         subject = gradeSubject.subject
@@ -195,3 +194,4 @@ class SolutionGenerator:
         l.info('processing....')
         # self.a/lgorithm_likes_human()
         # return
+
