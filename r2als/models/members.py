@@ -94,4 +94,7 @@ class Member(me.Document):
     last_year = me.IntField(required=True)
     last_semester = me.IntField(required=True)
 
+    expected_year = me.IntField(required=True)
+    expected_semester = me.IntField(required=True)
+
     enrolled_semesters = me.ListField(me.EmbeddedDocumentField(EnrolledSemester))

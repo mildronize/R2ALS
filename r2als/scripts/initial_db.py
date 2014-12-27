@@ -260,6 +260,8 @@ def main():
                 'registered_year' : 2557,
                 'last_year' : 1,
                 'last_semester' : 1,
+                'expected_year' : 4,
+                'expected_semester' : 3,
                 },
             'semesters' : [{
                 'year': 1,
@@ -285,6 +287,8 @@ def main():
                 'registered_year' : 2557,
                 'last_year' : 1,
                 'last_semester' : 1,
+                'expected_year' : 4,
+                'expected_semester' : 3,
                 },
             'semesters' : [{
                 'year': 1,
@@ -309,6 +313,8 @@ def main():
                 'registered_year' : 2557,
                 'last_year' : 1,
                 'last_semester' : 1,
+                'expected_year' : 4,
+                'expected_semester' : 3,
                 },
             'semesters' : [{
                 'year': 1,

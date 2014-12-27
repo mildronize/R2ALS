@@ -48,7 +48,7 @@ class Processor:
     ################ scoring method ################
 
     def getScore(self, lists):
-        return scoring.calculate(lists)
+        return scoring.scoring(lists)
     def printScore(self, lists):
         print("The score is "+str(self.getScore(lists))+" : ", end=" ")
         print(lists)
@@ -69,7 +69,7 @@ class Processor:
 
     def compareScoreBestSolution(self):
         #print("compareScoreBestSolution!")
-        if scoring.calculate(self.workingSolution) > scoring.calculate(self.bestSolution):
+        if scoring.scoring(self.workingSolution) > scoring.scoring(self.bestSolution):
             print("Working Solution ", end=" ")
             self.printScore(self.workingSolution)
             print("Old best Solution", end=" ")
@@ -101,7 +101,7 @@ class Processor:
         #         self.addTabuLists(self.workingSolution)
         #     self.compareScoreBestSolution()
         #
-        #     if scoring.calculate(self.bestSolution) >= 8:
+        #     if scoring.scoring(self.bestSolution) >= 8:
         #         self.isWorking = False
 
         print("End processor")

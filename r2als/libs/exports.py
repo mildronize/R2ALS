@@ -247,7 +247,6 @@ class ExportJointjs:
             }
         }
 
-
     def start(self, json_objects, num_year, num_semester):
         lists = list()
         lists += self.createSemesterLabelList(num_year, num_semester, json_objects['total_credits'])

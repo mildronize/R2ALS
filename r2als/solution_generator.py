@@ -68,7 +68,7 @@ class MoveSameChainBackwardOnly(SolutionGeneratorMethod):
         target_semester = dict()
         last_semester_id = self.si.get(last_year, last_semester) + 1
         subjectGroup = models.SubjectGroup.objects(subject_id = subject.id,
-                                                   name = self.member.subject_group).first()
+                                                   name=self.member.subject_group).first()
         if subjectGroup is None:
             return -1
         original_semester_id = self.si.get(subjectGroup.year,
@@ -109,9 +109,9 @@ class MoveSameChainBackwardOnly(SolutionGeneratorMethod):
             l.debug("START >> %s" , gradeSubject.subject.short_name)
         else:
             l.debug("%s (%s/%s) >> %s", previous_gradeSubject.subject.short_name,
-                                      previous_gradeSubject.year,
-                                      previous_gradeSubject.semester,
-                                      gradeSubject.subject.short_name)
+                                        previous_gradeSubject.year,
+                                        previous_gradeSubject.semester,
+                                        gradeSubject.subject.short_name)
         source_iden = self.findSubject(gradeSubject.subject)
         if source_iden is not None:
             target_semester = self.getTargetSemester(previous_gradeSubject,
