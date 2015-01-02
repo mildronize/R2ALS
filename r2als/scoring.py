@@ -17,7 +17,7 @@ class Scoring:
         # end before year 4 semester 3
         si = SemesterIndex(self.member.curriculum.num_semester)
         self.expectedSemesterToEnd = si.get(self.member.expected_year,self.member.expected_semester)
-
+        # score will be increased if the user study more than over
         self.scorePerSemester = 100
 
     def count_semester(self):

@@ -22,7 +22,7 @@ class SolutionGeneratorTest(unittest.TestCase):
         import json
         from r2als.libs.solutions import InitialSolution
         from r2als.libs.exports import ExportJson, ExportJointjs
-        from r2als.solution_generator import MoveSameChainBackwardOnly
+        from r2als.solution_generator import MoveWholeChain
 
         member = models.Member.objects(member_id = '5710110997').first()
         if member is None:
@@ -30,7 +30,7 @@ class SolutionGeneratorTest(unittest.TestCase):
             exit()
 
         semesterList = InitialSolution(member).start()
-        mSemesters = MoveSameChainBackwardOnly(semesterList).start()
+        mSemesters = MoveWholeChain(semesterList).start()
 
         json_obj = ExportJson(member, mSemesters).get()
         jointjs_json = ExportJointjs(json_obj).get()

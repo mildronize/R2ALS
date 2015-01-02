@@ -8,7 +8,13 @@ from r2als.libs import prerequisites
 
 l = Log('solution_generator').getLogger()
 
-class SolutionGeneratorMethod:
+class NextSolutionMethod:
+
+    def __init__(self, semesterList):
+        self.mSemesters = semesterList.semesters
+        self.member = semesterList.member
+        print(self.member)
+        self.si = SemesterIndex(self.member.curriculum.num_semester)
 
     def swap_gradeSubject(self, gs1, gs2):
         l.info('Swap sth')
@@ -30,14 +36,23 @@ class SolutionGeneratorMethod:
         # remove
         self.mSemesters[source_semester].subjects.pop(source_subject_order)
 
-class MoveSameChainBackwardOnly(SolutionGeneratorMethod):
+class RandomNextSolution(NextSolutionMethod):
 
-    def __init__(self, semesterList):
-        l.info('Runing MoveSameChainBackwardOnly ...')
-        self.mSemesters = semesterList.semesters
-        self.member = semesterList.member
-        print(self.member)
-        self.si = SemesterIndex(self.member.curriculum.num_semester)
+    def test(self):
+        print("555")
+
+    def start(self):
+        return self.mSemesters
+
+class RandomNextSolutionWithRule(NextSolutionMethod):
+
+    def test(self):
+        print("555")
+
+    def start(self):
+        return self.mSemesters
+
+class MoveWholeChain(NextSolutionMethod):
 
     def findFailSubjects(self):
         # interest only studied semester
@@ -192,6 +207,5 @@ class SolutionGenerator:
 
     def start(self):
         l.info('processing....')
-        # self.a/lgorithm_likes_human()
         # return
 

@@ -21,7 +21,6 @@ class ExportsTest(unittest.TestCase):
     def tearDown(self):
         self.file.close()
 
-
     def test_ExportJointjs(self):
         import json
         from r2als.libs.solutions import InitialSolution
