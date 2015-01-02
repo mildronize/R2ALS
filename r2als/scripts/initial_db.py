@@ -322,8 +322,8 @@ def main():
                 'subjects': [
                     {'code' : '200-101','grade' : 'C'},
                     {'code' : '242-101','grade' : 'C'},
-                    {'code' : '322-101','grade' : 'W'},  # E Math 1
-                    {'code' : '332-103','grade' : 'C'}, # W Drop Phy 1
+                    {'code' : '322-101','grade' : 'E'},  # E Math 1
+                    {'code' : '332-103','grade' : 'W'}, # W Drop Phy 1
                     {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
                     {'code' : '640-101','grade' : 'C'},
                     {'code' : '890-101','grade' : 'C'},

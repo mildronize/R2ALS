@@ -3,8 +3,6 @@ from r2als import models
 
 class SolutionGeneratorTest(unittest.TestCase):
 
-    # tests class SemesterIndex
-
     def setUp(self):
 
         from r2als import config
@@ -18,23 +16,24 @@ class SolutionGeneratorTest(unittest.TestCase):
     def tearDown(self):
         self.file.close()
 
-    def test_ExportJointjs(self):
-        import json
-        from r2als.libs.solutions import InitialSolution
-        from r2als.libs.exports import ExportJson, ExportJointjs
-        from r2als.solution_generator import MoveWholeChain
 
-        member = models.Member.objects(member_id = '5710110997').first()
-        if member is None:
-            print('Not found the member')
-            exit()
-
-        semesterList = InitialSolution(member).start()
-        mSemesters = MoveWholeChain(semesterList).start()
-
-        json_obj = ExportJson(member, mSemesters).get()
-        jointjs_json = ExportJointjs(json_obj).get()
-
-        self.file.write(json.dumps(jointjs_json))
-
-        self.assertNotEqual(jointjs_json, None)
+    # def test_ExportJointjs(self):
+    #     import json
+    #     from r2als.libs.solutions import InitialSolution
+    #     from r2als.libs.exports import ExportJson, ExportJointjs
+    #     from r2als.libs import next_solution_methods
+    #
+    #     member = models.Member.objects(member_id = '5710110997').first()
+    #     if member is None:
+    #         print('Not found the member')
+    #         exit()
+    #
+    #     semesterList = InitialSolution(member).start()
+    #     mSemesters = next_solution_methods.MoveWholeChain(semesterList).start()
+    #
+    #     json_obj = ExportJson(member, mSemesters).get()
+    #     jointjs_json = ExportJointjs(json_obj).get()
+    #
+    #     self.file.write(json.dumps(jointjs_json))
+    #
+    #     self.assertNotEqual(jointjs_json, None)
