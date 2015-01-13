@@ -187,6 +187,8 @@ class ExportJointjs:
         name = obj['name']
         if 'grade' in obj:
             name += ' ('+str(obj['grade'])+')'
+        else:
+            name += ' ('+str(obj['credit'])+')'
 
         # if len(name) <= 6:
         #     tap = '\t\t\t'

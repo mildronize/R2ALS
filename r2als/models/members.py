@@ -73,10 +73,17 @@ class Semester(me.Document):
     member = me.ReferenceField('Member')
     year = me.IntField(required=True)
     semester = me.IntField(required=True)
+
+    def calculate_total_credit(self):
+        total = 0
+        for gradeSubject in self.subjects:
+            total += gradeSubject.subject.credit
+        return total
+
+
     # semester_id = me.EmbeddedDocumentField(SemesterId)
 
 class EnrolledSemester(me.EmbeddedDocument):
-    meta = {'collection': 'semesters'}
 
     subjects = me.ListField(me.EmbeddedDocumentField(GradeSubject))
     year = me.IntField(required=True)
@@ -96,5 +103,7 @@ class Member(me.Document):
 
     expected_year = me.IntField(required=True)
     expected_semester = me.IntField(required=True)
+    # margin credit that user allow extra total credit
+    margin_credit = me.IntField(required=True)
 
     enrolled_semesters = me.ListField(me.EmbeddedDocumentField(EnrolledSemester))

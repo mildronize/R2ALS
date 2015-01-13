@@ -262,6 +262,7 @@ def main():
                 'last_semester' : 1,
                 'expected_year' : 4,
                 'expected_semester' : 3,
+                'margin_credit': 0
                 },
             'semesters' : [{
                 'year': 1,
@@ -289,6 +290,7 @@ def main():
                 'last_semester' : 1,
                 'expected_year' : 4,
                 'expected_semester' : 3,
+                'margin_credit': 0
                 },
             'semesters' : [{
                 'year': 1,
@@ -315,6 +317,7 @@ def main():
                 'last_semester' : 1,
                 'expected_year' : 4,
                 'expected_semester' : 3,
+                'margin_credit': 0
                 },
             'semesters' : [{
                 'year': 1,

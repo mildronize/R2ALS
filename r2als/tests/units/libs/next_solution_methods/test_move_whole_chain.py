@@ -3,7 +3,7 @@ __author__ = 'mildronize'
 import unittest
 from r2als import models
 
-class SolutionGeneratorTest(unittest.TestCase):
+class MoveWholeChainTest(unittest.TestCase):
 
     def setUp(self):
 
@@ -14,13 +14,6 @@ class SolutionGeneratorTest(unittest.TestCase):
         models.initial(configuration.settings)
 
         self.file = open(config.root_path+'/r2als/interface/processing_solution.json', 'w')
-
-    def tearDown(self):
-        self.file.close()
-
-
-    def test_MoveWholeChain(self):
-        #  This is function for running, not testing
 
         import json
         from r2als.libs.solutions import InitialSolution
@@ -40,4 +33,8 @@ class SolutionGeneratorTest(unittest.TestCase):
 
         self.file.write(json.dumps(jointjs_json))
 
-        self.assertNotEqual(jointjs_json, None)
+    def tearDown(self):
+        self.file.close()
+
+    def test_MoveWholeChain(self):
+        self.assertEqual(True,True)

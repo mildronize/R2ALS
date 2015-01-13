@@ -1,28 +1,70 @@
 __author__ = 'mildronize'
 
+from random import randint
 from r2als import models
 from r2als.libs.logs import Log
 from r2als.libs import prerequisites
 from r2als.libs.next_solution_method import NextSolutionMethod
+from r2als.libs.rules import Rule
+from r2als.libs.subject_list import SubjectList
 
 l = Log('move_whole_chain').getLogger()
 
 class MoveWholeChain(NextSolutionMethod):
 
-    def findFailSubjects(self):
+
+    def move_non_related_subject_out(self):
+        # 1 get all non_related subject
+        # last semester of the member
+
+
+        non_related_grade_subjects = []
+        rule = Rule(self.member)
+        last_semester_id = self.si.get(self.member.last_year,
+                                       self.member.last_semester)
+
+        for i in range(last_semester_id+1, len(self.mSemesters)):
+            maximum_credit = rule.calculate_maximum_credit(i)
+            total_credit = self.mSemesters[i].calculate_total_credit()
+            if total_credit > maximum_credit:
+                over_credit = total_credit - maximum_credit
+                l.error("Over %d credits in semester: %d/%d" % (over_credit,
+                                                                self.si.toYear(i),
+                                                                self.si.toSemester(i)))
+                # To find non related subject
+                for gradeSubject in self.mSemesters[i].subjects:
+                    if gradeSubject.subject.prerequisites == [] and \
+                    gradeSubject.subject.reverse_prerequisites == []:
+                        # add subject into subject_list
+                        non_related_grade_subjects.append(gradeSubject)
+                        l.info("%s (%d)" % (gradeSubject.subject.short_name,
+                                            gradeSubject.subject.credit))
+
+                while over_credit > 0:
+                    random_position = randint(0,len(non_related_grade_subjects) - 1)
+                    over_credit -= non_related_grade_subjects[random_position].subject.credit
+                    # remove the subject
+                    l.info("over credit %d , removing > %s " % (over_credit,
+                                                                non_related_grade_subjects[random_position].subject.short_name))
+                    self.mSemesters[i].subjects.remove(non_related_grade_subjects[random_position])
+                    non_related_grade_subjects.remove(non_related_grade_subjects[random_position])
+                print(self.mSemesters[i].calculate_total_credit())
+        return None
+
+    def find_fail_subjects(self):
         # interest only studied semester
-        lists = list()
+        result_list = []
         last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
         for i in range(last_semester_id):
             for gradeSubject in self.mSemesters[i].subjects:
                 if gradeSubject.grade.mustReEnroll:
-                    lists.append(models.GradeSubject(subject = gradeSubject.subject,
-                                                    year = self.si.toYear(i),
-                                                    semester = self.si.toSemester(i),
-                                                    grade = gradeSubject.grade))
-        return lists
+                    result_list.append(models.GradeSubject(subject = gradeSubject.subject,
+                                                            year = self.si.toYear(i),
+                                                            semester = self.si.toSemester(i),
+                                                            grade = gradeSubject.grade))
+        return result_list
 
-    def findSubject(self, failSubject):
+    def find_subject(self, failSubject):
         last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
         for i in range(last_semester_id, len(self.mSemesters)):
             # l.info('processing %s',i)
@@ -34,11 +76,11 @@ class MoveWholeChain(NextSolutionMethod):
                     }
         return None
 
-    def getTargetSemester(self, previous_gradeSubject, subject ,last_year, last_semester, source_iden, prerequisite_name):
+    def get_target_semester(self, previous_gradeSubject, subject ,last_year, last_semester, source_iden, prerequisite_name):
         target_semester = dict()
         last_semester_id = self.si.get(last_year, last_semester) + 1
         subjectGroup = models.SubjectGroup.objects(subject_id = subject.id,
-                                                   name=self.member.subject_group).first()
+                                                   name = self.member.subject_group).first()
         if subjectGroup is None:
             return -1
         original_semester_id = self.si.get(subjectGroup.year,
@@ -49,7 +91,7 @@ class MoveWholeChain(NextSolutionMethod):
             # move to next year and same semester
             target_semester['year'] = last_year + 1
             target_semester['semester'] = subjectGroup.semester
-        else :
+        else:
             # move to next year and same semester from previous subject
             if prerequisite_name is None:
                 l.error('Must have prerequisite_name')
@@ -74,17 +116,17 @@ class MoveWholeChain(NextSolutionMethod):
 
         return self.si.get(target_semester['year'], target_semester['semester'])
 
-    def prepareToMove(self, previous_gradeSubject, gradeSubject, prerequisite_name):
+    def prepare_moving(self, previous_gradeSubject, gradeSubject, prerequisite_name):
         if previous_gradeSubject is None:
-            l.debug("START >> %s" , gradeSubject.subject.short_name)
+            l.debug("START >> %s", gradeSubject.subject.short_name)
         else:
             l.debug("%s (%s/%s) >> %s", previous_gradeSubject.subject.short_name,
                                         previous_gradeSubject.year,
                                         previous_gradeSubject.semester,
                                         gradeSubject.subject.short_name)
-        source_iden = self.findSubject(gradeSubject.subject)
+        source_iden = self.find_subject(gradeSubject.subject)
         if source_iden is not None:
-            target_semester = self.getTargetSemester(previous_gradeSubject,
+            target_semester = self.get_target_semester(previous_gradeSubject,
                                                      gradeSubject.subject,
                                                      self.member.last_year,
                                                      self.member.last_semester,
@@ -99,39 +141,41 @@ class MoveWholeChain(NextSolutionMethod):
         else:
             l.error('Not found subject %s', gradeSubject.subject.name)
 
-    def runSameChain(self, previous_gradeSubject, gradeSubject):
+    def move_subject_whole_chain(self, previous_gradeSubject, gradeSubject):
         # l.info("Create new runSameChain : %s", subject.short_name)
         subject = gradeSubject.subject
         if previous_gradeSubject is None:
-            self.prepareToMove(None, gradeSubject, None)
+            self.prepare_moving(None, gradeSubject, None)
         if subject.reverse_prerequisites is []:
             return 0
         else:
             for reverse_prerequisite in subject.reverse_prerequisites:
-                semester_id = self.findSubject(subject)['semester_id']
+                semester_id = self.find_subject(subject)['semester_id']
                 tmp_gradeSubject = models.GradeSubject(subject = subject,
                                                        year = self.si.toYear(semester_id),
                                                        semester = self.si.toSemester(semester_id),
                                                        )
                 prerequisite_gradeSubject = models.GradeSubject(subject = reverse_prerequisite.subject)
-                self.prepareToMove(tmp_gradeSubject, prerequisite_gradeSubject, reverse_prerequisite.name)
-                self.runSameChain(tmp_gradeSubject, prerequisite_gradeSubject)
+                self.prepare_moving(tmp_gradeSubject, prerequisite_gradeSubject, reverse_prerequisite.name)
+                self.move_subject_whole_chain(tmp_gradeSubject, prerequisite_gradeSubject)
 
     def start(self):
         # step 1 : find fail subject
         # step 2 : store it in list
-        fail_subject = self.findFailSubjects()
+        fail_subject = self.find_fail_subjects()
         # for gradeSubject in fail_subject:
         #     l.info(gradeSubject.subject.short_name)
         # step 3 : move back each semester
         # Loop in remaining semester
-        last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
+
+        # last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
         for failGradeSubject in fail_subject:
-            self.runSameChain(None, failGradeSubject)
+            self.move_subject_whole_chain(None, failGradeSubject)
 
         # find fail_subject
         #   In each loop: swap the fail subject to nearest semester
         #
+        self.move_non_related_subject_out()
 
         return self.mSemesters
 
