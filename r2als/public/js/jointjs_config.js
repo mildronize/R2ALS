@@ -41,18 +41,21 @@ $('#perpendicularLinks').on('change', function() {
     paper.options.perpendicularLinks = $(this).is(':checked') ? true : false;
 });
 //url: "./joint_semesters.json",
-//./processing_solution.json
-function read() {
+//apis/solution_generator/json
+//http://127.0.0.1:6543/apis/solution_generator/json
+
+function read(graph) {
     $.ajax({
       type: "GET",
       dataType: "json",
       cache: false,
       crossDomain : true,
       url: "http://127.0.0.1:6543/apis/solution_generator/json",
+
       success: function (jsonString, textStatus, errorThrown) {
-        graph.clear();
-        graph.fromJSON(jsonString);
-        console.log(jsonString)
+          graph.clear();
+          console.log(jsonString);
+          graph.fromJSON(jsonString);
         }
      });
     return graph

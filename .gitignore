@@ -50,3 +50,9 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# Pycharm
+.idea/*
+
+# Remote Sync for Atom
+.remote-sync.json

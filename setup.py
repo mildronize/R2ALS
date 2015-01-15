@@ -8,8 +8,14 @@ CHANGES = open(os.path.join(here, 'CHANGES.md')).read()
 
 requires = [
     'mongoengine',
-    'rainbow_logging_handler'
+    'rainbow_logging_handler',
+    'pyramid',
+    'pyramid_mako',
+    'pyramid_debugtoolbar',
+    'pyramid_beaker',
+    'waitress'
     ]
+
 
 setup(name='r2als',
       version='0.1.0',
@@ -29,6 +35,8 @@ setup(name='r2als',
       tests_require=requires,
       test_suite="r2als",
       entry_points = """\
+      [paste.app_factory]
+      main = r2als:main
       [console_scripts]
       initialize_r2als_db = r2als.scripts.initial_db:main
       """,

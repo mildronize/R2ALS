@@ -1,0 +1,22 @@
+{
+  "name": "R2ALS",
+  "version": "0.2.0",
+  "homepage": "https://github.com/mildronize/R2ALS",
+  "authors": [
+    "Thada Wangthammang <mildronize@gmail.com>"
+  ],
+  "description": "Registration Assistant Application using Local-Search",
+  "keywords": [
+    "R2ALS"
+  ],
+  "dependencies":{
+      "bootstrap-css": ">= 3.1.1"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
