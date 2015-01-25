@@ -34,7 +34,7 @@ class GradeSubject(me.EmbeddedDocument):
     semester = me.IntField()
     # semester_id = me.EmbeddedDocumentField(SemesterId)
 
-class SemestersList(me.Document):
+class Solution(me.Document):
     meta = {'collection': 'semesters_lists'}
     member = me.ReferenceField('Member', primary_key= True)
     semesters = me.ListField(me.ReferenceField('Semester'))
@@ -73,6 +73,15 @@ class Semester(me.Document):
     member = me.ReferenceField('Member')
     year = me.IntField(required=True)
     semester = me.IntField(required=True)
+
+    def find_non_related_subjects(self):
+        non_related_grade_subjects = []
+        for gradeSubject in self.subjects:
+            if gradeSubject.subject.prerequisites == [] and \
+            gradeSubject.subject.reverse_prerequisites == []:
+                # add subject into subject_list
+                non_related_grade_subjects.append(gradeSubject)
+        return non_related_grade_subjects
 
     def calculate_total_credit(self):
         total = 0

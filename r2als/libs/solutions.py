@@ -8,10 +8,40 @@ from r2als import models
 
 from r2als.libs.logs import Log
 from r2als.libs.functions import SemesterIndex
+from r2als.libs import next_solution_methods
 pp = pprint.PrettyPrinter(indent=4)
 l = Log('libs/solutions').getLogger()
 
-class InitialSolution:
+class InitialSolution(next_solution_methods.MoveWholeChain):
+
+
+    def __init__(self, member):
+        solution = PreInitialSolution(member).start()
+        self.mSemesters = solution.semesters
+        self.member = member
+        self.si = SemesterIndex(self.member.curriculum.num_semester)
+
+    def start(self):
+        # step 1 : find fail subject
+        # step 2 : store it in list
+        fail_subject = self.find_fail_subjects()
+        # for gradeSubject in fail_subject:
+        #     l.info(gradeSubject.subject.short_name)
+        # step 3 : move back each semester
+        # Loop in remaining semester
+
+        for failGradeSubject in fail_subject:
+            self.move_subject_whole_chain(None, failGradeSubject)
+
+        self.move_non_related_subject_out()
+
+        solution = dict()
+        solution['member'] = self.member
+        solution['semesters'] = self.mSemesters
+        return solution
+
+
+class PreInitialSolution:
 
     def __init__(self, member):
         # self.semesterItems = []
@@ -95,7 +125,7 @@ class InitialSolution:
 
     def start(self):
         # mSemesters = []
-        semestersList = models.SemestersList()
+        semestersList = models.Solution()
         mSemesters = semestersList.semesters
         for i in range(self.numSemesterIndex):
             y = self.si.toYear(i)
@@ -119,7 +149,7 @@ class InitialSolution:
         # if len(self.remainSubjects[]) > 0:
         if self.countRemainSubjects() > 0:
 
-            for i in range(self.numSemesterIndex, \
+            for i in range(self.numSemesterIndex,
                            self.numSemesterIndex + self.curriculum.num_semester):
                 y = self.si.toYear(i)
                 s = self.si.toSemester(i)

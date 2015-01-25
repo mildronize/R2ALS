@@ -18,7 +18,7 @@ requires = [
 
 
 setup(name='r2als',
-      version='0.1.0',
+      version='0.2.0',
       description='r2als',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

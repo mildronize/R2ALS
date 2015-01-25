@@ -6,9 +6,9 @@ l = Log('next_solution_method').getLogger()
 
 class NextSolutionMethod:
 
-    def __init__(self, semesterList):
-        self.mSemesters = semesterList.semesters
-        self.member = semesterList.member
+    def __init__(self, solution):
+        self.mSemesters = solution.semesters
+        self.member = solution.member
         self.si = SemesterIndex(self.member.curriculum.num_semester)
 
     def swap_gradeSubject(self, gs1, gs2):

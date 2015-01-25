@@ -31,18 +31,27 @@ var paper = new joint.dia.Paper({
 
 });
 
-paper.scale(0.8, 0.8);
+paper.scale(0.6, 0.6);
 
 $(document).ready(function () {
     read(graph);
+
 });
 
 $('#perpendicularLinks').on('change', function() {
     paper.options.perpendicularLinks = $(this).is(':checked') ? true : false;
 });
+
+function GetURLElement(index) {
+    var sPageURL = window.location.pathname;
+    var sURLVariables = sPageURL.split('/');
+    return sURLVariables[index]
+}
+
 //url: "./joint_semesters.json",
 //apis/solution_generator/json
 //http://127.0.0.1:6543/apis/solution_generator/json
+
 
 function read(graph) {
     $.ajax({
@@ -50,7 +59,7 @@ function read(graph) {
       dataType: "json",
       cache: false,
       crossDomain : true,
-      url: "http://127.0.0.1:6543/apis/solution_generator/json",
+      url: "http://127.0.0.1:6543/apis/solution_generator/"+GetURLElement(2),
 
       success: function (jsonString, textStatus, errorThrown) {
           graph.clear();

@@ -1,5 +1,5 @@
 from .subjects import Subject, Curriculum, Prerequisite, SubjectGroup
-from .members import Member, Semester, GradeSubject, EnrolledSemester, SemestersList
+from .members import Member, Semester, GradeSubject, EnrolledSemester, Solution
 from .regulations import Grade
 
 from mongoengine import connect

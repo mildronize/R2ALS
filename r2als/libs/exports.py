@@ -34,6 +34,11 @@ class ExportJson:
             return False
         return True
 
+    def countPrerequisite(self, gradeSubject):
+        return len(gradeSubject.subject.prerequisites)
+    def countReverse_prerequisites(self, gradeSubject):
+        return len(gradeSubject.subject.reverse_prerequisites)
+
     def findTotalCredit(self, mSemester):
         total_credit = 0
         for gradeSubject in mSemester.subjects:
@@ -74,7 +79,9 @@ class ExportJson:
                 subject['semester'] = semester
                 subject['id'] = self.namingSubject(mSemesters, year, semester, str(gradeSubject.subject.id))
                 subject['name']  = gradeSubject.subject.short_name
-                subject['hasPrerequisite']  = self.hasPrerequisite(gradeSubject)
+                subject['hasPrerequisite'] = self.hasPrerequisite(gradeSubject)
+                subject['numPrerequisite'] = self.countPrerequisite(gradeSubject)
+                subject['numReverse_prerequisite'] = self.countReverse_prerequisites(gradeSubject)
                 subject['credit']  = gradeSubject.subject.credit
 
                 if 'grade' in gradeSubject:
@@ -109,7 +116,7 @@ class ExportJointjs:
         self.width = 100
         self.height = 40
 
-        self.offset_start_x = 150 # 50
+        self.offset_start_x = 30 # 50
         self.offset_start_y = 30
 
         self.offset_width = 50
@@ -130,14 +137,15 @@ class ExportJointjs:
             lists.append(0)
         return lists
 
-    def addList_num_subject(self, index, hasPrerequisite =True):
+    def addList_num_subject(self, index, hasPrerequisite =True, offset= 0):
         self.list_num_subject[index] += self.height
         if hasPrerequisite:
             self.list_num_subject[index] += self.offset_height
         else:
             self.list_num_subject[index] += self.offset_height_non_prereq
+        self.list_num_subject[index] += offset
 
-    def semesterToCoordinate(self, semesterIndex, hasPrerequisite):
+    def semesterToCoordinate(self, semesterIndex):
         x = self.offset_start_x + semesterIndex * (self.width + self.offset_width)
         y = self.offset_start_y + self.list_num_subject[semesterIndex]
         # y = self.offset_start_y + self.list_num_subject[semesterIndex] * (self.height+ self.offset_height)
@@ -149,7 +157,7 @@ class ExportJointjs:
     def createSemesterLabel(self, semesterIndex, total_credit):
         year = self.si.toYear(semesterIndex)
         semester = self.si.toSemester(semesterIndex)
-        coordinate = self.semesterToCoordinate(semesterIndex, True)
+        coordinate = self.semesterToCoordinate(semesterIndex)
         x = coordinate['x']
         y = coordinate['y']
         semester_id = 'semester-label-'+str(year)+'-'+str(semester)
@@ -176,7 +184,7 @@ class ExportJointjs:
         lists = list()
         for i in range(num_year * num_semester):
             lists.append(self.createSemesterLabel(i, total_credits[i]))
-            self.addList_num_subject(i, True)
+            self.addList_num_subject(i, True, 0)
         return lists
 
     def createSubject(self, obj):
@@ -190,15 +198,9 @@ class ExportJointjs:
         else:
             name += ' ('+str(obj['credit'])+')'
 
-        # if len(name) <= 6:
-        #     tap = '\t\t\t'
-        # else: tap = '\t\t'
-        #
-        # l.info('%s:%s%s' % (name,tap,self.list_num_subject))
-
-
-        coordinate = self.semesterToCoordinate(semesterIndex, obj['hasPrerequisite'])
-        self.addList_num_subject(semesterIndex, obj['hasPrerequisite'])
+        coordinate = self.semesterToCoordinate(semesterIndex)
+        # y_offset = max(obj['numReverse_prerequisite'],obj['numPrerequisite'])* 20
+        self.addList_num_subject(semesterIndex, obj['hasPrerequisite'], 0)
 
         x = coordinate['x']
         y = coordinate['y']

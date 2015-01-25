@@ -16,6 +16,7 @@ class Log:
          # setup `RainbowLoggingHandler`
         handler = RainbowLoggingHandler(sys.stderr, color_funcName=('black', 'gray', True))
         handler.setFormatter(formatter)
+
         logger.addHandler(handler)
 
         self.logger_tmp = logger

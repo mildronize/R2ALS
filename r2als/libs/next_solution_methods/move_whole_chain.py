@@ -18,7 +18,6 @@ class MoveWholeChain(NextSolutionMethod):
         # last semester of the member
 
 
-        non_related_grade_subjects = []
         rule = Rule(self.member)
         last_semester_id = self.si.get(self.member.last_year,
                                        self.member.last_semester)
@@ -31,14 +30,10 @@ class MoveWholeChain(NextSolutionMethod):
                 l.error("Over %d credits in semester: %d/%d" % (over_credit,
                                                                 self.si.toYear(i),
                                                                 self.si.toSemester(i)))
+
+                temp_subjects = []
                 # To find non related subject
-                for gradeSubject in self.mSemesters[i].subjects:
-                    if gradeSubject.subject.prerequisites == [] and \
-                    gradeSubject.subject.reverse_prerequisites == []:
-                        # add subject into subject_list
-                        non_related_grade_subjects.append(gradeSubject)
-                        l.info("%s (%d)" % (gradeSubject.subject.short_name,
-                                            gradeSubject.subject.credit))
+                non_related_grade_subjects = self.mSemesters[i].find_non_related_subjects()
 
                 while over_credit > 0:
                     random_position = randint(0,len(non_related_grade_subjects) - 1)
@@ -46,9 +41,24 @@ class MoveWholeChain(NextSolutionMethod):
                     # remove the subject
                     l.info("over credit %d , removing > %s " % (over_credit,
                                                                 non_related_grade_subjects[random_position].subject.short_name))
+                    temp_subjects.append(non_related_grade_subjects[random_position])
                     self.mSemesters[i].subjects.remove(non_related_grade_subjects[random_position])
                     non_related_grade_subjects.remove(non_related_grade_subjects[random_position])
-                print(self.mSemesters[i].calculate_total_credit())
+                # find the semesters that allow the subject to move in the semester
+                semester = self.si.toSemester(i)
+                # year = self.si.toYear(i)
+                for temp_subject in temp_subjects:
+                    available_semesters = []
+                    l.info("available_semester: %s (credit : %d)" % (temp_subject.subject.short_name, temp_subject.subject.credit))
+                    for key,mSemester in enumerate(self.mSemesters):
+                        if semester == self.si.toSemester(key) and key != i and \
+                        mSemester.calculate_total_credit() + temp_subject.subject.credit <= rule.calculate_maximum_credit(key):
+                            available_semesters.append(key)
+                            l.info("%d/%d" % (self.si.toYear(key), self.si.toSemester(key)))
+                    random_semester = randint(0, len(available_semesters) - 1 )
+                    self.mSemesters[available_semesters[random_semester]].subjects.append(temp_subject)
+
+                # print(self.mSemesters[i].calculate_total_credit())
         return None
 
     def find_fail_subjects(self):
@@ -160,39 +170,21 @@ class MoveWholeChain(NextSolutionMethod):
                 self.move_subject_whole_chain(tmp_gradeSubject, prerequisite_gradeSubject)
 
     def start(self):
-        # step 1 : find fail subject
-        # step 2 : store it in list
-        fail_subject = self.find_fail_subjects()
-        # for gradeSubject in fail_subject:
-        #     l.info(gradeSubject.subject.short_name)
-        # step 3 : move back each semester
-        # Loop in remaining semester
-
-        # last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
-        for failGradeSubject in fail_subject:
-            self.move_subject_whole_chain(None, failGradeSubject)
-
-        # find fail_subject
-        #   In each loop: swap the fail subject to nearest semester
+        # # step 1 : find fail subject
+        # # step 2 : store it in list
+        # fail_subject = self.find_fail_subjects()
+        # # for gradeSubject in fail_subject:
+        # #     l.info(gradeSubject.subject.short_name)
+        # # step 3 : move back each semester
+        # # Loop in remaining semester
         #
-        self.move_non_related_subject_out()
+        # # last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
+        # for failGradeSubject in fail_subject:
+        #     self.move_subject_whole_chain(None, failGradeSubject)
+        #
+        # # find fail_subject
+        # #   In each loop: swap the fail subject to nearest semester
+        # #
+        # self.move_non_related_subject_out()
 
         return self.mSemesters
-
-    # simple getTargetSemester
-    # def getTargetSemester(self, previous_gradeSubject, subject ,last_year, last_semester, source_iden):
-    #     last_semester_id = self.si.get(last_year, last_semester) + 1
-    #     subjectGroup = models.SubjectGroup.objects(subject_id = subject.id,
-    #                                                name = self.member.subject_group).first()
-    #     if subjectGroup is None:
-    #         return -1
-    #     semester_id = self.si.get(subjectGroup.year,
-    #                               subjectGroup.semester)
-    #     source_year = self.si.toYear(source_iden['semester_id'])
-    #     source_semester = self.si.toSemester(source_iden['semester_id'])
-    #     if semester_id < last_semester_id:
-    #         # move to next year and same semester
-    #         return self.si.get(last_year + 1, subjectGroup.semester)
-    #     else :
-    #         # move to next year and same semester from previous subject
-    #         return self.si.get(previous_gradeSubject.year + 1, subjectGroup.semester)
