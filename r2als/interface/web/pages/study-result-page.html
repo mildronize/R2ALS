@@ -1,0 +1,75 @@
+<!--<link rel="import" href="/components/polymer/polymer.html">-->
+<link rel="import" href="/layouts/main-layout.html">
+<link href="/components/paper-input/paper-autogrow-textarea.html" rel="import">
+<link href="/components/paper-input/paper-input-decorator.html" rel="import">
+<link href="/components/paper-input/paper-input.html" rel="import">
+<link href="/components/paper-button/paper-button.html" rel="import">
+<link href="/components/paper-radio-group/paper-radio-group.html" rel="import">
+
+<!--core animate page-->
+<link href="/components/core-animated-pages/core-animated-pages.html" rel="import">
+<link href="/components/paper-shadow/paper-shadow.html" rel="import">
+
+<link href="/components/core-list/core-list.html" rel="import">
+
+<link rel="import" href="/elements/r2als-subject-group.html">
+
+<!--
+   <script>
+  Polymer('list-subject', {
+    addIdx: 0,
+    deleteIdx: 0,
+    count: 50000,
+    ready: function() {
+      this.initArrayEmpty();
+      this.generateDummyArray();
+//      window.list = this.$.list;
+    },initArrayEmpty: function() {
+      this.data = [];
+    },generateDummyArray: function() {
+      this.data = [
+        {name: 'Math 1', grade: 'A'},
+        {name: 'Math 2', grade: 'B'},
+      ];
+    },
+    
+  });
+  </script>
+-->
+
+
+<polymer-element name="study-result-page" noscript>
+  <template>
+    <link rel="stylesheet" href="/styles.css" shim-shadowdom>
+    <main-layout selected="study-result" add_button="true">
+      
+      <div class="title">Study Result</div>
+      <h3>Step 3: Add your subjects and grades</h3>
+<!--        <r2als-subject name="Test" grade="A"></r2als-subject> -->
+      <r2als-subject-group topic="Year 1 Semester 1"></r2als-subject-group>
+      <r2als-subject-group topic="Year 1 Semester 2"></r2als-subject-group>
+        
+      <div style="width:80%;padding:10px;"><div horizontal center-justified layout></div></div>
+      <section horizontal end-justified layout>
+        <paper-button raised class="colored"><a href="/#/get-plans">Next</a></paper-button>
+      </section>
+
+    </main-layout>
+  </template>
+
+</polymer-element>
+
+  <script>
+//    var template = document.querySelector('study-result-page');
+//    template.subjects = [
+//        {name: 'Math 1', grade: 'A'},
+//        {name: 'Math 2', grade: 'B'},
+//      ];
+//    if(document.querySelector('study-result-page')){
+//      document.querySelector('study-result-page').aaa = "444"
+//    }else console.log("error");
+    
+    
+//    document.querySelector('study-result-page').aaa = "444"
+  </script>
+

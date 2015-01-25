@@ -1,0 +1,46 @@
+<link rel="import" href="/components/paper-shadow/paper-shadow.html">
+<link rel="import" href="/components/paper-fab/paper-fab.html">
+
+
+<link rel="import" href="r2als-subject.html">
+
+<polymer-element name="r2als-subject-group" attributes="topic">
+  <template>
+    <style>
+      section{
+        border-bottom: 1px solid #EEEEEE;
+        padding-bottom: 10px;
+      }
+      paper-shadow{
+/*        max-width: 10.5em;*/
+        width: 80%;
+      }
+    </style>
+    <section>
+      <h4>{{topic}}</h4>
+        <div flex>
+          <paper-shadow>
+            <template repeat="{{subject in subjects}}"> 
+              <r2als-subject name="{{subject.name}}" grade="{{subject.grade}}"></r2als-subject> 
+            </template> 
+           </paper-shadow>
+        </div>
+<!--        <paper-fab mini icon="done" class="green" title="done"></paper-fab>-->
+
+    </section>
+    
+  </template>
+    <script>
+      Polymer('r2als-subject-group', {
+        
+        // initialize the element's model
+        ready: function() {
+          this.subjects = [
+          {name: 'Math 1', grade: 'A'},
+          {name: 'Math 2', grade: 'B+'},
+          ];
+        }
+        
+      });
+  </script>
+</polymer-element>
