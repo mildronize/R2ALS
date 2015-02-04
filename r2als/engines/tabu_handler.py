@@ -9,43 +9,41 @@ l = Log('TabuHandler').getLogger()
 class TabuHandler:
 
     def __init__(self, tabu_size):
-
         self.tabu_list = []
         self.tabu_size = tabu_size
-
         l.info("TabuHandler")
 
     def add_next_solution(self, solution):
-        if self.is_existed(solution):
+        if self.__is_existed(solution):
             return False
-        self.store_solution(solution)
+        self.__store_solution(solution)
         return True
 
-    def find_solution(self, str):
+    def __find_solution(self, str):
         if any(str in s for s in self.tabu_list):
             return True
         return False
 
-    def is_exited(self, solution):
-        if self.find_solution(self.generate_solution_id(solution)):
+    def __is_existed(self, solution):
+        l.info(self.__generate_solution_id(solution))
+        if self.__find_solution(self.__generate_solution_id(solution)):
             return True
         return False
 
-    def generate_solution_id(self, solution):
-        return hashlib.sha1(self.convertSolution2String(solution)).hexdigest()
+    def __generate_solution_id(self, solution):
+        return hashlib.sha1(self.__convert_solution_to_string(solution)).hexdigest()
 
-    def convertSolution2String(self, solution):
+    def __convert_solution_to_string(self, solution):
         result = ""
-        for iter_semester in solution.semesters:
+        for iter_semester in solution['semesters']:
             result += ">%s/%s: " % (str(iter_semester.year), str(iter_semester.semester))
             for iter_gradeSubject in iter_semester.subjects:
                 result += "(%s,%s) " % (iter_gradeSubject.subject.code, iter_gradeSubject.subject.name)
-        # strLists =   ",".join(str(x) for x in soloution)
-        # strLists_bytes = strLists.encode('utf-8')
-        return result
+        return result.encode('utf-8')
 
-    def store_solution(self, solution):
-        if len(self.tabu_list) < self.tabu_size:
-            self.tabu_list.append(self.generate_solution_id(solution))
-        else:
+    def __store_solution(self, solution):
+        if len(self.tabu_list) == self.tabu_size:
             self.tabu_list.pop(0)
+            l.info("Tabu is full. Removing oldest solution from Tabu List (size %d)" % (self.tabu_size))
+        self.tabu_list.append(self.__generate_solution_id(solution))
+        return True
