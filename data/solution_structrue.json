@@ -1,0 +1,29 @@
+{
+  "member": {Member Object},
+  "semesters": [
+    {
+      "member": {Member Object},
+      "year": int,
+      "semester": int,
+      "subjects": [
+        {
+          "subject": {Subject Object},
+          "grade": {Grade Object},
+          "year": int,
+          "semester": int,
+        },
+        {GradeSubject Object},
+        {GradeSubject Object},
+        .
+        .
+        .
+      ]
+    },
+    {Semester Object},
+    {Semester Object},
+    {Semester Object},
+    .
+    .
+    .
+  ]
+}
