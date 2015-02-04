@@ -128,19 +128,21 @@ class CocurrentTest(unittest.TestCase):
     def test_canEnrolled(self):
         from r2als.libs.prerequisites import Cocurrent as CC
         # check all credit grade
-        self.assertEqual(CC(gs(1,1,'W'), gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'E'), gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'D'), gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'D+'),gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'C'), gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'C+'),gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'B'), gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'B+'),gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'A'), gs(1,2,''), self.member).canEnrolled(), True)
-        # #check all audit grade
-        # self.assertEqual(CC(gs(1,1,'S'), gs(1,2,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(1,1,'U'), gs(1,2,''), self.member).canEnrolled(), True)
-        # # check all semster
-        # self.assertEqual(CC(gs(1,2,'C'), gs(1,1,''), self.member).canEnrolled(), False)
-        # self.assertEqual(CC(gs(1,1,'C'), gs(1,1,''), self.member).canEnrolled(), True)
-        # self.assertEqual(CC(gs(2,1,'C'), gs(1,1,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'W'), gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'E'), gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'D'), gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'D+'),gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'C'), gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'C+'),gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'B'), gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'B+'),gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'A'), gs(1,2,''), self.member).canEnrolled(), False)
+        #check all audit grade
+        self.assertEqual(CC(gs(1,1,'S'), gs(1,2,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(1,1,'U'), gs(1,2,''), self.member).canEnrolled(), False)
+        # check all semster
+        self.assertEqual(CC(gs(1,2,'C'), gs(1,1,''), self.member).canEnrolled(), False)
+        self.assertEqual(CC(gs(2,1,'C'), gs(1,1,''), self.member).canEnrolled(), False)
+
+        self.assertEqual(CC(gs(1,1,'C'), gs(1,1,''), self.member).canEnrolled(), True)
+        self.assertEqual(CC(gs(2,1,'C'), gs(2,1,''), self.member).canEnrolled(), True)
