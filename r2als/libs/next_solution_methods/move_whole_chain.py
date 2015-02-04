@@ -17,7 +17,6 @@ class MoveWholeChain(NextSolutionMethod):
         # 1 get all non_related subject
         # last semester of the member
 
-
         rule = Rule(self.member)
         last_semester_id = self.si.get(self.member.last_year,
                                        self.member.last_semester)

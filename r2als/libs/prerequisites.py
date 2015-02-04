@@ -94,23 +94,16 @@ class Corequisite(Prerequisite):
 # remark!!!!!!!!!!!!!
 class Cocurrent(Prerequisite):
 
-    def isEnrolledSubject(self, gs):
-        for enrolled_semester in self.member.enrolled_semesters:
-            for gradeSubject in enrolled_semester.subjects:
-                if gs.subject == gradeSubject.subject:
-                    return gradeSubject.grade
-        return None
+    # def isEnrolledSubject(self, gs):
+    #     for enrolled_semester in self.member.enrolled_semesters:
+    #         for gradeSubject in enrolled_semester.subjects:
+    #             if gs.subject == gradeSubject.subject:
+    #                 return gradeSubject.grade
+    #     return None
 
     def canEnrolled(self):
         # Both 2 subjects must be enrolled simultaneously in first time
-        # case 3 : Both subject1 & subject 2 are not enrolled
-        # if self.findEnrolledSubject(self.gs_1) is None and self.findEnrolledSubject(self.gs_2) is None:
 
-        # case 1 : subject1 was enrolled & subject2 got 'W' must re-enroll
-        # case 2 : subject1 got 'W' must re-enroll & subject2 was enrolled
-
+        if self.check_semester(less = False, equal = True) == False:
+            return False
         return True
-
-        # if self.check_semester(less = False, equal = True) == False:
-        #     return False
-        #
