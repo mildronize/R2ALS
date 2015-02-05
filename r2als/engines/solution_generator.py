@@ -1,11 +1,4 @@
-import copy
-
-from r2als.engines import config
-from r2als import models
 from r2als.libs.logs import Log
-from r2als.libs.functions import SemesterIndex
-from r2als.libs import prerequisites
-from r2als.libs import next_solution_methods
 
 l = Log('solution_generator').getLogger()
 

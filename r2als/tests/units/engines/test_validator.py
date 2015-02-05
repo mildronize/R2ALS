@@ -20,7 +20,6 @@ class ValidatorTest(unittest.TestCase):
 
         self.solution = InitialSolution(member).start()
 
-
     # def tearDown(self):
         # self.file.close()
 
@@ -28,12 +27,4 @@ class ValidatorTest(unittest.TestCase):
     def test_validator(self):
         from r2als.engines.validator import validator
 
-        validator(self.solution, ['prerequisite_check'])
-
-
-
-
-
-
-
-
+        self.assertEqual(validator(self.solution, ['prerequisite_check']), True)

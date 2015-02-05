@@ -30,3 +30,6 @@ class SemesterIndex:
                 return -1
             else:
                 return 0
+# function for debugging
+def extract_grade_subject(grade_subject):
+    return "%s/%s: %s(%s)" % (grade_subject.year, grade_subject.semester, grade_subject.subject.short_name, grade_subject.grade)
