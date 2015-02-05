@@ -35,10 +35,12 @@ class TabuHandler:
 
     def __convert_solution_to_string(self, solution):
         result = ""
-        for iter_semester in solution['semesters']:
+        for i in range( solution.member.num_studied_semester_id , len(solution.semesters)):
+            iter_semester = solution.semesters[i]
             result += ">%s/%s: " % (str(iter_semester.year), str(iter_semester.semester))
             for iter_gradeSubject in iter_semester.subjects:
                 result += "(%s,%s) " % (iter_gradeSubject.subject.code, iter_gradeSubject.subject.name)
+        l.info(result)
         return result.encode('utf-8')
 
     def __store_solution(self, solution):

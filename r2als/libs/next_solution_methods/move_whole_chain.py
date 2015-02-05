@@ -26,7 +26,7 @@ class MoveWholeChain(NextSolutionMethod):
             total_credit = self.mSemesters[i].calculate_total_credit()
             if total_credit > maximum_credit:
                 over_credit = total_credit - maximum_credit
-                l.error("Over %d credits in semester: %d/%d" % (over_credit,
+                l.info("Over %d credits in semester: %d/%d" % (over_credit,
                                                                 self.si.toYear(i),
                                                                 self.si.toSemester(i)))
 
@@ -62,9 +62,10 @@ class MoveWholeChain(NextSolutionMethod):
 
     def find_fail_subjects(self):
         # interest only studied semester
+
         result_list = []
-        last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
-        for i in range(last_semester_id):
+        # last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
+        for i in range(self.member.num_studied_semester_id):
             for gradeSubject in self.mSemesters[i].subjects:
                 if gradeSubject.grade.mustReEnroll:
                     result_list.append(models.GradeSubject(subject = gradeSubject.subject,
@@ -169,21 +170,4 @@ class MoveWholeChain(NextSolutionMethod):
                 self.move_subject_whole_chain(tmp_gradeSubject, prerequisite_gradeSubject)
 
     def start(self):
-        # # step 1 : find fail subject
-        # # step 2 : store it in list
-        # fail_subject = self.find_fail_subjects()
-        # # for gradeSubject in fail_subject:
-        # #     l.info(gradeSubject.subject.short_name)
-        # # step 3 : move back each semester
-        # # Loop in remaining semester
-        #
-        # # last_semester_id = self.si.get(self.member.last_year, self.member.last_semester) + 1
-        # for failGradeSubject in fail_subject:
-        #     self.move_subject_whole_chain(None, failGradeSubject)
-        #
-        # # find fail_subject
-        # #   In each loop: swap the fail subject to nearest semester
-        # #
-        # self.move_non_related_subject_out()
-
         return self.mSemesters

@@ -15,22 +15,27 @@ class SolutionsTest(unittest.TestCase):
         # models.Semester.drop_collection()
 
     # test class InitialSolution
-    def test_InitialSolution(self):
-        from r2als.libs.solutions import InitialSolution
+    def test_PreInitialSolution(self):
+        # Not test now
+
+        from r2als.libs.solutions import PreInitialSolution
         member = models.Member.objects(member_id = '5710110997').first()
         if member is None:
             print('Not found the member')
             exit()
-        semesterList = InitialSolution(member).start()
-        mSemesters = semesterList.semesters
+        solution = PreInitialSolution(member).start()
+        # mSemesters = semesterList.semesters
         # count subject from curriculum
-        num_subject_from_curriculum = models.SubjectGroup.objects(curriculum = member.curriculum,
-                                                                  name = member.subject_group).count()
+        subject_groups = models.SubjectGroup.objects(curriculum = member.curriculum,name = member.subject_group)
+        # i=1
+        # for subject_group in subject_groups:
+        #     print( "%d) %d/%d: %s" % (i, subject_group.year, subject_group.semester,subject_group.subject.short_name))
+        #     i +=1
+        num_subject_from_curriculum = subject_groups.count()
 
         # count subject from InitialSolution (Generate)
-
         self.assertEqual(num_subject_from_curriculum,
-                         semesterList.countNumEnrolledSubject())
+                         solution.countNumEnrolledSubject())
 
         # test num of subject each semester
         # for mSemester in mSemesters:

@@ -13,17 +13,20 @@ class TabuHandlerTest(unittest.TestCase):
         configuration = config.Configurator(config.root_path + 'development.ini')
         configuration.set('mongodb.is_drop_database', False)
         models.initial(configuration.settings)
-        member = models.Member.objects(member_id = '5710110997').first()
-        if member is None:
+        self.member = models.Member.objects(member_id = '5710110997').first()
+        if self.member is None:
             print('Not found the member')
             exit()
 
-        self.solution = InitialSolution(member).start()
-
+        self.solution = InitialSolution(self.member).start()
 
     # def tearDown(self):
         # self.file.close()
 
+    def __create_empty_solution(self):
+        solution = models.Solution()
+        solution.member = self.member
+        return solution
     # Functional Test
     def test_add_next_solution(self):
 
@@ -34,12 +37,12 @@ class TabuHandlerTest(unittest.TestCase):
         # Duplicate solution
         self.assertEqual(tabu_handler.add_next_solution(self.solution), False)
         # Empty solution
-        self.assertEqual(tabu_handler.add_next_solution({"semesters": []}), True)
+        self.assertEqual(tabu_handler.add_next_solution(self.__create_empty_solution()), True)
         # == test Full tabu list case
         tabu_handler = TabuHandler(1)
         self.assertEqual(tabu_handler.add_next_solution(self.solution), True)
         # Empty solution
-        self.assertEqual(tabu_handler.add_next_solution({"semesters": []}), True)
+        self.assertEqual(tabu_handler.add_next_solution(self.__create_empty_solution()), True)
 
 
 

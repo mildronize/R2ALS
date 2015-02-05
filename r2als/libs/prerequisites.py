@@ -20,9 +20,9 @@ class Prerequisite:
     # subject 1 ,subject 2 must be models.gradeSubject
     # subject 1 ,subject 2 must be models.gs
 
-    def __init__(self, gradeSubject_1, gradeSubject_2, member):
-        self.gs_1 = gradeSubject_1
-        self.gs_2 = gradeSubject_2
+    def __init__(self, grade_subject_before, grade_subject_after, member):
+        self.gs_1 = grade_subject_before
+        self.gs_2 = grade_subject_after
         self.member = member
 
         self.si = SemesterIndex()
@@ -30,7 +30,16 @@ class Prerequisite:
     def canEnrolled(self):
         return False
 
-    def check_semester(self, less, equal):
+    def _has_grade(self):
+        if 'grade' in self.gs_1:
+            if self.gs_1.grade is None:
+                return False
+            return True
+        else:
+            return False
+
+
+    def _check_semester(self, less, equal):
         cmp_semester = self.si.compare_semester(self.gs_1.year,
                                                 self.gs_1.semester,
                                                 self.gs_2.year,
@@ -48,10 +57,10 @@ class StudiedPrerequisite(Prerequisite):
     def canEnrolled(self):
         # all grade without 'W'
         # StudiedPrerequisite
-        if self.check_semester(less = True, equal = False) == False:
+        if self._check_semester(less = True, equal = False) == False:
             return False
 
-        if 'grade' in self.gs_1:
+        if self._has_grade():
             if self.gs_1.grade.name == 'W':
                 return False
             else:
@@ -62,10 +71,10 @@ class PassedPrerequisite(Prerequisite):
 
     def canEnrolled(self):
         #The prerequisite subject with at least grade D or S.
-        if self.check_semester(less = True, equal = False) == False:
+        if self._check_semester(less = True, equal = False) == False:
             return False
         # PassedPrerequisite
-        if 'grade' in self.gs_1:
+        if self._has_grade():
             if 'score' in self.gs_1.grade:
                 if self.gs_1.grade.score >= 1.00 :
                     return True
@@ -81,10 +90,10 @@ class Corequisite(Prerequisite):
     def canEnrolled(self):
         # The prerequisite subject is enrolled with the subject
         # simultaneously, or studied prerequisite subject
-        if self.check_semester(less = True, equal = True) == False:
+        if self._check_semester(less = True, equal = True) == False:
             return False
 
-        if 'grade' in self.gs_1:
+        if self._has_grade():
             if self.gs_1.grade.name == 'W':
                 return False
             else:
@@ -104,6 +113,6 @@ class Cocurrent(Prerequisite):
     def canEnrolled(self):
         # Both 2 subjects must be enrolled simultaneously in first time
 
-        if self.check_semester(less = False, equal = True) == False:
+        if self._check_semester(less = False, equal = True) == False:
             return False
         return True
