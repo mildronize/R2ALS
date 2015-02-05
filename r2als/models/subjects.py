@@ -1,6 +1,7 @@
 
 import mongoengine as me
 import datetime
+from . import GradeSubject
 # from .members import SemesterId
 
 prerequisite_names = ['studied_prerequisite',
@@ -12,7 +13,10 @@ class Prerequisite(me.EmbeddedDocument):
     name = me.StringField(required=True,
                           choices= prerequisite_names,
                           primary_key=True)
+    # old version will be removed in the future
     subject = me.ReferenceField('Subject')
+
+    grade_subject = me.EmbeddedDocumentField(GradeSubject)
 
 class SubjectGroup(me.Document):
     meta = {'collection': 'subject_groups'}
@@ -43,10 +47,18 @@ class Curriculum(me.Document):
     faculty = me.StringField(required=True)
     department = me.StringField(required=True)
     year = me.IntField(required=True)
+
     required_num_year = me.IntField(required=True) # A number of year must be studied
     num_semester = me.IntField(required=True)
+    num_required_semester_id = me.IntField()
+
     subject_groups = me.ListField(me.StringField(required=True, primary_key=True))
     categories = me.ListField(me.StringField(required=True, primary_key=True))
+
+    def clean(self):
+        from r2als.libs.functions import SemesterIndex
+        si = SemesterIndex(self.num_semester)
+        self.num_required_semester_id = si.get(self.required_num_year, self.num_semester) + 1
 
 class Subject(me.Document):
     meta = {'collection': 'subjects'}

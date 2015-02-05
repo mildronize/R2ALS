@@ -35,9 +35,15 @@ class InitialSolution(next_solution_methods.MoveWholeChain):
 
         self.move_non_related_subject_out()
 
-        solution = dict()
-        solution['member'] = self.member
-        solution['semesters'] = self.mSemesters
+        # solution = dict()
+        # solution['member'] = self.member
+        # solution['semesters'] = self.mSemesters
+
+        solution = models.Solution()
+        solution.member = self.member
+        solution.semesters = self.mSemesters
+        solution.get_ready()
+        solution.update_all_prerequisite()
         return solution
 
 
@@ -50,15 +56,15 @@ class PreInitialSolution:
         self.importedSubject = []
         # === Todo ===: Remove all his subject!
         self.si = SemesterIndex(self.curriculum.num_semester)
-        self.maxStudiedSemesterIndex = self.si.get(self.member.last_year, self.member.last_semester)
-        self.numStudiedSemesterIndex = self.maxStudiedSemesterIndex + 1
-        self.maxSemesterIndex = self.si.get(self.curriculum.required_num_year, self.curriculum.num_semester)
-        self.numSemesterIndex = self.maxSemesterIndex + 1
-
+        # self.maxStudiedSemesterIndex = self.si.get(self.member.last_year, self.member.last_semester)
+        self.numStudiedSemesterIndex = self.member.num_studied_semester_id
+        # self.maxSemesterIndex = self.si.get(self.curriculum.required_num_year, self.curriculum.num_semester)
+        self.numSemesterIndex = self.curriculum.num_required_semester_id
         self.remainSubjects = []
         self.initialRemainSubjects()
 
         # self.initialEmptySemester()
+
     def initialRemainSubjects(self):
         for i in range(self.member.curriculum.num_semester):
             self.remainSubjects.append([])
