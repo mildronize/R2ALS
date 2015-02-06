@@ -1,7 +1,9 @@
 
 import mongoengine as me
 import datetime
-from r2als.libs.functions import SemesterIndex
+from r2als.libs.functions import *
+from r2als.libs.logs import Log
+l = Log('models/members').getLogger()
 # import math
 
 # class SemesterId(me.EmbeddedDocument):
@@ -63,23 +65,6 @@ class Solution(me.Document):
                     else:
                         l.error("Not found subject")
 
-    def swap_grade_subject(self, grade_subject_1, grade_subject_2):
-        # Prepare var
-        si = SemesterIndex(self.member.curriculum.num_semester)
-        semester_id_1 = si.get(grade_subject_1.year, grade_subject_1.semester)
-        target_subject_1_position = self.__find_grade_subject_id(semester_id_1,
-                                                                 grade_subject_1.subject)
-
-        semester_id_2 = si.get(grade_subject_2.year, grade_subject_2.semester)
-        target_subject_2_position = self.__find_grade_subject_id(semester_id_2,
-                                                                 grade_subject_2.subject)
-        # Swapping
-        tmp = self.semesters[semester_id_1].subjects.pop(target_subject_1_position)
-        self.semesters[semester_id_2].subjects.append(tmp)
-        self.semesters[semester_id_1].subjects.append(
-            self.semesters[semester_id_2].subjects.pop(target_subject_2_position)
-        )
-
     def move_grade_subject(self, grade_subject, target_semester_id):
         # Prepare var
         si = SemesterIndex(self.member.curriculum.num_semester)
@@ -118,13 +103,6 @@ class Solution(me.Document):
                         gradeSubject.semester = semester.semester
                         lists.append(gradeSubject)
         return lists
-
-    def __find_grade_subject_id(self, semester_id, subject):
-        for i in range(len(self.semesters[semester_id].subjects)):
-            tmp_subject = self.semesters[semester_id].subjects[i]
-            if subject == tmp_subject:
-                return i
-        return -1
 
     def __find_grade_subject(self, subject):
         for semester in self.semesters:

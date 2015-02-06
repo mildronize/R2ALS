@@ -4,61 +4,36 @@ from random import randint
 from r2als import models
 from r2als.libs.logs import Log
 from r2als.libs import prerequisites
-from r2als.libs.next_solution_method import NextSolutionMethod
-from r2als.libs.rules import Rule
-from r2als.libs.subject_list import SubjectList
+from r2als.libs.next_solution_methods import *
 
 l = Log('move_whole_chain').getLogger()
 
 class MoveWholeChain(NextSolutionMethod):
 
+    def get_solution(self):
+        # for i in reversed(range(self.solution.member.num_studied_semester_id, len(self.solution.semesters))):
+        #     semester = self.solution.semesters[i]
+        #     invalid_grade_subjects = self.find_invalid_subjects()
+        #     for invalid_grade_subject in invalid_grade_subjects:
+        #         for prerequisite in invalid_grade_subject.subject.prerequisites:
+        #             # check prerequisite
 
-    def move_non_related_subject_out(self):
-        # 1 get all non_related subject
-        # last semester of the member
+        return self.solution
 
-        rule = Rule(self.solution.member)
-        last_semester_id = self.si.get(self.solution.member.last_year,
-                                       self.solution.member.last_semester)
+    def get_initial_solution(self):
+         # step 1 : find fail subject
+        # step 2 : store it in list
+        fail_subjects = self.find_fail_subjects()
+        # for gradeSubject in fail_subject:
+        #     l.info(gradeSubject.subject.short_name)
+        # step 3 : move back each semester
+        # Loop in remaining semester
 
-        for i in range(last_semester_id+1, len(self.solution.semesters)):
-            maximum_credit = rule.calculate_maximum_credit(i)
-            total_credit = self.solution.semesters[i].calculate_total_credit()
-            if total_credit > maximum_credit:
-                over_credit = total_credit - maximum_credit
-                l.info("Over %d credits in semester: %d/%d" % (over_credit,
-                                                                self.si.toYear(i),
-                                                                self.si.toSemester(i)))
+        for failGradeSubject in fail_subjects:
+            self.move_subject_whole_chain(None, failGradeSubject)
 
-                temp_subjects = []
-                # To find non related subject
-                non_related_grade_subjects = self.solution.semesters[i].find_non_related_subjects()
-
-                while over_credit > 0:
-                    random_position = randint(0,len(non_related_grade_subjects) - 1)
-                    over_credit -= non_related_grade_subjects[random_position].subject.credit
-                    # remove the subject
-                    l.info("over credit %d , removing > %s " % (over_credit,
-                                                                non_related_grade_subjects[random_position].subject.short_name))
-                    temp_subjects.append(non_related_grade_subjects[random_position])
-                    self.solution.semesters[i].subjects.remove(non_related_grade_subjects[random_position])
-                    non_related_grade_subjects.remove(non_related_grade_subjects[random_position])
-                # find the semesters that allow the subject to move in the semester
-                semester = self.si.toSemester(i)
-                # year = self.si.toYear(i)
-                for temp_subject in temp_subjects:
-                    available_semesters = []
-                    l.info("available_semester: %s (credit : %d)" % (temp_subject.subject.short_name, temp_subject.subject.credit))
-                    for key,mSemester in enumerate(self.solution.semesters):
-                        if semester == self.si.toSemester(key) and key != i and \
-                        mSemester.calculate_total_credit() + temp_subject.subject.credit <= rule.calculate_maximum_credit(key):
-                            available_semesters.append(key)
-                            l.info("%d/%d" % (self.si.toYear(key), self.si.toSemester(key)))
-                    random_semester = randint(0, len(available_semesters) - 1 )
-                    self.solution.semesters[available_semesters[random_semester]].subjects.append(temp_subject)
-
-                # print(self.solution.semesters[i].calculate_total_credit())
-        return None
+        # self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution()
+        return self.solution
 
     def find_fail_subjects(self):
         # interest only studied semester
@@ -168,17 +143,3 @@ class MoveWholeChain(NextSolutionMethod):
                 prerequisite_gradeSubject = models.GradeSubject(subject = reverse_prerequisite.subject)
                 self.prepare_moving(tmp_gradeSubject, prerequisite_gradeSubject, reverse_prerequisite.name)
                 self.move_subject_whole_chain(tmp_gradeSubject, prerequisite_gradeSubject)
-
-    def start(self):
-        # for i in reversed(range(self.solution.member.num_studied_semester_id, len(self.solution.semesters))):
-        #     semester = self.solution.semesters[i]
-        #     invalid_grade_subjects = self.find_invalid_subjects()
-        #     for invalid_grade_subject in invalid_grade_subjects:
-        #         for prerequisite in invalid_grade_subject.subject.prerequisites:
-        #             # check prerequisite
-        #
-        #
-        #
-        #
-
-        return self.solution

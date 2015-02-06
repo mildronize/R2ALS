@@ -33,3 +33,13 @@ class SemesterIndex:
 # function for debugging
 def extract_grade_subject(grade_subject):
     return "%s/%s: %s(%s)" % (grade_subject.year, grade_subject.semester, grade_subject.subject.short_name, grade_subject.grade)
+
+def extract_solution(solution, semester_id):
+    si = SemesterIndex(solution.member.curriculum.num_semester)
+    tmp = str(si.toYear(semester_id))+"/"+str(si.toSemester(semester_id))
+    tmp += " [ "
+    for grade_subject in solution.semesters[semester_id].subjects:
+        tmp += '"'+grade_subject.subject.short_name+'", '
+    tmp = tmp[:len(tmp)-2]
+    tmp += " ]"
+    return tmp

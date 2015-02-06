@@ -5,47 +5,24 @@ from mongoengine import Q
 
 from r2als import models
 
-
 from r2als.libs.logs import Log
 from r2als.libs.functions import SemesterIndex
-from r2als.libs import next_solution_methods
+from r2als.libs.next_solution_methods import MoveWholeChain, MoveNonRelatedSubjectOut
+
 pp = pprint.PrettyPrinter(indent=4)
 l = Log('libs/solutions').getLogger()
 
-class InitialSolution(next_solution_methods.MoveWholeChain):
-
+class InitialSolution:
 
     def __init__(self, member):
-        self.solution = PreInitialSolution(member).start()
-        # self.mSemesters = solution.semesters
-        # self.member = member
-        self.si = SemesterIndex(member.curriculum.num_semester)
-
-    def start(self):
-        # step 1 : find fail subject
-        # step 2 : store it in list
-        fail_subjects = self.find_fail_subjects()
-        # for gradeSubject in fail_subject:
-        #     l.info(gradeSubject.subject.short_name)
-        # step 3 : move back each semester
-        # Loop in remaining semester
-
-        for failGradeSubject in fail_subjects:
-            self.move_subject_whole_chain(None, failGradeSubject)
-
-        self.move_non_related_subject_out()
-
-        # solution = dict()
-        # solution['member'] = self.member
-        # solution['semesters'] = self.mSemesters
-
-        # solution = models.Solution()
-        # solution.member = self.member
-        # solution.semesters = self.mSemesters
+        self.solution = PreInitialSolution(member).get_solution()
+        self.solution = MoveWholeChain(self.solution).get_initial_solution()
+        self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution()
         self.solution.get_ready()
         self.solution.update_all_prerequisite()
-        return self.solution
 
+    def get_solution(self):
+        return self.solution
 
 class PreInitialSolution:
 
@@ -129,7 +106,7 @@ class PreInitialSolution:
 
         return mSemester
 
-    def start(self):
+    def get_solution(self):
         # mSemesters = []
         solution = models.Solution()
         mSemesters = solution.semesters
@@ -148,9 +125,8 @@ class PreInitialSolution:
                 # ==========  This section for year & semester remaining ========
                 l.info("semster (%d/%d) are processing[%d]",y,s,numSubjects)
         for gradeSubject in solution.findNotEnrolledSubjects():
-            print(gradeSubject.subject.short_name)
             self.addRemainSubjects(gradeSubject.semester, gradeSubject)
-        print(self.countRemainSubjects())
+
         # add extra semester
         # if len(self.remainSubjects[]) > 0:
         if self.countRemainSubjects() > 0:
