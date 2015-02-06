@@ -16,21 +16,21 @@ class InitialSolution(next_solution_methods.MoveWholeChain):
 
 
     def __init__(self, member):
-        solution = PreInitialSolution(member).start()
-        self.mSemesters = solution.semesters
-        self.member = member
-        self.si = SemesterIndex(self.member.curriculum.num_semester)
+        self.solution = PreInitialSolution(member).start()
+        # self.mSemesters = solution.semesters
+        # self.member = member
+        self.si = SemesterIndex(member.curriculum.num_semester)
 
     def start(self):
         # step 1 : find fail subject
         # step 2 : store it in list
-        fail_subject = self.find_fail_subjects()
+        fail_subjects = self.find_fail_subjects()
         # for gradeSubject in fail_subject:
         #     l.info(gradeSubject.subject.short_name)
         # step 3 : move back each semester
         # Loop in remaining semester
 
-        for failGradeSubject in fail_subject:
+        for failGradeSubject in fail_subjects:
             self.move_subject_whole_chain(None, failGradeSubject)
 
         self.move_non_related_subject_out()
@@ -39,12 +39,12 @@ class InitialSolution(next_solution_methods.MoveWholeChain):
         # solution['member'] = self.member
         # solution['semesters'] = self.mSemesters
 
-        solution = models.Solution()
-        solution.member = self.member
-        solution.semesters = self.mSemesters
-        solution.get_ready()
-        solution.update_all_prerequisite()
-        return solution
+        # solution = models.Solution()
+        # solution.member = self.member
+        # solution.semesters = self.mSemesters
+        self.solution.get_ready()
+        self.solution.update_all_prerequisite()
+        return self.solution
 
 
 class PreInitialSolution:
@@ -131,8 +131,8 @@ class PreInitialSolution:
 
     def start(self):
         # mSemesters = []
-        semestersList = models.Solution()
-        mSemesters = semestersList.semesters
+        solution = models.Solution()
+        mSemesters = solution.semesters
         for i in range(self.numSemesterIndex):
             y = self.si.toYear(i)
             s = self.si.toSemester(i)
@@ -147,7 +147,7 @@ class PreInitialSolution:
             else:
                 # ==========  This section for year & semester remaining ========
                 l.info("semster (%d/%d) are processing[%d]",y,s,numSubjects)
-        for gradeSubject in semestersList.findNotEnrolledSubjects():
+        for gradeSubject in solution.findNotEnrolledSubjects():
             print(gradeSubject.subject.short_name)
             self.addRemainSubjects(gradeSubject.semester, gradeSubject)
         print(self.countRemainSubjects())
@@ -161,8 +161,8 @@ class PreInitialSolution:
                 s = self.si.toSemester(i)
                 mSemesters.append(self.addSemesterModel(i, True))
 
-        semestersList.member = self.member
-        return semestersList
+        solution.member = self.member
+        return solution
 
 # def isCorrectInitialSolution(self):
 #     for y in range(1,self.curriculum.required_num_year+1):
