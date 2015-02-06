@@ -9,25 +9,24 @@ l = Log('exports').getLogger()
 
 class ExportJson:
 
-    def __init__(self, member, mSemesters):
+    def __init__(self, solution):
         l.info('hello ExportJson')
-        self.member = member
+        self.member = solution.member
         self.json_object = dict()
-        self.si = SemesterIndex(member.curriculum.num_semester)
-        self.json_object['subjects'] = self.exportListSubject(mSemesters)
-        self.json_object['links'] = self.exportLink(mSemesters)
+        self.si = SemesterIndex(solution.member.curriculum.num_semester)
+        self.json_object['subjects'] = self.exportListSubject(solution.semesters)
+        self.json_object['links'] = self.exportLink(solution.semesters)
         print(len(self.json_object['links']))
-        self.json_object['num_semester'] = member.curriculum.num_semester
+        self.json_object['num_semester'] = solution.member.curriculum.num_semester
 
         # plus one year because it is spare semester
-        self.json_object['num_year'] = member.curriculum.required_num_year + 1
+        self.json_object['num_year'] = solution.member.curriculum.required_num_year + 1
 
-        self.json_object['last_year'] = member.last_year
-        self.json_object['last_semester'] = member.last_semester
-        # self.json_object['member'] = dict()
-        # self.json_object['member']['name'] = member.name
-        l.info(member.name)
-        self.json_object['total_credits'] = self.findTotalCreditList(mSemesters)
+        self.json_object['last_year'] = solution.member.last_year
+        self.json_object['last_semester'] = solution.member.last_semester
+
+        l.info(solution.member.name)
+        self.json_object['total_credits'] = self.findTotalCreditList(solution.semesters)
 
     def hasPrerequisite(self, gradeSubject):
         if gradeSubject.subject.prerequisites == [] and gradeSubject.subject.reverse_prerequisites == []:

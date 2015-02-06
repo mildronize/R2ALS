@@ -15,6 +15,7 @@ class TabuHandler:
 
     def add_next_solution(self, solution):
         if self.__is_existed(solution):
+            l.error("Exist solution is found")
             return False
         self.__store_solution(solution)
         return True
@@ -40,7 +41,7 @@ class TabuHandler:
             result += ">%s/%s: " % (str(iter_semester.year), str(iter_semester.semester))
             for iter_gradeSubject in iter_semester.subjects:
                 result += "(%s,%s) " % (iter_gradeSubject.subject.code, iter_gradeSubject.subject.name)
-        l.info(result)
+        # l.info(result)
         return result.encode('utf-8')
 
     def __store_solution(self, solution):

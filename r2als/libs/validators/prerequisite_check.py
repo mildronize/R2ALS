@@ -9,13 +9,13 @@ l = Log('prerequisite_check').getLogger()
 def prerequisite_check(solution):
     # l.info("prerequisite_check is validating...")
     si = SemesterIndex(solution.member.curriculum.num_semester)
-
     for current_semester_id in reversed(range(solution.member.num_studied_semester_id, len(solution.semesters))):
         semester_item = solution.semesters[current_semester_id]
         for grade_subject in semester_item.subjects:
             if grade_subject.subject.prerequisites != []:
                 for prerequisite in grade_subject.subject.prerequisites:
                     # Not consider studied semester
+
                     if si.get(prerequisite.grade_subject.year, prerequisite.grade_subject.semester) >= current_semester_id:
                         p = prerequisites.selector(prerequisite.name,
                                                    prerequisite.grade_subject,
