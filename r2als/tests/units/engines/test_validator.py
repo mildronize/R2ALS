@@ -18,7 +18,7 @@ class ValidatorTest(unittest.TestCase):
             print('Not found the member')
             exit()
 
-        self.solution = InitialSolution(member).start()
+        self.solution = InitialSolution(member).get_solution()
 
     # def tearDown(self):
         # self.file.close()
