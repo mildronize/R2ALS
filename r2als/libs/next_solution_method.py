@@ -12,8 +12,6 @@ class NextSolutionMethod(object):
 
     def __init__(self, solution):
         self.solution = solution
-        # self.mSemesters = solution.semesters
-        # self.member = solution.member
         self.si = SemesterIndex(solution.member.curriculum.num_semester)
 
     @abc.abstractmethod
@@ -37,29 +35,8 @@ class NextSolutionMethod(object):
         if target_subject_2_position < 0:
             l.error("not found subject")
         # Swapping
-        l.info("Before Swapping %s & %s" % (extract_grade_subject(grade_subject_1), extract_grade_subject(grade_subject_2)))
-        l.info("Before "+extract_solution(self.solution, semester_id_1))
-        l.info("Before "+extract_solution(self.solution, semester_id_2))
-        # l.info("Before "+extract_solution(self.solution, semester_id_1))
         tmp = self.solution.semesters[semester_id_1].subjects.pop(target_subject_1_position)
-        # l.info("Removing "+extract_grade_subject(tmp))
-        # l.info("After "+extract_solution(self.solution, semester_id_1))
-
-        # l.info("*"*45)
-
-        # l.info("Before "+extract_solution(self.solution, semester_id_2))
         self.solution.semesters[semester_id_2].subjects.append(tmp)
-        # l.info("Adding "+extract_grade_subject(tmp))
-        # l.info("After "+extract_solution(self.solution, semester_id_2))
-
-        # l.info("*"*45)
-
-        # l.info("Before "+extract_solution(self.solution, semester_id_2))
-        # tmp = self.solution.semesters[semester_id_2].subjects.pop(target_subject_2_position)
-        # l.info("Removing "+extract_grade_subject(tmp))
-        # l.info("After "+extract_solution(self.solution, semester_id_2))
-
-        # l.info("*"*45)
 
         self.solution.semesters[semester_id_1].subjects.append(
             self.solution.semesters[semester_id_2].subjects.pop(target_subject_2_position)
@@ -67,8 +44,7 @@ class NextSolutionMethod(object):
         # swapping year & semester
         grade_subject_1.year, grade_subject_2.year = grade_subject_2.year, grade_subject_1.year
         grade_subject_1.semester, grade_subject_2.semester = grade_subject_2.semester, grade_subject_1.semester
-        l.info("After "+extract_solution(self.solution, semester_id_1))
-        l.info("After "+extract_solution(self.solution, semester_id_2))
+
         l.info("After Swapping %s & %s" % (extract_grade_subject(grade_subject_1), extract_grade_subject(grade_subject_2)))
 
 

@@ -18,7 +18,7 @@ def validator(solution ,checklist):
         validators = checklist
     for validator in validators:
         if validator == AVAILABLE_VALIDATOR[0]:
-            result = prerequisite_check(solution)
+            result = prerequisite_check(solution=solution)
             if result: count += 1
             _print_result(validator, result)
     if count == len(checklist):

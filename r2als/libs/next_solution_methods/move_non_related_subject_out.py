@@ -4,8 +4,7 @@ from random import randint
 from r2als.libs.rules import Rule
 from r2als.libs.logs import Log
 from r2als.libs.next_solution_methods import *
-l = Log('move_whole_chain').getLogger()
-
+l = Log('move_non_related_subject_out').getLogger()
 
 class MoveNonRelatedSubjectOut(NextSolutionMethod):
 

@@ -44,19 +44,17 @@ def solution_generator_api_initial(request):
         print('Not found the member')
         exit()
 
-    # tabu = TabuHandler(10)
-
     solution = InitialSolution(member).get_solution()
-    # tabu.add_next_solution(solution)
 
     for i in range(10):
         l.info("-"*45)
         l.info("Random "+str(i) + " rounds ....")
         solution = RandomSubject(solution).get_solution()
-        # tabu.add_next_solution(solution)
-
+        solution = MoveWholeChain(solution).get_solution()
+        solution.get_ready()
         if validator(solution, ['*']) is False:
             break
+    # validator(solution, ['*'])
 
     # mSemesters = next_solution_methods.MoveWholeChain(solution).start()
     json_obj = ExportJson(solution).get()
