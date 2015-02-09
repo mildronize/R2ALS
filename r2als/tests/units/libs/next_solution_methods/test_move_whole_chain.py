@@ -25,10 +25,10 @@ class MoveWholeChainTest(unittest.TestCase):
             print('Not found the member')
             exit()
 
-        semesterList = InitialSolution(member).start()
-        mSemesters = next_solution_methods.MoveWholeChain(semesterList).start()
+        semesterList = InitialSolution(member).get_solution()
+        solution = next_solution_methods.MoveWholeChain(semesterList).get_solution()
 
-        json_obj = ExportJson(member, mSemesters).get()
+        json_obj = ExportJson(solution).get()
         jointjs_json = ExportJointjs(json_obj).get()
 
         self.file.write(json.dumps(jointjs_json))

@@ -8,7 +8,7 @@ from r2als.libs.logs import Log
 from r2als.libs.functions import *
 from r2als.libs.next_solution_methods import *
 
-l = Log('next_solution_methods.random').getLogger()
+l = Log('nsm.random_subject').getLogger()
 
 class RandomSubject(NextSolutionMethod):
 
@@ -21,12 +21,10 @@ class RandomSubject(NextSolutionMethod):
 
         si = SemesterIndex(self.solution.member.curriculum.num_semester)
         if si.get(grade_subject_0.year, grade_subject_0.semester) != semester_id[0]:
-            l.error("Incorrect grade_subject_0")
+            l.error("Incorrect grade_subject_0: "+extract_grade_subject(grade_subject_0)+" "+str(self.si.toYear(semester_id[0]))+"/"+str(self.si.toSemester(semester_id[0])))
         if si.get(grade_subject_1.year, grade_subject_1.semester) != semester_id[1]:
-            l.error("Incorrect grade_subject_1")
+            l.error("Incorrect grade_subject_1: "+extract_grade_subject(grade_subject_1)+" "+str(self.si.toYear(semester_id[1]))+"/"+str(self.si.toSemester(semester_id[1])))
 
-        extract_grade_subject(grade_subject_0)
-        extract_grade_subject(grade_subject_1)
 
         self.swap_grade_subject(grade_subject_0, grade_subject_1)
         return self.solution

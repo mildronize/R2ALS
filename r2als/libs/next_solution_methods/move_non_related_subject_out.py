@@ -4,7 +4,9 @@ from random import randint
 from r2als.libs.rules import Rule
 from r2als.libs.logs import Log
 from r2als.libs.next_solution_methods import *
-l = Log('move_non_related_subject_out').getLogger()
+l = Log('nsm.move_non_related_subject_out').getLogger()
+
+# todo: This class is not good because must use self.solution.get_ready() for fix sth
 
 class MoveNonRelatedSubjectOut(NextSolutionMethod):
 
