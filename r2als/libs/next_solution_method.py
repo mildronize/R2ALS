@@ -47,6 +47,17 @@ class NextSolutionMethod(object):
 
         l.info("After Swapping %s & %s" % (extract_grade_subject(grade_subject_1), extract_grade_subject(grade_subject_2)))
 
+    def move_grade_subject(self, grade_subject, target_semester_id):
+        # Prepare var
+        semester_id = self.si.get(grade_subject.year, grade_subject.semester)
+        target_subject_position = self.__find_grade_subject_id(semester_id, grade_subject.subject)
+        # Moving
+        self.solution.semesters[target_semester_id].subjects.append(
+            self.solution.semesters[semester_id].subjects.pop(target_subject_position)
+        )
+
+        grade_subject.year = self.si.toYear(target_semester_id)
+        grade_subject.semester = self.si.toSemester(target_semester_id)
 
     def moveGradeSubject(self, source_semester, source_subject_order, target_semester):
         l.warn("This function is deprecated, please use \"move_grade_subject\" instead")

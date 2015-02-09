@@ -34,7 +34,10 @@ def prerequisite_check(solution, quick_checking=True, isReversed=True):
                                                                    extract_grade_subject(grade_subject)))
                             if quick_checking:
                                 return False
-                            invalid_grade_subjects.append(prerequisite.grade_subject)
+                            tmp = dict()
+                            tmp['prerequisite_grade_subject'] = prerequisite.grade_subject
+                            tmp['grade_subject'] = grade_subject
+                            invalid_grade_subjects.append(tmp)
     if quick_checking:
         return True
     else:
