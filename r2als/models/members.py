@@ -167,12 +167,12 @@ class Member(me.Document):
     num_studied_semester_id = me.IntField()
 
     # Expected semester id
-    expected_year = me.IntField(required=True)
-    expected_semester = me.IntField(required=True)
-    num_expected_semester_id = me.IntField()
+    # expected_year = me.IntField(required=True)
+    # expected_semester = me.IntField(required=True)
+    # num_expected_semester_id = me.IntField()
 
     # margin credit that user allow extra total credit
-    margin_credit = me.IntField(required=True)
+    # margin_credit = me.IntField(required=True)
 
     enrolled_semesters = me.ListField(me.EmbeddedDocumentField(EnrolledSemester))
 
@@ -180,4 +180,4 @@ class Member(me.Document):
         from r2als.libs.functions import SemesterIndex
         si = SemesterIndex(self.curriculum.num_semester)
         self.num_studied_semester_id = si.get(self.last_year, self.last_semester) + 1
-        self.num_expected_semester_id = si.get(self.expected_year, self.expected_semester) + 1
+        # self.num_expected_semester_id = si.get(self.expected_year, self.expected_semester) + 1

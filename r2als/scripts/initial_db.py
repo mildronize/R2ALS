@@ -158,7 +158,7 @@ def create_Grade(grade_info):
     # print(models.Grade.objects().count())
     # return grade_tmp
 
-def add_Member(member):
+def add_member(member):
     member_tmp = models.Member()
     for key, value in member['info'].items():
         member_tmp[key] = value
@@ -167,27 +167,39 @@ def add_Member(member):
     # adding EnrolledSemester
     for semester in member['semesters']:
         enrolledSemester = models.EnrolledSemester()
-        # enrolledSemester.semester_id = models.SemesterId(year = semester['year'],
-        #                                                     semester= semester['semester'])
         enrolledSemester.year = semester['year']
         enrolledSemester.semester = semester['semester']
 
         for subject in semester['subjects']:
+
+            if 'id' in subject:
+                mSubject = models.Subject.objects(id = subject['id']).first()
+                tmp_subject = subject['id']
+            elif 'code' in subject:
+                mSubject = models.Subject.objects(code = subject['code']).first()
+                tmp_subject = subject['code']
+            else:
+                mSubject = None
+                tmp_subject = None
+                return -1
+
             gradeSubject = models.GradeSubject()
-            mSubject = models.Subject.objects(code = subject['code']).first()
             if mSubject is not None:
                 gradeSubject.subject = mSubject
             else:
-                l.error('Not found subject "%s"' % subject['code'])
+                l.error('Not found subject "%s"' % tmp_subject)
+                return -2
             mGrade = models.Grade.objects(name = subject['grade']).first()
             if mGrade is not None:
                 gradeSubject.grade = mGrade
             else:
                 l.error('Not found grade "%s"' % subject['grade'])
+                return -3
             enrolledSemester.subjects.append(gradeSubject)
 
         member_tmp.enrolled_semesters.append(enrolledSemester)
     member_tmp.save()
+    return 0
 
 def initial_coe_curriculum_data(curriculumPath):
     raw_curriculum = import_curriculum_to_model(curriculumPath)
@@ -336,4 +348,4 @@ def main():
     ]
 
     for testing_member in testing_members:
-        add_Member(testing_member)
+        add_member(testing_member)

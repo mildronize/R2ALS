@@ -19,7 +19,7 @@ class InitialSolution:
         self.solution.get_ready()
         self.solution.update_all_prerequisite()
         self.solution = MoveWholeChain(self.solution).get_initial_solution()
-        # self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution()
+        self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution()
         self.solution.get_ready()
 
     def get_solution(self):

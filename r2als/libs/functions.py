@@ -1,4 +1,6 @@
 import math
+from r2als.libs.logs import Log
+l = Log("functions").getLogger()
 
 class SemesterIndex:
 
@@ -30,6 +32,24 @@ class SemesterIndex:
                 return -1
             else:
                 return 0
+
+def response_json(data, message_type="success", message=""):
+    result = {
+        'type': message_type,
+        'data': data
+    }
+    message_type_available = ['success','error','warning']
+    if message_type in message_type_available:
+        if message_type == message_type_available[0]:
+            return result
+        else:
+            result['message'] = message
+            return result
+    else:
+        l.error("Not found response_json message_type")
+
+
+
 # function for debugging
 def extract_grade_subject(grade_subject):
     if grade_subject is None:
@@ -47,3 +67,4 @@ def extract_solution(solution, semester_id):
     tmp = tmp[:len(tmp)-2]
     tmp += " ]"
     return tmp
+
