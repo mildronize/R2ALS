@@ -49,6 +49,11 @@ def create_Curriculum(curriculum_data):
     curriculum['year'] = int(curriculum_data['year'])
     curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
     curriculum['num_semester'] = int(curriculum_data['num_semester'])
+    for not_force_enrolled_semester in curriculum_data['not_force_enrolled_semesters']:
+        if int(not_force_enrolled_semester) > int(curriculum['num_semester']):
+            l.error("not_force_enrolled_semester must <= num_semester")
+        else:
+            curriculum['not_force_enrolled_semesters'].append(int(not_force_enrolled_semester))
     l.info("Creating curriculum: "+ curriculum_data['department'] + " " + curriculum_data['year'])
     l.info("Creating Studied Group for the curriculum")
     for subject_group in curriculum_data['subject_groups']:
@@ -181,25 +186,26 @@ def add_member(member):
             else:
                 mSubject = None
                 tmp_subject = None
-                return -1
+                return None
 
             gradeSubject = models.GradeSubject()
             if mSubject is not None:
                 gradeSubject.subject = mSubject
             else:
                 l.error('Not found subject "%s"' % tmp_subject)
-                return -2
+                return None
             mGrade = models.Grade.objects(name = subject['grade']).first()
             if mGrade is not None:
                 gradeSubject.grade = mGrade
             else:
                 l.error('Not found grade "%s"' % subject['grade'])
-                return -3
+                return None
             enrolledSemester.subjects.append(gradeSubject)
 
         member_tmp.enrolled_semesters.append(enrolledSemester)
     member_tmp.save()
-    return 0
+    member_tmp.reload()
+    return member_tmp
 
 def initial_coe_curriculum_data(curriculumPath):
     raw_curriculum = import_curriculum_to_model(curriculumPath)
@@ -263,61 +269,7 @@ def main():
     l.info("======== Starting initial test cases")
     #add a member
     testing_members = [
-        {
-            'info': {
-                'member_id':'5710110999',
-                'name' : 'Thongdee Mana',
-                'curriculum' : coe_curriculum_model,
-                'subject_group' : 'first-group',
-                'registered_year' : 2557,
-                'last_year' : 1,
-                'last_semester' : 1,
-                'expected_year' : 4,
-                'expected_semester' : 3,
-                'margin_credit': 0
-                },
-            'semesters' : [{
-                'year': 1,
-                'semester': 1,
-                'subjects': [
-                    {'code' : '895-171','grade' : 'C'}, # subject from another semester
-                    {'code' : '200-101','grade' : 'C'},
-                    {'code' : '242-101','grade' : 'C'},
-                    {'code' : '322-101','grade' : 'C'},
-                    {'code' : '332-103','grade' : 'C'},
-                    {'code' : '332-113','grade' : 'C'},
-                    {'code' : '640-101','grade' : 'C'},
-                    {'code' : '890-101','grade' : 'C'},
-                    ]
-                }]
-        },
-        {
-            'info': {
-                'member_id':'5710110998',
-                'name' : 'Thongyib kondee',
-                'curriculum' : coe_curriculum_model,
-                'subject_group' : 'first-group',
-                'registered_year' : 2557,
-                'last_year' : 1,
-                'last_semester' : 1,
-                'expected_year' : 4,
-                'expected_semester' : 3,
-                'margin_credit': 0
-                },
-            'semesters' : [{
-                'year': 1,
-                'semester': 1,
-                'subjects': [
-                    {'code' : '200-101','grade' : 'C'},
-                    {'code' : '242-101','grade' : 'C'},
-                    {'code' : '322-101','grade' : 'C'},
-                    {'code' : '332-103','grade' : 'C'},
-                    {'code' : '332-113','grade' : 'C'},
-                    {'code' : '640-101','grade' : 'C'},
-                    # not complete enrollment
-                    ]
-                }]
-        },
+
         {
             'info': {
                 'member_id':'5710110997',
@@ -326,10 +278,7 @@ def main():
                 'subject_group' : 'first-group',
                 'registered_year' : 2557,
                 'last_year' : 1,
-                'last_semester' : 1,
-                'expected_year' : 4,
-                'expected_semester' : 3,
-                'margin_credit': 0
+                'last_semester' : 1
                 },
             'semesters' : [{
                 'year': 1,
@@ -349,3 +298,54 @@ def main():
 
     for testing_member in testing_members:
         add_member(testing_member)
+
+
+        # {
+        #     'info': {
+        #         'member_id':'5710110999',
+        #         'name' : 'Thongdee Mana',
+        #         'curriculum' : coe_curriculum_model,
+        #         'subject_group' : 'first-group',
+        #         'registered_year' : 2557,
+        #         'last_year' : 1,
+        #         'last_semester' : 1,
+        #         },
+        #     'semesters' : [{
+        #         'year': 1,
+        #         'semester': 1,
+        #         'subjects': [
+        #             {'code' : '895-171','grade' : 'C'}, # subject from another semester
+        #             {'code' : '200-101','grade' : 'C'},
+        #             {'code' : '242-101','grade' : 'C'},
+        #             {'code' : '322-101','grade' : 'C'},
+        #             {'code' : '332-103','grade' : 'C'},
+        #             {'code' : '332-113','grade' : 'C'},
+        #             {'code' : '640-101','grade' : 'C'},
+        #             {'code' : '890-101','grade' : 'C'},
+        #             ]
+        #         }]
+        # },
+        # {
+        #     'info': {
+        #         'member_id':'5710110998',
+        #         'name' : 'Thongyib kondee',
+        #         'curriculum' : coe_curriculum_model,
+        #         'subject_group' : 'first-group',
+        #         'registered_year' : 2557,
+        #         'last_year' : 1,
+        #         'last_semester' : 1,
+        #         },
+        #     'semesters' : [{
+        #         'year': 1,
+        #         'semester': 1,
+        #         'subjects': [
+        #             {'code' : '200-101','grade' : 'C'},
+        #             {'code' : '242-101','grade' : 'C'},
+        #             {'code' : '322-101','grade' : 'C'},
+        #             {'code' : '332-103','grade' : 'C'},
+        #             {'code' : '332-113','grade' : 'C'},
+        #             {'code' : '640-101','grade' : 'C'},
+        #             # not complete enrollment
+        #             ]
+        #         }]
+        # },

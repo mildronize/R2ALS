@@ -19,6 +19,20 @@ class SemesterIndex:
     def toSemester(self, semester_index):
         return semester_index + 4 - (3 * self.toYear(semester_index))
 
+    def count_specific_semesters(self, semester_index, specific_semesters=[]):
+        count = 0
+        for specific_semester in specific_semesters:
+            count += self.count_specific_semester(semester_index, specific_semester)
+        return count
+
+    def count_specific_semester(self, semester_index, specific_semester):
+        count = 0
+        for i in range(semester_index + 1):
+            if self.toSemester(specific_semester) == specific_semester:
+                count +=1
+        return count
+
+
     def compare_semester(self, year1, semester1, year2, semester2):
         if year1 > year2:
             return 1
