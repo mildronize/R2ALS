@@ -12,21 +12,9 @@ class ExportJson:
     def __init__(self, solution):
         l.info('hello ExportJson')
         self.member = solution.member
+        self.solution = solution
         self.json_object = dict()
         self.si = SemesterIndex(solution.member.curriculum.num_semester)
-        self.json_object['subjects'] = self.exportListSubject(solution.semesters)
-        self.json_object['links'] = self.exportLink(solution.semesters)
-        print(len(self.json_object['links']))
-        self.json_object['num_semester'] = solution.member.curriculum.num_semester
-
-        # plus one year because it is spare semester
-        self.json_object['num_year'] = solution.member.curriculum.required_num_year + 1
-
-        self.json_object['last_year'] = solution.member.last_year
-        self.json_object['last_semester'] = solution.member.last_semester
-
-        l.info(solution.member.name)
-        self.json_object['total_credits'] = self.findTotalCreditList(solution.semesters)
 
     def hasPrerequisite(self, gradeSubject):
         if gradeSubject.subject.prerequisites == [] and gradeSubject.subject.reverse_prerequisites == []:
@@ -46,8 +34,9 @@ class ExportJson:
 
     def findTotalCreditList(self, mSemesters):
         lists = list()
-        for i in range(self.json_object['num_semester'] * self.json_object['num_year']):
+        for i in range(len(self.solution.semesters)):
             lists.append(self.findTotalCredit(mSemesters[i]))
+            # lists.append(0)
         return lists
 
     def namingSubject(self, mSemesters, cur_year, cur_semester, original_id):
@@ -88,6 +77,36 @@ class ExportJson:
                 lists.append(subject)
 
         return sorted(lists, key=lambda k: k['hasPrerequisite'], reverse= True)
+
+    def exportListSemester(self, mSemesters):
+        lists = []
+        for mSemester in mSemesters:
+            # year = mSemester.year
+            # semester = mSemester.semester
+            tmp = dict()
+            tmp['year'] = mSemester.year
+            tmp['semester'] = mSemester.semester
+            tmp['subjects'] = []
+            for gradeSubject in mSemester.subjects:
+                # if self.hasPrerequisite(gradeSubject):
+                subject = dict()
+                subject['semesterIndex'] = self.si.get(tmp['year'], tmp['semester'])
+                subject['year'] = tmp['year']
+                subject['semester'] = tmp['semester']
+                subject['id'] = self.namingSubject(mSemesters, tmp['year'], tmp['semester'], str(gradeSubject.subject.id))
+                subject['name']  = gradeSubject.subject.short_name
+                subject['hasPrerequisite'] = self.hasPrerequisite(gradeSubject)
+                subject['numPrerequisite'] = self.countPrerequisite(gradeSubject)
+                subject['numReverse_prerequisite'] = self.countReverse_prerequisites(gradeSubject)
+                subject['credit']  = gradeSubject.subject.credit
+
+                if 'grade' in gradeSubject:
+                    subject['grade'] = gradeSubject.grade.name
+                tmp['subjects'].append(subject)
+                tmp['subjects'] = sorted(tmp['subjects'], key=lambda k: k['hasPrerequisite'], reverse= True)
+            lists.append(tmp)
+        return lists
+
     def exportLink(self, mSemesters):
         lists = []
         for mSemester in mSemesters:
@@ -105,6 +124,40 @@ class ExportJson:
         return lists
 
     def get(self):
+        return self.get_subject_list()
+
+    def get_subject_list(self):
+        self.json_object['subjects'] = self.exportListSubject(self.solution.semesters)
+
+        self.json_object['links'] = self.exportLink(self.solution.semesters)
+        print(len(self.json_object['links']))
+        self.json_object['num_semester'] = self.solution.member.curriculum.num_semester
+
+        # plus one year because it is spare semester
+        self.json_object['num_year'] = self.member.curriculum.required_num_year + 1
+
+        self.json_object['last_year'] = self.solution.member.last_year
+        self.json_object['last_semester'] = self.solution.member.last_semester
+
+        l.info(self.solution.member.name)
+        self.json_object['total_credits'] = self.findTotalCreditList(self.solution.semesters)
+        return self.json_object
+
+    def get_semester_list(self):
+        self.json_object['semesters'] = self.exportListSemester(self.solution.semesters)
+
+        self.json_object['links'] = self.exportLink(self.solution.semesters)
+
+        self.json_object['num_semester'] = self.solution.member.curriculum.num_semester
+
+        # plus one year because it is spare semester
+        self.json_object['num_year'] = self.member.curriculum.required_num_year + 1
+
+        self.json_object['last_year'] = self.solution.member.last_year
+        self.json_object['last_semester'] = self.solution.member.last_semester
+
+        l.info(self.solution.member.name)
+        self.json_object['total_credits'] = self.findTotalCreditList(self.solution.semesters)
         return self.json_object
 
 

@@ -59,7 +59,7 @@ function read(graph) {
       dataType: "json",
       cache: false,
       crossDomain : true,
-      url: "http://127.0.0.1:6543/apis/solution_generator/"+GetURLElement(2),
+      url: "http://127.0.0.1:6543/apis/solution-generator/"+GetURLElement(2),
 
       success: function (jsonString, textStatus, errorThrown) {
           graph.clear();
