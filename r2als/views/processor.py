@@ -96,6 +96,7 @@ def index(request):
 
     if is_testing == True:
         member = models.Member.objects(member_id = '5710110997').first()
+        si = SemesterIndex(member.curriculum.num_semester)
     else:
         member = add_member(prepare_add_member(semesters, member))
         if member is None:
@@ -117,9 +118,12 @@ def index(request):
             return response_json({}, "error", 'Please checking your enrollment')
 
     solutions = Processor(member).start()
+
     for solution in solutions:
+        # l.info("Last semester %d/%d" % (si.toYear(len(solution.semesters)-1), si.toSemester(len(solution.semesters)-1) ) )
         # json_obj = ExportJson(solution).get()
         # result['plans'].append(ExportJointjs(json_obj).get())
         result['plans'].append(ExportJson(solution).get_semester_list())
+
     return response_json(result)
 

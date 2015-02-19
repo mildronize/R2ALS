@@ -47,6 +47,24 @@ class Solution(me.Document):
 
     def get_ready(self):
         self.update_all_grade_subject()
+        self.remove_empty_semester()
+
+    def remove_empty_semester(self):
+        for i in reversed(range(len(self.semesters))):
+            if len(self.semesters[i].subjects) is 0:
+                self.semesters.pop(i)
+            else:
+                break
+    def extend_semester_size(self, target_semester_id):
+        si = SemesterIndex(self.member.curriculum.num_semester)
+        if target_semester_id > len(self.semesters)-1:
+            l.error("Extending semester size")
+            for i in range(len(self.semesters)-1, target_semester_id):
+                tmp = Semester(subjects=[],
+                               member=self.member,
+                               year=si.toYear(i),
+                               semester=si.toSemester(i))
+                self.semesters.append(tmp)
 
     def update_all_grade_subject(self):
         for semester in self.semesters:
@@ -72,6 +90,8 @@ class Solution(me.Document):
                     else:
                         l.error("Not found subject")
 
+
+
     # def move_grade_subject(self, grade_subject, target_semester_id):
     #     # Prepare var
     #     si = SemesterIndex(self.member.curriculum.num_semester)
@@ -82,24 +102,30 @@ class Solution(me.Document):
     #     self.semesters[target_semester_id].subjects.append(
     #         self.semesters[semester_id].subjects.pop(target_subject_position)
     #     )
-
-    def countNumEnrolledSubject(self):
+    def get_enrolled_grade_subjects(self):
         # count all subject without grade 'W'
-        num_subject = 0
+        # num_subject = 0
+        tmp = list()
         for semester in self.semesters:
             for gradeSubject in semester.subjects:
-                # print(semester.semester_id.year, semester.semester_id.semester,gradeSubject.subject.short_name)
                 if 'grade' in gradeSubject:
                     if gradeSubject.grade.isEnrolled:
-                        num_subject += 1
-                        # print(num_subject,': ',gradeSubject.subject.short_name)
+                        tmp.append(gradeSubject)
                 else:
-                    num_subject += 1
-                # print( "%d) %d/%d: %s" % (num_subject, semester.year, semester.semester,  gradeSubject.subject.short_name))
-                    # print(num_subject,': ',gradeSubject.subject.short_name)
-        return num_subject
+                    tmp.append(gradeSubject)
+        return tmp
 
-    def findNotEnrolledSubjects(self):
+    def get_grade_subjects(self):
+        tmp = list()
+        for semester in self.semesters:
+            for gradeSubject in semester.subjects:
+                tmp.append(gradeSubject)
+        return tmp
+
+    def countNumEnrolledSubject(self):
+        return len(self.get_enrolled_grade_subjects())
+
+    def findFailSubjects(self):
         # return a list of subject with grade 'W'
         lists = list()
         for semester in self.semesters:

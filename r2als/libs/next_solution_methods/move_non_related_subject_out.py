@@ -18,12 +18,12 @@ class MoveNonRelatedSubjectOut(NextSolutionMethod):
         # 1 get all non_related subject
         # last semester of the member
 
-        rule = Rule(self.solution.member)
+        self.rule = Rule(self.solution.member)
         last_semester_id = self.si.get(self.solution.member.last_year,
                                        self.solution.member.last_semester)
 
         for i in range(last_semester_id+1, len(self.solution.semesters)):
-            maximum_credit = rule.calculate_maximum_credit(i)
+            maximum_credit = self.rule.calculate_maximum_credit(i)
             total_credit = self.solution.semesters[i].calculate_total_credit()
             if total_credit > maximum_credit:
                 over_credit = total_credit - maximum_credit
@@ -45,17 +45,31 @@ class MoveNonRelatedSubjectOut(NextSolutionMethod):
                     self.solution.semesters[i].subjects.remove(non_related_grade_subjects[random_position])
                     non_related_grade_subjects.remove(non_related_grade_subjects[random_position])
                 # find the semesters that allow the subject to move in the semester
-                semester = self.si.toSemester(i)
-                # year = self.si.toYear(i)
+
                 for temp_subject in temp_subjects:
-                    available_semesters = []
-                    l.info("available_semester: %s (credit : %d)" % (temp_subject.subject.short_name, temp_subject.subject.credit))
-                    for key,mSemester in enumerate(self.solution.semesters):
-                        if semester == self.si.toSemester(key) and key != i and \
-                        mSemester.calculate_total_credit() + temp_subject.subject.credit <= rule.calculate_maximum_credit(key):
-                            available_semesters.append(key)
-                            l.info("%d/%d" % (self.si.toYear(key), self.si.toSemester(key)))
+                    available_semesters = self.get_available_semesters(i, temp_subject)
                     random_semester = randint(0, len(available_semesters) - 1 )
+                    self.solution.extend_semester_size(available_semesters[random_semester])
                     self.solution.semesters[available_semesters[random_semester]].subjects.append(temp_subject)
 
                 # print(self.solution.semesters[i].calculate_total_credit())
+
+    def get_available_semesters(self, index, temp_subject):
+        # l.info("available_semester: %s (credit : %d)" % (temp_subject.subject.short_name, temp_subject.subject.credit))
+        available_semesters = []
+        semester = self.si.toSemester(index)
+        for semester_id in range(self.solution.member.num_studied_semester_id, len(self.solution.semesters)):
+            if semester != self.si.toSemester(semester_id):
+                continue
+            if semester_id == index:
+                continue
+            if self.solution.semesters[semester_id].calculate_total_credit() + temp_subject.subject.credit > self.rule.calculate_maximum_credit(semester_id):
+                continue
+            available_semesters.append(semester_id)
+        # for semester_id,mSemester in enumerate(self.solution.semesters):
+        #     if semester == self.si.toSemester(semester_id) and \
+        #        semester_id != index and \
+        #        mSemester.calculate_total_credit() + temp_subject.subject.credit <= self.rule.calculate_maximum_credit(semester_id):
+        #         available_semesters.append(semester_id)
+        return available_semesters
+        # l.info("%d/%d" % (self.si.toYear(semester_id), self.si.toSemester(semester_id)))

@@ -23,19 +23,23 @@ class SolutionsTest(unittest.TestCase):
         if member is None:
             print('Not found the member')
             exit()
-        solution = PreInitialSolution(member).start()
-        # mSemesters = semesterList.semesters
-        # count subject from curriculum
-        subject_groups = models.SubjectGroup.objects(curriculum = member.curriculum,name = member.subject_group)
-        # i=1
-        # for subject_group in subject_groups:
-        #     print( "%d) %d/%d: %s" % (i, subject_group.year, subject_group.semester,subject_group.subject.short_name))
-        #     i +=1
-        num_subject_from_curriculum = subject_groups.count()
+        solution = PreInitialSolution(member).get_solution()
+
+        grade_subjects = []
+        for grade_subject in solution.get_grade_subjects():
+            grade_subjects.append(str(grade_subject.subject.id))
+        all_subjects = []
+        for subject_group in models.SubjectGroup.objects(curriculum = member.curriculum,name = member.subject_group):
+            all_subjects.append(str(subject_group.subject.id))
 
         # count subject from InitialSolution (Generate)
-        self.assertEqual(num_subject_from_curriculum,
-                         solution.countNumEnrolledSubject())
+        tmp_diff_lists = list(set(all_subjects) - set(grade_subjects))
+        # if len(tmp_diff_lists) > 0:
+        #     for tmp_subject in tmp_diff_lists:
+                # l.info(self.findSubjectById(tmp_subject).short_name +"\t\t is enrolled over than the curriculum")
+        # self.assertEqual(num_subject_from_curriculum,
+        #                  solution.countNumEnrolledSubject())
+        self.assertEqual(len(tmp_diff_lists), 0)
 
         # test num of subject each semester
         # for mSemester in mSemesters:
@@ -49,7 +53,6 @@ class SolutionsTest(unittest.TestCase):
 
         # self.assertEqual(initialSolution.isCorrectInitialSolution(),True)
         # self.assertEqual(initialSolution.countAllSubject(), initialSolution.countOnlyMemberSubject())
-
 
             # Run all data
             # todo : testing each case , There are 3 cases

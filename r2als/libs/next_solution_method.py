@@ -49,15 +49,25 @@ class NextSolutionMethod(object):
 
     def move_grade_subject(self, grade_subject, target_semester_id):
         # Prepare var
-        semester_id = self.si.get(grade_subject.year, grade_subject.semester)
-        target_subject_position = self.__find_grade_subject_id(semester_id, grade_subject.subject)
-        # Moving
-        self.solution.semesters[target_semester_id].subjects.append(
-            self.solution.semesters[semester_id].subjects.pop(target_subject_position)
-        )
+        msg = "Can't move subject into "+ str(self.si.toYear(target_semester_id))+"/"+str(self.si.toSemester(target_semester_id) ) +" because: "
 
-        grade_subject.year = self.si.toYear(target_semester_id)
-        grade_subject.semester = self.si.toSemester(target_semester_id)
+        semester_id = self.si.get(grade_subject.year, grade_subject.semester)
+        subject_position = self.__find_grade_subject_id(semester_id, grade_subject.subject)
+        if subject_position >= 0:
+            # extending the semester
+            self.solution.extend_semester_size(target_semester_id)
+            # Moving
+            l.info("Moving subject %s to %d/%d" % (extract_grade_subject(grade_subject), self.si.toYear(target_semester_id), self.si.toSemester(target_semester_id) ) )
+            self.solution.semesters[target_semester_id].subjects.append(
+                self.solution.semesters[semester_id].subjects.pop(subject_position)
+            )
+
+            grade_subject.year = self.si.toYear(target_semester_id)
+            grade_subject.semester = self.si.toSemester(target_semester_id)
+        elif subject_position == -1:
+            l.error(msg + "Can't find gradesubject " + extract_grade_subject(grade_subject))
+        elif subject_position == -2:
+            l.error(msg + extract_grade_subject(grade_subject)+ " is a fail subject ( studied subject)")
 
     def moveGradeSubject(self, source_semester, source_subject_order, target_semester):
         l.warn("This function is deprecated, please use \"move_grade_subject\" instead")
@@ -81,6 +91,8 @@ class NextSolutionMethod(object):
             )
 
     def __find_grade_subject_id(self, semester_id, subject):
+        if semester_id < self.solution.member.num_studied_semester_id:
+            return -2
         for i in range(len(self.solution.semesters[semester_id].subjects)):
             tmp_subject = self.solution.semesters[semester_id].subjects[i].subject
             if subject == tmp_subject:

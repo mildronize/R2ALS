@@ -48,6 +48,7 @@ def create_Curriculum(curriculum_data):
     curriculum['department'] = curriculum_data['department']
     curriculum['year'] = int(curriculum_data['year'])
     curriculum['required_num_year'] = int(curriculum_data['required_num_year'])
+    curriculum['max_year'] = int(curriculum_data['max_year'])
     curriculum['num_semester'] = int(curriculum_data['num_semester'])
     for not_force_enrolled_semester in curriculum_data['not_force_enrolled_semesters']:
         if int(not_force_enrolled_semester) > int(curriculum['num_semester']):
@@ -284,13 +285,13 @@ def main():
                 'year': 1,
                 'semester': 1,
                 'subjects': [
-                    {'code' : '200-101','grade' : 'C'},
-                    {'code' : '242-101','grade' : 'C'},
-                    {'code' : '322-101','grade' : 'E'},  # E Math 1
-                    {'code' : '332-103','grade' : 'W'}, # W Drop Phy 1
-                    {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
+                    # {'code' : '200-101','grade' : 'C'},
+                    # {'code' : '242-101','grade' : 'C'},
+                    # {'code' : '322-101','grade' : 'E'},  # E Math 1
+                    # {'code' : '332-103','grade' : 'W'}, # W Drop Phy 1
+                    # {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
                     {'code' : '640-101','grade' : 'C'},
-                    {'code' : '890-101','grade' : 'C'},
+                    # {'code' : '890-101','grade' : 'C'},
                     ]
                 }]
         }

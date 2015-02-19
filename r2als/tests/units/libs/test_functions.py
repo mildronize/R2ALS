@@ -19,6 +19,12 @@ class FunctionsTest(unittest.TestCase):
         self.assertEqual(semesterIndex.get(4,1),9)
         self.assertEqual(semesterIndex.get(4,2),10)
         self.assertEqual(semesterIndex.get(4,3),11)
+        self.assertEqual(semesterIndex.get(5,1),12)
+        self.assertEqual(semesterIndex.get(5,2),13)
+        self.assertEqual(semesterIndex.get(5,3),14)
+        self.assertEqual(semesterIndex.get(6,1),15)
+        self.assertEqual(semesterIndex.get(6,2),16)
+        self.assertEqual(semesterIndex.get(6,3),17)
 
     def test_toYear(self):
         from r2als.libs.functions import SemesterIndex
@@ -35,6 +41,12 @@ class FunctionsTest(unittest.TestCase):
         self.assertEqual(semesterIndex.toYear(9),4)
         self.assertEqual(semesterIndex.toYear(10),4)
         self.assertEqual(semesterIndex.toYear(11),4)
+        self.assertEqual(semesterIndex.toYear(12),5)
+        self.assertEqual(semesterIndex.toYear(13),5)
+        self.assertEqual(semesterIndex.toYear(14),5)
+        self.assertEqual(semesterIndex.toYear(15),6)
+        self.assertEqual(semesterIndex.toYear(16),6)
+        self.assertEqual(semesterIndex.toYear(17),6)
 
     def test_toSemester(self):
         from r2als.libs.functions import SemesterIndex
@@ -51,6 +63,12 @@ class FunctionsTest(unittest.TestCase):
         self.assertEqual(semesterIndex.toSemester(9),1)
         self.assertEqual(semesterIndex.toSemester(10),2)
         self.assertEqual(semesterIndex.toSemester(11),3)
+        self.assertEqual(semesterIndex.toSemester(12),1)
+        self.assertEqual(semesterIndex.toSemester(13),2)
+        self.assertEqual(semesterIndex.toSemester(14),3)
+        self.assertEqual(semesterIndex.toSemester(15),1)
+        self.assertEqual(semesterIndex.toSemester(16),2)
+        self.assertEqual(semesterIndex.toSemester(17),3)
 
     def test_compare_semester(self):
         from r2als.libs.functions import SemesterIndex

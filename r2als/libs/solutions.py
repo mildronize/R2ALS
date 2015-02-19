@@ -6,7 +6,7 @@ from mongoengine import Q
 from r2als import models
 
 from r2als.libs.logs import Log
-from r2als.libs.functions import SemesterIndex
+from r2als.libs.functions import SemesterIndex, extract_grade_subject
 from r2als.libs.next_solution_methods import MoveWholeChain, MoveNonRelatedSubjectOut
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -15,9 +15,9 @@ l = Log('libs/solutions').getLogger()
 class InitialSolution:
 
     def __init__(self, member):
+        si = SemesterIndex(member.curriculum.num_semester)
         self.solution = PreInitialSolution(member).get_solution()
-        self.solution.get_ready()
-        self.solution.update_all_prerequisite()
+        # # l.info("Last semester %d/%d" % (si.toYear(len(self.solution.semesters)-1), si.toSemester(len(self.solution.semesters)-1) ) )
         self.solution = MoveWholeChain(self.solution).get_initial_solution()
         self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution()
         self.solution.get_ready()
@@ -38,6 +38,7 @@ class PreInitialSolution:
         self.numStudiedSemesterIndex = self.member.num_studied_semester_id
         # self.maxSemesterIndex = self.si.get(self.curriculum.required_num_year, self.curriculum.num_semester)
         self.numSemesterIndex = self.curriculum.num_required_semester_id
+        l.info("Last semester %d/%d" % (self.si.toYear(self.numSemesterIndex-1), self.si.toSemester(self.numSemesterIndex-1) ) )
         self.remainSubjects = []
         self.initialRemainSubjects()
 
@@ -58,14 +59,14 @@ class PreInitialSolution:
     def addImportedSubject(self, subject_id):
         if self.hasImportedSubject(subject_id) :
             mSubject = models.Subject.objects(id= subject_id).first()
-            l.error('The subject '+subject_id+'is exist !: '+mSubject.name)
+            l.info('The subject '+subject_id+'is exist !: '+mSubject.name)
             return False
         else:
             self.importedSubject.append(subject_id)
             return True
 
-    def addRemainSubjects(self, semester, gradeSubject):
-        self.remainSubjects[semester-1].append(gradeSubject)
+    def addRemainSubjects(self, gradeSubject):
+        self.remainSubjects[gradeSubject.semester-1].append(gradeSubject)
 
     def countRemainSubjects(self):
         tmp = 0
@@ -111,6 +112,7 @@ class PreInitialSolution:
         # mSemesters = []
         solution = models.Solution()
         mSemesters = solution.semesters
+        # initail fail subject
         for i in range(self.numSemesterIndex):
             y = self.si.toYear(i)
             s = self.si.toSemester(i)
@@ -125,21 +127,66 @@ class PreInitialSolution:
             else:
                 # ==========  This section for year & semester remaining ========
                 l.info("semster (%d/%d) are processing[%d]",y,s,numSubjects)
-        for gradeSubject in solution.findNotEnrolledSubjects():
-            self.addRemainSubjects(gradeSubject.semester, gradeSubject)
+
+        for gradeSubject in solution.findFailSubjects():
+            self.addRemainSubjects(gradeSubject)
+
+        # l.info(self.countImportedSubject())
+
+        grade_subjects = []
+        for grade_subject in solution.get_grade_subjects():
+            grade_subjects.append(str(grade_subject.subject.id))
+        all_subjects = []
+        for subject_group in models.SubjectGroup.objects(curriculum = self.member.curriculum,name = self.member.subject_group):
+            all_subjects.append(str(subject_group.subject.id))
+
+        # checking importing subject
+        tmp_diff_lists = list(set(grade_subjects) - set(all_subjects))
+        if len(tmp_diff_lists) > 0:
+            for tmp_subject in tmp_diff_lists:
+                l.info(self.findSubjectById(tmp_subject).short_name +"\t\t is enrolled over than the curriculum")
+
+        # checking missing subject
+        missing_subjects = list(set(all_subjects) - set(grade_subjects))
+        missing_grade_subjects = []
+        if len(missing_subjects) > 0:
+            for missing_subject in missing_subjects:
+                subject = self.findSubjectById(missing_subject)
+                l.info(subject.short_name +"\t is missing")
+                subject_group = models.SubjectGroup.objects(subject_id=subject.id,
+                                                            curriculum= self.member.curriculum,
+                                                            name = self.member.subject_group).first()
+                if subject_group is not None:
+                    tmp_grade_subject = models.GradeSubject(subject=subject_group.subject,
+                                                            year=subject_group.year,
+                                                            semester=subject_group.semester)
+                    self.addRemainSubjects(tmp_grade_subject)
+                    missing_grade_subjects.append(models.GradeSubject(subject=subject_group.subject))
+                else:
+                    l.error("Can't find subject")
 
         # add extra semester
         # if len(self.remainSubjects[]) > 0:
+        l.info("self.countRemainSubjects() " + str(self.countRemainSubjects()))
         if self.countRemainSubjects() > 0:
 
             for i in range(self.numSemesterIndex,
                            self.numSemesterIndex + self.curriculum.num_semester):
-                y = self.si.toYear(i)
-                s = self.si.toSemester(i)
                 mSemesters.append(self.addSemesterModel(i, True))
 
         solution.member = self.member
+        solution.get_ready()
+        solution.update_all_prerequisite()
+        solution = MoveWholeChain(solution).get_initial_solution(missing_grade_subjects)
         return solution
+
+    def findSubjectById(self, subject_id):
+        return models.Subject.objects(id = subject_id).first()
+
+    def differenceTwoList(self, list1, list2):
+        if(len(list1) > len(list2)):
+            return list(set(list1) - set(list2))
+        return list(set(list2) - set(list1))
 
 # def isCorrectInitialSolution(self):
 #     for y in range(1,self.curriculum.required_num_year+1):
