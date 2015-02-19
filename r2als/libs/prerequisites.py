@@ -1,5 +1,3 @@
-from r2als import config
-from r2als import models
 from r2als.libs.logs import Log
 from r2als.libs.functions import SemesterIndex
 

@@ -62,9 +62,8 @@ def response_json(data, message_type="success", message=""):
     else:
         l.error("Not found response_json message_type")
 
-
-
 # function for debugging
+
 def extract_grade_subject(grade_subject):
     if grade_subject is None:
         return "Grade subject is None"

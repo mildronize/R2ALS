@@ -8,7 +8,7 @@ from r2als.libs.validators import *
 
 l = Log('Validator').getLogger()
 
-AVAILABLE_VALIDATOR = ['prerequisite_check','grade_subject_format']
+AVAILABLE_VALIDATOR = ['prerequisite_check','grade_subject_format','grade_subject_in_curriculum']
 
 def validator(solution ,checklist):
     count = 0
@@ -25,11 +25,17 @@ def validator(solution ,checklist):
             result = grade_subject_format(solution=solution)
             if result: count += 1
             _print_result(validator, result)
+        if validator == AVAILABLE_VALIDATOR[2]:
+            result = grade_subject_in_curriculum(solution=solution)
+            if result: count += 1
+            _print_result(validator, result)
     if count == len(validators):
         return True
     return False
 
 def _print_result(validator_string, result):
-    if result: result_msg = "PASS"
-    else: result_msg = "FAIL"
-    l.info("%s\t\t%s" % (validator_string, result_msg ))
+    if result:
+        l.info("%s\t\t%s" % (validator_string, "PASS"))
+    else:
+        l.error("%s\t\t%s" % (validator_string, "FAIL"))
+
