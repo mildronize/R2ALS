@@ -45,18 +45,18 @@ def solution_generator_api_initial(request):
         exit()
 
     solution = InitialSolution(member).get_solution()
-    # validator(solution, ['*'])
-    # for i in range(10):
-    #     l.info("-"*45)
-    #     l.info("Random "+str(i) + " rounds ....")
-    #     # solution = RandomSubject(solution).get_solution()
-    #     # solution = MoveWholeChain(solution).get_solution()
-    #     # solution.get_ready()
-    #     if validator(solution, ['*']) is False:
-    #         break
-    # validator(solution, ['*'])
+    validator(solution, ['*'])
+    for i in range(10):
+        l.info("-"*45)
+        l.info("Random "+str(i) + " rounds ....")
+        solution = RandomSubject(solution).get_solution()
+        solution = MoveWholeChain(solution).get_solution()
+        solution.get_ready()
+        if validator(solution, ['*']) is False:
+            break
+    validator(solution, ['*'])
 
     # mSemesters = next_solution_methods.MoveWholeChain(solution).start()
     json_obj = ExportJson(solution).get()
     return ExportJointjs(json_obj).get()
-
+    # return ExportJson(solution).get_semester_list()

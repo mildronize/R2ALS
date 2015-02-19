@@ -50,6 +50,7 @@ class Curriculum(me.Document):
 
     required_num_year = me.IntField(required=True) # A number of year must be studied
     num_semester = me.IntField(required=True)
+    max_year = me.IntField(required=True)
     num_required_semester_id = me.IntField()
     not_force_enrolled_semesters = me.ListField(me.IntField(min_value=1))
 

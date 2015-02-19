@@ -28,7 +28,7 @@ class CsvToModel:
 		self.SPLIT_SYMBOL = ":"
 		self.MULTI_FIELD_SYMBOL = "*"
 		# Format of head
-		self.HEADER_LISTS = ['faculty','department','year','required_num_year','num_semester','*not_force_enrolled_semesters','*subject_groups','*branches','*categories','*prerequisites']
+		self.HEADER_LISTS = ['faculty','department','year','required_num_year','num_semester','max_year','*not_force_enrolled_semesters','*subject_groups','*branches','*categories','*prerequisites']
 		# END_HEADER = "END_HEADER"
 
 	def hasComment(self, str):

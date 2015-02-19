@@ -3,7 +3,7 @@ import hashlib
 import copy
 from r2als import config
 from r2als import models
-from r2als import scoring
+# from r2als import scoring
 from r2als.libs.solutions import InitialSolution
 from r2als.libs.logs import Log
 
