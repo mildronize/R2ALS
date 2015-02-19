@@ -126,38 +126,29 @@ class ExportJson:
     def get(self):
         return self.get_subject_list()
 
-    def get_subject_list(self):
-        self.json_object['subjects'] = self.exportListSubject(self.solution.semesters)
-
+    def prepare_output_list(self):
         self.json_object['links'] = self.exportLink(self.solution.semesters)
-        print(len(self.json_object['links']))
-        self.json_object['num_semester'] = self.solution.member.curriculum.num_semester
 
-        # plus one year because it is spare semester
-        self.json_object['num_year'] = self.member.curriculum.required_num_year + 1
+        self.json_object['num_semester'] = self.solution.member.curriculum.num_semester
+        self.json_object['num_year'] = self.member.curriculum.required_num_year
+        self.json_object['last_semester_id_plan'] = len(self.solution.semesters) - 1
+        self.json_object['last_year_plan'] = self.si.toYear(self.json_object['last_semester_id_plan'])
+        self.json_object['last_semester_plan'] = self.si.toSemester(self.json_object['last_semester_id_plan'])
 
         self.json_object['last_year'] = self.solution.member.last_year
         self.json_object['last_semester'] = self.solution.member.last_semester
 
         l.info(self.solution.member.name)
         self.json_object['total_credits'] = self.findTotalCreditList(self.solution.semesters)
+
+    def get_subject_list(self):
+        self.json_object['subjects'] = self.exportListSubject(self.solution.semesters)
+        self.prepare_output_list()
         return self.json_object
 
     def get_semester_list(self):
         self.json_object['semesters'] = self.exportListSemester(self.solution.semesters)
-
-        self.json_object['links'] = self.exportLink(self.solution.semesters)
-
-        self.json_object['num_semester'] = self.solution.member.curriculum.num_semester
-
-        # plus one year because it is spare semester
-        self.json_object['num_year'] = self.member.curriculum.required_num_year + 1
-
-        self.json_object['last_year'] = self.solution.member.last_year
-        self.json_object['last_semester'] = self.solution.member.last_semester
-
-        l.info(self.solution.member.name)
-        self.json_object['total_credits'] = self.findTotalCreditList(self.solution.semesters)
+        self.prepare_output_list()
         return self.json_object
 
 
@@ -180,12 +171,12 @@ class ExportJointjs:
         self.si = SemesterIndex(json_object['num_semester'])
         self.last_year = json_object['last_year']
         self.last_semester = json_object['last_semester']
-        self.list_num_subject = self.initialZeroList(json_object['num_year'], json_object['num_semester'])
-        self.jointjs_object['cells'] = self.start(json_object, json_object['num_year'], json_object['num_semester'])
-
-    def initialZeroList(self, num_year, num_semester):
+        self.list_num_subject = self.initialZeroList(json_object['last_semester_id_plan'])
+        self.jointjs_object['cells'] = self.start(json_object, json_object['last_semester_id_plan'])
+        # self.jointjs_object['cells'] = self.start(json_object, json_object['num_year'], json_object['num_semester'])
+    def initialZeroList(self, last_semester_id_plan):
         lists = list()
-        for i in range(num_year * num_semester):
+        for i in range(last_semester_id_plan + 1):
             lists.append(0)
         return lists
 
@@ -232,9 +223,9 @@ class ExportJointjs:
             "z": 1
         }
 
-    def createSemesterLabelList(self, num_year, num_semester, total_credits):
+    def createSemesterLabelList(self, last_semester_id_plan, total_credits):
         lists = list()
-        for i in range(num_year * num_semester):
+        for i in range(last_semester_id_plan + 1):
             lists.append(self.createSemesterLabel(i, total_credits[i]))
             self.addList_num_subject(i, True, 0)
         return lists
@@ -303,9 +294,9 @@ class ExportJointjs:
             }
         }
 
-    def start(self, json_objects, num_year, num_semester):
+    def start(self, json_objects, last_semester_id_plan):
         lists = list()
-        lists += self.createSemesterLabelList(num_year, num_semester, json_objects['total_credits'])
+        lists += self.createSemesterLabelList(last_semester_id_plan, json_objects['total_credits'])
         for json_object in json_objects['subjects']:
             lists.append(self.createSubject(json_object))
             # return lists
