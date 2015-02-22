@@ -18,7 +18,6 @@ class MoveWholeChain(NextSolutionMethod):
                                                     isReversed=False)
 
         for invalid_grade_subject in invalid_grade_subjects:
-            l.info("*"*60)
             # l.info(extract_grade_subject(invalid_grade_subject))
             l.info(extract_grade_subject(invalid_grade_subject['grade_subject'])+"   "+extract_grade_subject(invalid_grade_subject['prerequisite_grade_subject']))
             self.move_subject_whole_chain(invalid_grade_subject['prerequisite_grade_subject'],
@@ -71,7 +70,7 @@ class MoveWholeChain(NextSolutionMethod):
             grade_subject.year = self.si.toYear(source_subject_pos)
             grade_subject.semester = self.si.toSemester(source_subject_pos)
 
-        l.warn(extract_grade_subject(previous_grade_subject)+ " <-- " + extract_grade_subject(grade_subject))
+        # l.warn(extract_grade_subject(previous_grade_subject)+ " <-- " + extract_grade_subject(grade_subject))
         # if self.si.get(grade_subject.year, grade_subject.semester) >= self.solution.member.num_studied_semester_id:
         #     l.warn(extract_grade_subject(previous_grade_subject)+ " <-- " + extract_grade_subject(grade_subject))
         target_semester_id = self.get_target_semester(previous_grade_subject,

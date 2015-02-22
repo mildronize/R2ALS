@@ -13,17 +13,17 @@ l = Log('nsm.random_subject').getLogger()
 class RandomSubject(NextSolutionMethod):
 
     def get_solution(self):
-        semester_id = self.__random_two_semesters()
-        subject_pos = self.__random_two_subjects(semester_id[0], semester_id[1])
+        semester_ids = self.__random_two_semesters()
+        subject_pos = self.__random_two_subjects(semester_ids[0], semester_ids[1])
 
-        grade_subject_0 = self.solution.semesters[semester_id[0]].subjects[subject_pos[0]]
-        grade_subject_1 = self.solution.semesters[semester_id[1]].subjects[subject_pos[1]]
+        grade_subject_0 = self.solution.semesters[semester_ids[0]].subjects[subject_pos[0]]
+        grade_subject_1 = self.solution.semesters[semester_ids[1]].subjects[subject_pos[1]]
 
         si = SemesterIndex(self.solution.member.curriculum.num_semester)
-        if si.get(grade_subject_0.year, grade_subject_0.semester) != semester_id[0]:
-            l.error("Incorrect grade_subject_0: "+extract_grade_subject(grade_subject_0)+" "+str(self.si.toYear(semester_id[0]))+"/"+str(self.si.toSemester(semester_id[0])))
-        if si.get(grade_subject_1.year, grade_subject_1.semester) != semester_id[1]:
-            l.error("Incorrect grade_subject_1: "+extract_grade_subject(grade_subject_1)+" "+str(self.si.toYear(semester_id[1]))+"/"+str(self.si.toSemester(semester_id[1])))
+        if si.get(grade_subject_0.year, grade_subject_0.semester) != semester_ids[0]:
+            l.error("Incorrect grade_subject_0: "+extract_grade_subject(grade_subject_0)+" "+str(self.si.toYear(semester_ids[0]))+"/"+str(self.si.toSemester(semester_ids[0])))
+        if si.get(grade_subject_1.year, grade_subject_1.semester) != semester_ids[1]:
+            l.error("Incorrect grade_subject_1: "+extract_grade_subject(grade_subject_1)+" "+str(self.si.toYear(semester_ids[1]))+"/"+str(self.si.toSemester(semester_ids[1])))
 
 
         self.swap_grade_subject(grade_subject_0, grade_subject_1)
@@ -40,8 +40,6 @@ class RandomSubject(NextSolutionMethod):
         return semester_id
 
     def __random_two_subjects(self, semester_id_0, semester_id_1):
-        # l.info("sem "+str(semester_id_0)+": " + str(len(self.solution.semesters[semester_id_0].subjects)))
-        # l.info("sem "+str(semester_id_1)+": " + str(len(self.solution.semesters[semester_id_1].subjects)))
         return [
             self.__random_two_things(rand_start=0, rand_end=len(self.solution.semesters[semester_id_0].subjects))[0],
             self.__random_two_things(rand_start=0, rand_end=len(self.solution.semesters[semester_id_1].subjects))[0]
