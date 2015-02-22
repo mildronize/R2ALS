@@ -30,16 +30,16 @@ class TabuHandlerTest(unittest.TestCase):
     # Functional Test
     def test_add_next_solution(self):
 
-        from r2als.engines.tabu_handler import TabuHandler
+        from r2als.engines.tabu_manager import TabuManager
         # == test Normal case
-        tabu_handler = TabuHandler(10)
+        tabu_handler = TabuManager(10)
         self.assertEqual(tabu_handler.add_next_solution(self.solution), True)
         # Duplicate solution
         self.assertEqual(tabu_handler.add_next_solution(self.solution), False)
         # Empty solution
         self.assertEqual(tabu_handler.add_next_solution(self.__create_empty_solution()), True)
         # == test Full tabu list case
-        tabu_handler = TabuHandler(1)
+        tabu_handler = TabuManager(1)
         self.assertEqual(tabu_handler.add_next_solution(self.solution), True)
         # Empty solution
         self.assertEqual(tabu_handler.add_next_solution(self.__create_empty_solution()), True)

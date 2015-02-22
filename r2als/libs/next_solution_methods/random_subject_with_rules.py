@@ -56,19 +56,19 @@ class RandomSubjectWithRules(NextSolutionMethod):
                         available_subjects.pop(subject_pos_1)
 
                 if isMoveSubject:
-                    l.warn("Preparing to move subect " + extract_grade_subject(grade_subject_0))
+                    # l.warn("Preparing to move subect " + extract_grade_subject(grade_subject_0))
                     if len(available_semesters) > 0:
                         self.move_grade_subject(grade_subject_0, semester_id_1)
                     else:
                         l.warn("Can't find suitable semester for " + extract_grade_subject(grade_subject_0))
                 else:
-                    l.info("Swapping.. "+extract_grade_subject(grade_subject_0) + " with")
-                    l.info("Swapping.. "+extract_grade_subject(grade_subject_1) )
+                    # l.info("Swapping.. "+extract_grade_subject(grade_subject_0) + " with")
+                    # l.info("Swapping.. "+extract_grade_subject(grade_subject_1) )
                     self.swap_grade_subject(grade_subject_0, grade_subject_1)
         else:
             # l.warn("Preparing to move subject " + extract_grade_subject(grade_subject_0))
             l.error("can't find available_semesters for " + extract_grade_subject(grade_subject_0))
-
+            return Nones
         return self.solution
 
     def __random_semester_id(self, external_available_semesters=None):

@@ -34,8 +34,8 @@ def validator(solution ,checklist):
     return False
 
 def _print_result(validator_string, result):
-    if result:
-        l.info("%s\t\t%s" % (validator_string, "PASS"))
-    else:
+    if not result:
+        # l.info("%s\t\t%s" % (validator_string, "PASS"))
+    # else:
         l.error("%s\t\t%s" % (validator_string, "FAIL"))
 

@@ -9,7 +9,7 @@ from r2als.libs.logs import Log
 from r2als.libs import next_solution_methods
 from r2als.libs.next_solution_methods import *
 from r2als.engines.validator import validator
-from r2als.engines.tabu_handler import TabuHandler
+from r2als.engines.tabu_manager import TabuManager
 
 
 l = Log("view/solution_generator").getLogger()

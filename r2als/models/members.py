@@ -39,11 +39,10 @@ class GradeSubject(me.EmbeddedDocument):
 
 class Solution(me.Document):
 
-    # todo: Making dynamic number of semesters list
-
     meta = {'collection': 'solutions'}
     member = me.ReferenceField('Member', primary_key= True)
     semesters = me.ListField(me.ReferenceField('Semester'))
+    score = me.IntField(default=-1)
 
     def get_ready(self):
         self.update_all_grade_subject()

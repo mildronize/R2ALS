@@ -19,7 +19,7 @@ class MoveWholeChain(NextSolutionMethod):
 
         for invalid_grade_subject in invalid_grade_subjects:
             # l.info(extract_grade_subject(invalid_grade_subject))
-            l.info(extract_grade_subject(invalid_grade_subject['grade_subject'])+"   "+extract_grade_subject(invalid_grade_subject['prerequisite_grade_subject']))
+            # l.info(extract_grade_subject(invalid_grade_subject['grade_subject'])+"   "+extract_grade_subject(invalid_grade_subject['prerequisite_grade_subject']))
             self.move_subject_whole_chain(invalid_grade_subject['prerequisite_grade_subject'],
                                           invalid_grade_subject['grade_subject'],
                                           True)
@@ -77,7 +77,7 @@ class MoveWholeChain(NextSolutionMethod):
                                                        grade_subject,
                                                        prerequisite_name,
                                                        has_previous)
-        l.info("target_semester_id "+str(target_semester_id))
+        # l.info("target_semester_id "+str(target_semester_id))
         if target_semester_id < 0:
             l.error('Impossible enroll of %s', grade_subject.subject.name)
         else:
@@ -129,7 +129,7 @@ class MoveWholeChain(NextSolutionMethod):
                     target_semester['year'] = enrollable_semester['year']
                     target_semester['semester'] = enrollable_semester['semester']
         else:
-            l.info("has_previous is True")
+            # l.info("has_previous is True")
             if previous_grade_subject is None:
                 l.error("previous_grade_subject is None")
                 return -2
@@ -158,7 +158,7 @@ class MoveWholeChain(NextSolutionMethod):
             target_grade_subject = models.GradeSubject(subject = grade_subject.subject,
                                                        year = year,
                                                        semester = semester)
-            l.info("target_grade_subject: "+extract_grade_subject(target_grade_subject))
+            # l.info("target_grade_subject: "+extract_grade_subject(target_grade_subject))
             # l.info(semester)
             p = prerequisites.selector(prerequisite_name, previous_grade_subject, target_grade_subject, self.solution.member)
             if p.canEnrolled() is True:

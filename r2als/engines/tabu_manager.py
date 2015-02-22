@@ -4,14 +4,14 @@ from r2als.libs.functions import SemesterIndex
 import hashlib
 from r2als.libs.logs import Log
 
-l = Log('TabuHandler').getLogger()
+l = Log('TabuManager').getLogger()
 
-class TabuHandler:
+class TabuManager:
 
     def __init__(self, tabu_size):
         self.tabu_list = []
         self.tabu_size = tabu_size
-        l.info("TabuHandler")
+        l.info("TabuManager")
 
     def add_next_solution(self, solution):
         if self.__is_existed(solution):
@@ -26,7 +26,7 @@ class TabuHandler:
         return False
 
     def __is_existed(self, solution):
-        l.info(self.__generate_solution_id(solution))
+        # l.info(self.__generate_solution_id(solution))
         if self.__find_solution(self.__generate_solution_id(solution)):
             return True
         return False
@@ -34,19 +34,33 @@ class TabuHandler:
     def __generate_solution_id(self, solution):
         return hashlib.sha1(self.__convert_solution_to_string(solution)).hexdigest()
 
+    # def __convert_solution_to_string(self, solution):
+    #     result = ""
+    #     for i in range( solution.member.num_studied_semester_id , len(solution.semesters)):
+    #         iter_semester = solution.semesters[i]
+    #         result += ">%s/%s: " % (str(iter_semester.year), str(iter_semester.semester))
+    #         for iter_gradeSubject in iter_semester.subjects:
+    #             result += "(%s,%s) " % (iter_gradeSubject.subject.code, iter_gradeSubject.subject.name)
+    #     # l.info(result)
+    #     return result.encode('utf-8')
+
     def __convert_solution_to_string(self, solution):
         result = ""
-        for i in range( solution.member.num_studied_semester_id , len(solution.semesters)):
+        for i in range(solution.member.num_studied_semester_id , len(solution.semesters)):
             iter_semester = solution.semesters[i]
-            result += ">%s/%s: " % (str(iter_semester.year), str(iter_semester.semester))
+            iter_semester.subjects.sort(key=lambda x: str(x.subject.id), reverse=False)
+            result += "[%s/%s| " % (str(iter_semester.year), str(iter_semester.semester))
+            # l.info("[%s/%s| " % (str(iter_semester.year), str(iter_semester.semester)))
             for iter_gradeSubject in iter_semester.subjects:
-                result += "(%s,%s) " % (iter_gradeSubject.subject.code, iter_gradeSubject.subject.name)
+                # l.info("%s " % (iter_gradeSubject.subject.id))
+                result += "%s " % (iter_gradeSubject.subject.id)
+            result += ']'
         # l.info(result)
         return result.encode('utf-8')
 
     def __store_solution(self, solution):
         if len(self.tabu_list) == self.tabu_size:
             self.tabu_list.pop(0)
-            l.info("Tabu is full. Removing oldest solution from Tabu List (size %d)" % (self.tabu_size))
+            l.warn("Tabu is full. Removing oldest solution from Tabu List (size %d)" % (self.tabu_size))
         self.tabu_list.append(self.__generate_solution_id(solution))
         return True
