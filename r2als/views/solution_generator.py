@@ -49,7 +49,7 @@ def solution_generator_api_initial(request):
     for i in range(10):
         l.info("-"*45)
         l.info("Random "+str(i) + " rounds ....")
-        solution = RandomSubject(solution).get_solution()
+        solution = RandomSubjectWithRules(solution).get_solution()
         solution = MoveWholeChain(solution).get_solution()
         solution.get_ready()
         if validator(solution, ['*']) is False:

@@ -57,9 +57,12 @@ class Solution(me.Document):
                 break
     def extend_semester_size(self, target_semester_id):
         si = SemesterIndex(self.member.curriculum.num_semester)
+        # l.info("Consider.. (%d/%d)" % (self.semesters[len(self.semesters)-1].year, self.semesters[len(self.semesters)-1].semester) )
+        # l.info("Consider.. (%d ? %d)" % (target_semester_id, len(self.semesters) - 1))
         if target_semester_id > len(self.semesters)-1:
-            l.error("Extending semester size")
-            for i in range(len(self.semesters)-1, target_semester_id):
+            l.info("Extend semester size")
+            for i in range(len(self.semesters), target_semester_id + 1):
+                # l.warn("Extending... (%d/%d)" % (si.toYear(i), si.toSemester(i) ))
                 tmp = Semester(subjects=[],
                                member=self.member,
                                year=si.toYear(i),

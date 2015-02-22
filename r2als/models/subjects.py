@@ -41,6 +41,13 @@ class SubjectGroup(me.Document):
             self.code = self.subject.code
             self.subject_id = self.subject.id
 
+    def get_grade_subject(self):
+        return GradeSubject(
+            subject=self.subject,
+            year=self.year,
+            semester=self.semester
+        )
+
 class Curriculum(me.Document):
     meta = {'collection': 'curriculums'}
 
