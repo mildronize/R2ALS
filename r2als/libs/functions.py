@@ -68,7 +68,7 @@ def extract_grade_subject(grade_subject):
     if grade_subject is None:
         return "Grade subject is None"
     elif grade_subject.grade is None:
-        return "%s/%s: %s(%s)" % (grade_subject.year, grade_subject.semester, grade_subject.subject.short_name, grade_subject.grade)
+        return "%s/%s: %s" % (grade_subject.year, grade_subject.semester, grade_subject.subject.short_name)
     return "%s/%s: %s(%s)" % (grade_subject.year, grade_subject.semester, grade_subject.subject.short_name, grade_subject.grade.name)
 
 def extract_solution(solution, semester_id):

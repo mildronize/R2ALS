@@ -1,5 +1,5 @@
 from r2als.libs.logs import Log
-from r2als.libs.functions import SemesterIndex
+from r2als.libs.functions import SemesterIndex, extract_grade_subject
 
 l = Log('prerequisites').getLogger()
 
@@ -38,6 +38,7 @@ class Prerequisite:
 
 
     def _check_semester(self, less, equal):
+
         cmp_semester = self.si.compare_semester(self.gs_1.year,
                                                 self.gs_1.semester,
                                                 self.gs_2.year,
@@ -55,6 +56,7 @@ class StudiedPrerequisite(Prerequisite):
     def canEnrolled(self):
         # all grade without 'W'
         # StudiedPrerequisite
+        l.debug("Check-semester " + extract_grade_subject(self.gs_1) + " " + extract_grade_subject(self.gs_2))
         if self._check_semester(less = True, equal = False) == False:
             return False
 

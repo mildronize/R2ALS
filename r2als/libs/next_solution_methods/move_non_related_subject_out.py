@@ -1,7 +1,8 @@
 __author__ = 'mildronize'
 
-from random import randint
+
 from r2als.libs.rules import Rule
+from r2als import config
 from r2als.libs.logs import Log
 from r2als.libs.next_solution_methods import *
 from r2als.libs.available_semesters import get_available_semesters
@@ -11,13 +12,16 @@ l = Log('nsm.move_non_related_subject_out').getLogger()
 
 class MoveNonRelatedSubjectOut(NextSolutionMethod):
 
-    def get_solution(self):
+    def get_solution(self, random_operator):
+        l.info("Move Non Related Subject Out start")
+        self.random_operator = random_operator
         self.move_non_related_subject_out()
         return self.solution
 
     def move_non_related_subject_out(self):
         # 1 get all non_related subject
         # last semester of the member
+        # random.seed(config.random_seed)
 
         self.rule = Rule(self.solution.member)
         last_semester_id = self.si.get(self.solution.member.last_year,
@@ -37,7 +41,7 @@ class MoveNonRelatedSubjectOut(NextSolutionMethod):
                 non_related_grade_subjects = self.solution.semesters[i].find_non_related_subjects()
 
                 while over_credit > 0:
-                    random_position = randint(0,len(non_related_grade_subjects) - 1)
+                    random_position = self.random_operator.randint(0,len(non_related_grade_subjects) - 1)
                     over_credit -= non_related_grade_subjects[random_position].subject.credit
                     # remove the subject
                     l.info("over credit %d , removing > %s " % (over_credit,
@@ -50,7 +54,7 @@ class MoveNonRelatedSubjectOut(NextSolutionMethod):
                 for temp_grade_subject in temp_subjects:
                     # available_semesters = self.get_available_semesters(i, temp_subject)
                     available_semesters = get_available_semesters(self.solution, temp_grade_subject)
-                    random_semester = randint(0, len(available_semesters) - 1 )
+                    random_semester = self.random_operator.randint(0, len(available_semesters) - 1 )
                     self.solution.extend_semester_size(available_semesters[random_semester])
                     self.solution.semesters[available_semesters[random_semester]].subjects.append(temp_grade_subject)
 

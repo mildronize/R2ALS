@@ -10,7 +10,7 @@ l = Log('exports').getLogger()
 class ExportJson:
 
     def __init__(self, solution):
-        l.info('hello ExportJson')
+        # l.info('hello ExportJson')
         self.member = solution.member
         self.solution = solution
         self.json_object = dict()
@@ -138,7 +138,7 @@ class ExportJson:
         self.json_object['last_year'] = self.solution.member.last_year
         self.json_object['last_semester'] = self.solution.member.last_semester
 
-        l.info(self.solution.member.name)
+        # l.info(self.solution.member.name)
         self.json_object['total_credits'] = self.findTotalCreditList(self.solution.semesters)
 
     def get_subject_list(self):

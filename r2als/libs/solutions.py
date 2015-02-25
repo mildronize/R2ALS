@@ -14,12 +14,12 @@ l = Log('libs/solutions').getLogger()
 
 class InitialSolution:
 
-    def __init__(self, member):
+    def __init__(self, member, random_operator):
         si = SemesterIndex(member.curriculum.num_semester)
         self.solution = PreInitialSolution(member).get_solution()
         # # l.info("Last semester %d/%d" % (si.toYear(len(self.solution.semesters)-1), si.toSemester(len(self.solution.semesters)-1) ) )
         self.solution = MoveWholeChain(self.solution).get_initial_solution()
-        self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution()
+        self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution(random_operator)
         self.solution.get_ready()
 
     def get_solution(self):
@@ -178,6 +178,7 @@ class PreInitialSolution:
         solution.get_ready()
         solution.update_all_prerequisite()
         solution = MoveWholeChain(solution).get_initial_solution(missing_grade_subjects)
+        # solution.update_all_prerequisite()
         return solution
 
     def findSubjectById(self, subject_id):

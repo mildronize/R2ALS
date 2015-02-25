@@ -47,6 +47,7 @@ class Solution(me.Document):
     def get_ready(self):
         self.update_all_grade_subject()
         self.remove_empty_semester()
+        self.update_all_total_credit()
 
     def remove_empty_semester(self):
         for i in reversed(range(len(self.semesters))):
@@ -54,6 +55,11 @@ class Solution(me.Document):
                 self.semesters.pop(i)
             else:
                 break
+
+    def update_all_total_credit(self):
+        for semester in self.semesters:
+            semester.total_credit = semester.calculate_total_credit()
+
     def extend_semester_size(self, target_semester_id):
         si = SemesterIndex(self.member.curriculum.num_semester)
         # l.info("Consider.. (%d/%d)" % (self.semesters[len(self.semesters)-1].year, self.semesters[len(self.semesters)-1].semester) )
@@ -84,13 +90,13 @@ class Solution(me.Document):
                     if found_grade_subject is not None:
                         prerequisite.grade_subject = found_grade_subject
                     else:
-                        l.error("Not found subject")
+                        l.error("Not found subject " + prerequisite.subject.short_name)
                 for reverse_prerequisite in grade_subject.subject.reverse_prerequisites:
                     found_grade_subject = self.__find_grade_subject(reverse_prerequisite.subject)
                     if found_grade_subject is not None:
                         reverse_prerequisite.grade_subject = found_grade_subject
                     else:
-                        l.error("Not found subject")
+                        l.error("Not found subject " + reverse_prerequisite.subject.short_name)
 
 
 
@@ -129,7 +135,7 @@ class Solution(me.Document):
 
     def findFailSubjects(self):
         # return a list of subject with grade 'W'
-        lists = list()
+        lists = []
         for semester in self.semesters:
             for gradeSubject in semester.subjects:
                 if 'grade' in gradeSubject:
@@ -140,8 +146,9 @@ class Solution(me.Document):
         return lists
 
     def __find_grade_subject(self, subject):
-        for semester in self.semesters:
-            for grade_subject in semester.subjects:
+        # Notice: Select non studied subject first
+        for semester_id in reversed(range(len(self.semesters))):
+            for grade_subject in self.semesters[semester_id].subjects:
                 if subject == grade_subject.subject:
                     return grade_subject
         return None
@@ -154,6 +161,7 @@ class Semester(me.Document):
     member = me.ReferenceField('Member')
     year = me.IntField(required=True)
     semester = me.IntField(required=True)
+    total_credit = me.IntField()
 
     def find_non_related_subjects(self):
         non_related_grade_subjects = []

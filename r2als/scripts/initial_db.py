@@ -278,7 +278,7 @@ def main():
                 'curriculum' : coe_curriculum_model,
                 'subject_group' : 'first-group',
                 'registered_year' : 2557,
-                'last_year' : 1,
+                'last_year' : 2,
                 'last_semester' : 1
                 },
             'semesters' : [{
@@ -287,14 +287,65 @@ def main():
                 'subjects': [
                     {'code' : '200-101','grade' : 'C'},
                     {'code' : '242-101','grade' : 'C'},
-                    {'code' : '322-101','grade' : 'E'},  # E Math 1
-                    {'code' : '332-103','grade' : 'W'}, # W Drop Phy 1
+                    {'code' : '322-101','grade' : 'C'},  # E Math 1
+                    {'code' : '332-103','grade' : 'C'}, # W Drop Phy 1
                     {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
                     {'code' : '640-101','grade' : 'C'},
                     {'code' : '890-101','grade' : 'C'},
                     ]
-                }]
+                },{
+                'year': 1,
+                'semester': 2,
+                'subjects': [
+                    {'code' : '215-111','grade' : 'C'},
+                    {'code' : '220-102','grade' : 'C'},
+                    {'code' : '322-102','grade' : 'C'},
+                    {'code' : '324-103','grade' : 'C'},
+                    {'code' : '325-103','grade' : 'C'},
+                    {'code' : '332-104','grade' : 'C'},
+                    {'code' : '332-114','grade' : 'C'},
+                    {'code' : '340-326','grade' : 'C'},
+                    ]
+                },{
+                'year': 2,
+                'semester': 1,
+                'subjects': [
+                    {'code' : '242-201','grade' : 'C'},
+                    {'code' : '242-202','grade' : 'E'}, # lab hard 1
+                    {'code' : '242-205','grade' : 'C'},
+                    {'code' : '242-206','grade' : 'C'},
+                    {'code' : '242-207','grade' : 'E'}, #CPT
+                    {'code' : '242-208','grade' : 'E'}, #Digital
+                    {'code' : '322-201','grade' : 'C'},
+                    {'code' : '890-102','grade' : 'C'},
+                    ]
+                }
+            ]
         }
+        # {
+        #     'info': {
+        #         'member_id':'5710110997',
+        #         'name' : 'Sangkaya Thaithai',
+        #         'curriculum' : coe_curriculum_model,
+        #         'subject_group' : 'first-group',
+        #         'registered_year' : 2557,
+        #         'last_year' : 1,
+        #         'last_semester' : 1
+        #         },
+        #     'semesters' : [{
+        #         'year': 1,
+        #         'semester': 1,
+        #         'subjects': [
+        #             {'code' : '200-101','grade' : 'C'},
+        #             {'code' : '242-101','grade' : 'C'},
+        #             {'code' : '322-101','grade' : 'C'},  # E Math 1
+        #             {'code' : '332-103','grade' : 'C'}, # W Drop Phy 1
+        #             {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
+        #             {'code' : '640-101','grade' : 'C'},
+        #             {'code' : '890-101','grade' : 'C'},
+        #             ]
+        #         }]
+        # }
     ]
 
     for testing_member in testing_members:

@@ -45,7 +45,7 @@ class NextSolutionMethod(object):
         grade_subject_1.year, grade_subject_2.year = grade_subject_2.year, grade_subject_1.year
         grade_subject_1.semester, grade_subject_2.semester = grade_subject_2.semester, grade_subject_1.semester
 
-        l.info("After Swapping %s & %s" % (extract_grade_subject(grade_subject_1), extract_grade_subject(grade_subject_2)))
+        l.info("Swapping %s & %s" % (extract_grade_subject(grade_subject_1), extract_grade_subject(grade_subject_2)))
 
     def move_grade_subject(self, grade_subject, target_semester_id):
         # Prepare var

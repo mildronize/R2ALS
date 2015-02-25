@@ -1,6 +1,6 @@
 __author__ = 'mildronize'
 
-from random import randint
+# from random import randint
 from r2als import models
 from r2als.libs.logs import Log
 from r2als.libs import prerequisites
@@ -13,13 +13,14 @@ l = Log('nsm.move_whole_chain').getLogger()
 class MoveWholeChain(NextSolutionMethod):
 
     def get_solution(self):
+        l.info("Move Whole Chain start")
         invalid_grade_subjects = prerequisite_check(solution=self.solution,
                                                     quick_checking=False,
                                                     isReversed=False)
 
         for invalid_grade_subject in invalid_grade_subjects:
             # l.info(extract_grade_subject(invalid_grade_subject))
-            # l.info(extract_grade_subject(invalid_grade_subject['grade_subject'])+"   "+extract_grade_subject(invalid_grade_subject['prerequisite_grade_subject']))
+            l.info(extract_grade_subject(invalid_grade_subject['grade_subject'])+"   "+extract_grade_subject(invalid_grade_subject['prerequisite_grade_subject']))
             self.move_subject_whole_chain(invalid_grade_subject['prerequisite_grade_subject'],
                                           invalid_grade_subject['grade_subject'],
                                           True)
@@ -78,7 +79,9 @@ class MoveWholeChain(NextSolutionMethod):
                                                        prerequisite_name,
                                                        has_previous)
         # l.info("target_semester_id "+str(target_semester_id))
-        if target_semester_id < 0:
+        if target_semester_id == -5:
+            l.warn('Can\'t find suitable semester id for %s', grade_subject.subject.name)
+        elif target_semester_id < 0:
             l.error('Impossible enroll of %s', grade_subject.subject.name)
         else:
             self.move_grade_subject(grade_subject, target_semester_id)
@@ -167,7 +170,7 @@ class MoveWholeChain(NextSolutionMethod):
                 year += 1
             if year > self.solution.member.curriculum.max_year:
                 # check = False
-                l.error('Can\'t find suitable semester id for %s', grade_subject.subject.name)
+                # l.error('Can\'t find suitable semester id for %s', grade_subject.subject.name)
                 return None
 
         return {
