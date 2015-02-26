@@ -9,7 +9,7 @@ from r2als.engines.tabu_manager import TabuManager
 from r2als.libs.next_solution_methods import *
 from r2als.engines.scoring import Scoring
 
-SEED = 45
+SEED = 47
 
 l=Log("engine/Processor").getLogger()
 
@@ -58,8 +58,8 @@ class Processor:
                 break
             l.warn("Adding to result %d" % (len(self.result_solutions)) )
             self.__add_to_result(SnapSolution(working_solution))
-            # if len(self.result_solutions) > 8:
-            #     break
+            if len(self.result_solutions) > 11:
+                break
         # self.__add_to_result(self.best_solution)
         # self.__add_to_result(working_solution)
         l.info("Ended processor")

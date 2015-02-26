@@ -94,7 +94,8 @@ class ExportJson:
                 subject['year'] = tmp['year']
                 subject['semester'] = tmp['semester']
                 subject['id'] = self.namingSubject(mSemesters, tmp['year'], tmp['semester'], str(gradeSubject.subject.id))
-                subject['name']  = gradeSubject.subject.short_name
+                subject['short_name']  = gradeSubject.subject.short_name
+                subject['name']  = gradeSubject.subject.name
                 subject['hasPrerequisite'] = self.hasPrerequisite(gradeSubject)
                 subject['numPrerequisite'] = self.countPrerequisite(gradeSubject)
                 subject['numReverse_prerequisite'] = self.countReverse_prerequisites(gradeSubject)

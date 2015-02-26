@@ -293,7 +293,8 @@ def main():
                     {'code' : '640-101','grade' : 'C'},
                     {'code' : '890-101','grade' : 'C'},
                     ]
-                },{
+                },
+                {
                 'year': 1,
                 'semester': 2,
                 'subjects': [

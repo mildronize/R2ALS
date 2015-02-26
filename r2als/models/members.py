@@ -42,6 +42,7 @@ class Solution(me.Document):
     meta = {'collection': 'solutions'}
     member = me.ReferenceField('Member', primary_key= True)
     semesters = me.ListField(me.ReferenceField('Semester'))
+    min_semester_id = me.IntField()
     score = me.IntField(default=-1)
 
     def get_ready(self):

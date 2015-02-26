@@ -25,7 +25,7 @@ def prerequisite_check(solution, quick_checking=True, isReversed=True):
             # if grade_subject.subject.prerequisites != []:
             # l.debug("Checking... " +extract_grade_subject(grade_subject))
             for prerequisite in grade_subject.subject.prerequisites:
-                l.debug(extract_grade_subject(prerequisite.grade_subject) + " <----- " + extract_grade_subject(grade_subject))
+                # l.debug(extract_grade_subject(prerequisite.grade_subject) + " <----- " + extract_grade_subject(grade_subject))
                 # Not consider studied semester
                 if si.get(prerequisite.grade_subject.year, prerequisite.grade_subject.semester) > solution.member.num_studied_semester_id - 1:
                     p = prerequisites.selector(prerequisite.name,

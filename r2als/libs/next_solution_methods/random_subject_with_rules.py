@@ -15,6 +15,7 @@ l = Log('nsm.random_subject_with_rules').getLogger()
 class RandomSubjectWithRules(NextSolutionMethod):
 
     def get_solution(self, random_operator):
+        is_add_extra_semester = False
         self.random_operator = random_operator
         # 1 random a semester_id(A) /
         # 2 random a subject(A) in semester_id(A)
@@ -35,11 +36,19 @@ class RandomSubjectWithRules(NextSolutionMethod):
             return None
         subject_pos_0 = available_subjects[self.random_operator.randint(0, len(available_subjects) - 1)]
         grade_subject_0 = self.solution.semesters[semester_id_0].subjects[subject_pos_0]
+        l.debug("grade_subject_0 >> " + extract_grade_subject(grade_subject_0))
         # subject_pos_0 = self.random_operator.randint(0, len(self.solution.semesters[semester_id_0].subjects) - 1)
         # grade_subject_0 = self.solution.semesters[semester_id_0].subjects[subject_pos_0]
 
         # 3
         available_semesters = get_available_semesters(self.solution, grade_subject_0)
+        # extra semester
+        if is_add_extra_semester:
+            new_year = self.si.toYear(self.solution.min_semester_id) + 1
+            new_semester = grade_subject_0.semester
+            new_semester_id = self.si.get(new_year, new_semester)
+            if new_semester_id not in available_semesters:
+                available_semesters.append(new_semester_id)
         # for available_semester in available_semesters:
         #     l.info("available_semester %d/%d" % (self.si.toYear(available_semester), self.si.toSemester(available_semester)))
 
@@ -62,6 +71,7 @@ class RandomSubjectWithRules(NextSolutionMethod):
                     grade_subject_1 = self.solution.semesters[semester_id_1].subjects[subject_pos_1]
                     # l.info("%d) %s" % (subject_pos_1 ,extract_grade_subject(grade_subject_1)))
                     if is_correct_semester(self.solution, grade_subject_1):
+                        # swap
                         isMoveSubject = False
                         break
                     else:
@@ -87,30 +97,30 @@ class RandomSubjectWithRules(NextSolutionMethod):
         # self.spread_out_subject()
         return self.solution
 
-    def spread_out_subject(self):
+    # def spread_out_subject(self):
 
-        average_credit = self.__find_average_credit(self.solution.member.num_studied_semester_id, len(self.solution.semesters))
-        l.info(average_credit)
-        # todo: Can do faster
-        # available_semesters = self.__find_available_semesters()
-        semester_id_0 = self.__find_max_credit_of_semester_id(self.solution.member.num_studied_semester_id, len(self.solution.semesters))
-        available_subjects = self.__get_available_subjects(semester_id_0)
-        if len(available_subjects) == 0:
-            l.error("sth error")
-            return None
-        subject_pos_0 = available_subjects[self.random_operator.randint(0, len(available_subjects) - 1)]
-        grade_subject_0 = self.solution.semesters[semester_id_0].subjects[subject_pos_0]
-        l.info(extract_grade_subject(grade_subject_0))
-        available_semesters = self.__get_low_credit_semester_ids(semester_id_0, average_credit)
-        if len(available_semesters) == 0:
-            l.warn("Do not have low credit semester")
-            return None
-
-        semester_id_1 = self.__random_semester_id(available_semesters)
-        if semester_id_1 < 0:
-            return None
-
-        self.move_grade_subject(grade_subject_0, semester_id_1)
+        # average_credit = self.__find_average_credit(self.solution.member.num_studied_semester_id, len(self.solution.semesters))
+        # l.info(average_credit)
+        # # todo: Can do faster
+        # # available_semesters = self.__find_available_semesters()
+        # semester_id_0 = self.__find_max_credit_of_semester_id(self.solution.member.num_studied_semester_id, len(self.solution.semesters))
+        # available_subjects = self.__get_available_subjects(semester_id_0)
+        # if len(available_subjects) == 0:
+        #     l.error("sth error")
+        #     return None
+        # subject_pos_0 = available_subjects[self.random_operator.randint(0, len(available_subjects) - 1)]
+        # grade_subject_0 = self.solution.semesters[semester_id_0].subjects[subject_pos_0]
+        # l.info(extract_grade_subject(grade_subject_0))
+        # available_semesters = self.__get_low_credit_semester_ids(semester_id_0, average_credit)
+        # if len(available_semesters) == 0:
+        #     l.warn("Do not have low credit semester")
+        #     return None
+        #
+        # semester_id_1 = self.__random_semester_id(available_semesters)
+        # if semester_id_1 < 0:
+        #     return None
+        #
+        # self.move_grade_subject(grade_subject_0, semester_id_1)
         # return self.solution
 
 
@@ -151,21 +161,31 @@ class RandomSubjectWithRules(NextSolutionMethod):
                 if len(self.solution.semesters[semester_id].subjects) != 0:
                     available_semesters.append(semester_id)
         else:
-            for semester_id in external_available_semesters:
-                if len(self.solution.semesters[semester_id].subjects) != 0:
-                    available_semesters.append(semester_id)
+            available_semesters = external_available_semesters
+            # for semester_id in external_available_semesters:
+            #     # if semester_id < len(self.solution.semesters):
+            #     if len(self.solution.semesters[semester_id].subjects) != 0:
+            #         available_semesters.append(semester_id)
         return available_semesters
 
-    def __get_available_subjects(self, semester_id):
+    def __get_available_subjects(self, semester_id, grade_subject=None):
         available_subject_ids = []
         # available_subjects = copy.copy(self.solution.semesters[semester_id].subjects)
         # for grade_subject in available_subjects:
         #     if len(grade_subject.subject.reverse_prerequisites) > 0:
         #         available_subjects.remove(grade_subject)
-        semester = self.solution.semesters[semester_id]
-        for subject_id in range(len(semester.subjects)):
-            if len(semester.subjects[subject_id].subject.reverse_prerequisites) == 0:
-                available_subject_ids.append(subject_id)
-            # else:
-            #     l.warn(extract_grade_subject(semester.subjects[subject_id]))
+        if semester_id < len(self.solution.semesters):
+            semester = self.solution.semesters[semester_id]
+            if grade_subject is None:
+                for subject_id in range(len(semester.subjects)):
+                    if len(semester.subjects[subject_id].subject.reverse_prerequisites) == 0:
+                        available_subject_ids.append(subject_id)
+            else:
+                # Not in used
+                for subject_id in range(len(semester.subjects)):
+                    if grade_subject.subject.isSpecific is False and \
+                            semester.subjects[subject_id].subject.isSpecific is True:
+                        continue
+                    if len(semester.subjects[subject_id].subject.reverse_prerequisites) == 0:
+                        available_subject_ids.append(subject_id)
         return available_subject_ids

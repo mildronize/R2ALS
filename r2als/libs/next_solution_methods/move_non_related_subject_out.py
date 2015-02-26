@@ -54,9 +54,10 @@ class MoveNonRelatedSubjectOut(NextSolutionMethod):
                 for temp_grade_subject in temp_subjects:
                     # available_semesters = self.get_available_semesters(i, temp_subject)
                     available_semesters = get_available_semesters(self.solution, temp_grade_subject)
-                    random_semester = self.random_operator.randint(0, len(available_semesters) - 1 )
-                    self.solution.extend_semester_size(available_semesters[random_semester])
-                    self.solution.semesters[available_semesters[random_semester]].subjects.append(temp_grade_subject)
+                    if len(available_semesters) > 0:
+                        random_semester = self.random_operator.randint(0, len(available_semesters) - 1 )
+                        self.solution.extend_semester_size(available_semesters[random_semester])
+                        self.solution.semesters[available_semesters[random_semester]].subjects.append(temp_grade_subject)
 
                 # print(self.solution.semesters[i].calculate_total_credit())
 

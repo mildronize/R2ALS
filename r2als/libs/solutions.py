@@ -8,6 +8,7 @@ from r2als import models
 from r2als.libs.logs import Log
 from r2als.libs.functions import SemesterIndex, extract_grade_subject
 from r2als.libs.next_solution_methods import MoveWholeChain, MoveNonRelatedSubjectOut
+from r2als.engines.validator import validator
 
 pp = pprint.PrettyPrinter(indent=4)
 l = Log('libs/solutions').getLogger()
@@ -21,7 +22,10 @@ class InitialSolution:
         self.solution = MoveWholeChain(self.solution).get_initial_solution()
         self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution(random_operator)
         self.solution.get_ready()
-
+        self.solution.min_semester_id = len(self.solution.semesters) - 1
+        if validator(self.solution, ['*']) is False:
+            self.solution = MoveWholeChain(self.solution).get_solution()
+            self.solution.get_ready()
     def get_solution(self):
         return self.solution
 

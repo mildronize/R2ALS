@@ -56,7 +56,7 @@ class StudiedPrerequisite(Prerequisite):
     def canEnrolled(self):
         # all grade without 'W'
         # StudiedPrerequisite
-        l.debug("Check-semester " + extract_grade_subject(self.gs_1) + " " + extract_grade_subject(self.gs_2))
+        # l.debug("Check-semester " + extract_grade_subject(self.gs_1) + " " + extract_grade_subject(self.gs_2))
         if self._check_semester(less = True, equal = False) == False:
             return False
 
