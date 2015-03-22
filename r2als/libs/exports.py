@@ -100,9 +100,11 @@ class ExportJson:
                 subject['numPrerequisite'] = self.countPrerequisite(gradeSubject)
                 subject['numReverse_prerequisite'] = self.countReverse_prerequisites(gradeSubject)
                 subject['credit']  = gradeSubject.subject.credit
-
                 if 'grade' in gradeSubject:
                     subject['grade'] = gradeSubject.grade.name
+                    subject['isFail'] = gradeSubject.grade.mustReEnroll
+                else:
+                    subject['isFail'] = False
                 tmp['subjects'].append(subject)
                 tmp['subjects'] = sorted(tmp['subjects'], key=lambda k: k['hasPrerequisite'], reverse= True)
             lists.append(tmp)

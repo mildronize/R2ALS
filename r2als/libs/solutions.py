@@ -32,7 +32,6 @@ class InitialSolution:
 class PreInitialSolution:
 
     def __init__(self, member):
-        # self.semesterItems = []
         self.member = member
         self.curriculum = member.curriculum
         self.importedSubject = []
@@ -45,8 +44,6 @@ class PreInitialSolution:
         l.info("Last semester %d/%d" % (self.si.toYear(self.numSemesterIndex-1), self.si.toSemester(self.numSemesterIndex-1) ) )
         self.remainSubjects = []
         self.initialRemainSubjects()
-
-        # self.initialEmptySemester()
 
     def initialRemainSubjects(self):
         for i in range(self.member.curriculum.num_semester):

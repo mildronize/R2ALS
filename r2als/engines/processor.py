@@ -9,7 +9,7 @@ from r2als.engines.tabu_manager import TabuManager
 from r2als.libs.next_solution_methods import *
 from r2als.engines.scoring import Scoring
 
-SEED = 47
+SEED = None
 
 l=Log("engine/Processor").getLogger()
 
@@ -25,10 +25,13 @@ class Processor:
         l.info("Starting processor...")
         random.seed(SEED)
         tabu = TabuManager(20)
+        # tmp_solution = PreInitialSolution(self.member).get_solution()
+        # tmp_solution.score = Scoring(tmp_solution).get_score()
+        # self.__add_to_result(SnapSolution(tmp_solution), False)
         working_solution = InitialSolution(self.member, random).get_solution()
         working_solution.score = Scoring(working_solution).get_score()
         self.best_solution = SnapSolution(working_solution)
-        # self.__add_to_result(self.best_solution)
+        # self.__add_to_result(self.best_solution, False)
         validator(working_solution, ['*'])
         num_nsg_fail = 0
         num_validate_fail = 0
@@ -58,8 +61,9 @@ class Processor:
                 break
             l.warn("Adding to result %d" % (len(self.result_solutions)) )
             self.__add_to_result(SnapSolution(working_solution))
-            if len(self.result_solutions) > 11:
+            if len(self.result_solutions) > 12:
                 break
+
         # self.__add_to_result(self.best_solution)
         # self.__add_to_result(working_solution)
         l.info("Ended processor")
