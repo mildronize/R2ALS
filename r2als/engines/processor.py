@@ -8,6 +8,7 @@ from r2als.engines.validator import validator
 from r2als.engines.tabu_manager import TabuManager
 from r2als.libs.next_solution_methods import *
 from r2als.engines.scoring import Scoring
+from r2als.engines.filter import Filter
 
 SEED = None
 
@@ -61,8 +62,8 @@ class Processor:
                 break
             l.warn("Adding to result %d" % (len(self.result_solutions)) )
             self.__add_to_result(SnapSolution(working_solution))
-            if len(self.result_solutions) > 12:
-                break
+            # if len(self.result_solutions) > 12:
+            #     break
 
         # self.__add_to_result(self.best_solution)
         # self.__add_to_result(working_solution)
@@ -76,7 +77,8 @@ class Processor:
         l.info("Num of solution which exist in tabu: " + str(num_add_tabu_fail))
         l.info("Num of solution which has score equal to the best: " + str(num_equal_best))
         l.info("="*60)
-        return self.result_solutions
+        # return self.result_solutions
+        return Filter(self.result_solutions).start()
 
     # def __prepare(self):
     #     l.info("Preparing some data....")

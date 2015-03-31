@@ -11,5 +11,7 @@ def initial(setting):
     if setting.get('mongodb.is_drop_database') is not None:
         if setting.get('mongodb.is_drop_database') is True:
             db.drop_database(setting.get('mongodb.db_name'))
+            print("mongodb.is_drop_database is "+ str(setting.get('mongodb.is_drop_database')))
     elif setting.get('mongodb.is_reset') :
         db.drop_database(setting.get('mongodb.db_name'))
+        print("mongodb.is_reset is "+ str(setting.get('mongodb.is_reset')))

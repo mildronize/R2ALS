@@ -17,9 +17,10 @@ class NextSolutionMethod(object):
     @abc.abstractmethod
     def get_solution(self):
         """Retrieve solution"""
-        return
+        return self.solution
 
     def swap_grade_subject(self, grade_subject_1, grade_subject_2):
+        # l.info("B_Swapping %s & %s" % (extract_grade_subject(grade_subject_1), extract_grade_subject(grade_subject_2)))
         # Prepare var
         si = SemesterIndex(self.solution.member.curriculum.num_semester)
         semester_id_1 = si.get(grade_subject_1.year, grade_subject_1.semester)
@@ -27,6 +28,7 @@ class NextSolutionMethod(object):
                                                                  grade_subject_1.subject)
         if target_subject_1_position < 0:
             l.error("not found subject")
+            return False
 
         semester_id_2 = si.get(grade_subject_2.year, grade_subject_2.semester)
         target_subject_2_position = self.__find_grade_subject_id(semester_id_2,
@@ -34,6 +36,7 @@ class NextSolutionMethod(object):
 
         if target_subject_2_position < 0:
             l.error("not found subject")
+            return False
         # Swapping
         tmp = self.solution.semesters[semester_id_1].subjects.pop(target_subject_1_position)
         self.solution.semesters[semester_id_2].subjects.append(tmp)
@@ -46,6 +49,7 @@ class NextSolutionMethod(object):
         grade_subject_1.semester, grade_subject_2.semester = grade_subject_2.semester, grade_subject_1.semester
 
         l.info("Swapping %s & %s" % (extract_grade_subject(grade_subject_1), extract_grade_subject(grade_subject_2)))
+        return True
 
     def move_grade_subject(self, grade_subject, target_semester_id):
         # Prepare var
@@ -61,34 +65,36 @@ class NextSolutionMethod(object):
             self.solution.semesters[target_semester_id].subjects.append(
                 self.solution.semesters[semester_id].subjects.pop(subject_position)
             )
-
             grade_subject.year = self.si.toYear(target_semester_id)
             grade_subject.semester = self.si.toSemester(target_semester_id)
         elif subject_position == -1:
             l.error(msg + "Can't find gradesubject " + extract_grade_subject(grade_subject))
+            return False
         elif subject_position == -2:
             l.error(msg + extract_grade_subject(grade_subject)+ " is a fail subject ( studied subject)")
+            return False
 
-    def moveGradeSubject(self, source_semester, source_subject_order, target_semester):
-        l.warn("This function is deprecated, please use \"move_grade_subject\" instead")
-        msg = 'Moving "%s"\t(%d/%d) to (%d/%d)' % ( self.solution.semesters[source_semester].subjects[source_subject_order].subject.short_name,
-                                                self.si.toYear(source_semester),
-                                                self.si.toSemester(source_semester),
-                                                self.si.toYear(target_semester),
-                                                self.si.toSemester(target_semester))
-        if source_semester == target_semester:
-            l.error(msg)
-        else:
-            l.info(msg)
-
-            # tmp_gradeSubject = copy.copy(self.mSemesters[source_semester].subjects[source_subject_order])
-            # move
-            # self.mSemesters[target_semester].subjects.append(self.mSemesters[source_semester].subjects[source_subject_order])
-            # # remove
-            # self.mSemesters[source_semester].subjects.pop(source_subject_order)
-            self.solution.semesters[target_semester].subjects.append(
-                self.solution.semesters[source_semester].subjects.pop(source_subject_order)
-            )
+        return True
+    # def moveGradeSubject(self, source_semester, source_subject_order, target_semester):
+    #     l.warn("This function is deprecated, please use \"move_grade_subject\" instead")
+    #     msg = 'Moving "%s"\t(%d/%d) to (%d/%d)' % ( self.solution.semesters[source_semester].subjects[source_subject_order].subject.short_name,
+    #                                             self.si.toYear(source_semester),
+    #                                             self.si.toSemester(source_semester),
+    #                                             self.si.toYear(target_semester),
+    #                                             self.si.toSemester(target_semester))
+    #     if source_semester == target_semester:
+    #         l.error(msg)
+    #     else:
+    #         l.info(msg)
+    #
+    #         # tmp_gradeSubject = copy.copy(self.mSemesters[source_semester].subjects[source_subject_order])
+    #         # move
+    #         # self.mSemesters[target_semester].subjects.append(self.mSemesters[source_semester].subjects[source_subject_order])
+    #         # # remove
+    #         # self.mSemesters[source_semester].subjects.pop(source_subject_order)
+    #         self.solution.semesters[target_semester].subjects.append(
+    #             self.solution.semesters[source_semester].subjects.pop(source_subject_order)
+    #         )
 
     def __find_grade_subject_id(self, semester_id, subject):
         if semester_id < self.solution.member.num_studied_semester_id:

@@ -26,6 +26,7 @@ class InitialSolution:
         if validator(self.solution, ['*']) is False:
             self.solution = MoveWholeChain(self.solution).get_solution()
             self.solution.get_ready()
+
     def get_solution(self):
         return self.solution
 
@@ -34,7 +35,8 @@ class PreInitialSolution:
     def __init__(self, member):
         self.member = member
         self.curriculum = member.curriculum
-        self.importedSubject = []
+        # initial all values
+        self.imported_subject = []
         # === Todo ===: Remove all his subject!
         self.si = SemesterIndex(self.curriculum.num_semester)
         # self.maxStudiedSemesterIndex = self.si.get(self.member.last_year, self.member.last_semester)
@@ -42,37 +44,31 @@ class PreInitialSolution:
         # self.maxSemesterIndex = self.si.get(self.curriculum.required_num_year, self.curriculum.num_semester)
         self.numSemesterIndex = self.curriculum.num_required_semester_id
         l.info("Last semester %d/%d" % (self.si.toYear(self.numSemesterIndex-1), self.si.toSemester(self.numSemesterIndex-1) ) )
-        self.remainSubjects = []
-        self.initialRemainSubjects()
+        self.remain_subjects = self.initial_empty_year()
 
-    def initialRemainSubjects(self):
+    def initial_empty_year(self):
+        subjects = []
         for i in range(self.member.curriculum.num_semester):
-            self.remainSubjects.append([])
+            subjects.append([])
+        return subjects
 
-    def countImportedSubject(self):
-        # l.debug(len(self.importedSubject))
-        return len(self.importedSubject)
-
-    def hasImportedSubject(self, subject_id):
-        if subject_id in self.importedSubject: return True
+    def has_imported_subject(self, subject_id):
+        if subject_id in self.imported_subject: return True
         else: return False
 
-    def addImportedSubject(self, subject_id):
-        if self.hasImportedSubject(subject_id) :
-            mSubject = models.Subject.objects(id= subject_id).first()
-            l.info('The subject '+subject_id+'is exist !: '+mSubject.name)
+    def add_imported_subject(self, subject_id):
+        if self.has_imported_subject(subject_id) :
+            # mSubject = models.Subject.objects(id= subject_id).first()
+            l.info('The subject '+subject_id+'is exist ! ')
             return False
         else:
-            self.importedSubject.append(subject_id)
+            self.imported_subject.append(subject_id)
             return True
 
-    def addRemainSubjects(self, gradeSubject):
-        self.remainSubjects[gradeSubject.semester-1].append(gradeSubject)
-
-    def countRemainSubjects(self):
+    def count_remain_subjects(self):
         tmp = 0
-        for remainSubject in self.remainSubjects:
-            tmp += len(remainSubject)
+        for remain_subject in self.remain_subjects:
+            tmp += len(remain_subject)
         return tmp
 
     def addSemesterModel(self, index, isRemaining = False):
@@ -98,19 +94,18 @@ class PreInitialSolution:
                                                              year = mSemester.year,
                                                              semester = mSemester.semester)
                 for mSubjectGroup in mSubjectGroups:
-                    if not self.hasImportedSubject(str(mSubjectGroup.subject['id'])):
+                    if not self.has_imported_subject(str(mSubjectGroup.subject['id'])):
                         gradeSubject = models.GradeSubject()
                         gradeSubject.subject = mSubjectGroup.subject
                         mSemester.subjects.append(gradeSubject)
-                        self.addImportedSubject(str(mSubjectGroup.subject['id']))
+                        self.add_imported_subject(str(mSubjectGroup.subject['id']))
         else:
-            for gradeSubject in self.remainSubjects[index-self.numSemesterIndex]:
+            for gradeSubject in self.remain_subjects[index-self.numSemesterIndex]:
                 mSemester.subjects.append(models.GradeSubject(subject = gradeSubject.subject))
 
         return mSemester
 
     def get_solution(self):
-        # mSemesters = []
         solution = models.Solution()
         mSemesters = solution.semesters
         # initail fail subject
@@ -118,7 +113,7 @@ class PreInitialSolution:
             y = self.si.toYear(i)
             s = self.si.toSemester(i)
             numSubjects = models.SubjectGroup.objects(curriculum = self.curriculum,
-                                                      name = self.member.subject_group ,
+                                                      name = self.member.subject_group,
                                                       year = y,
                                                       semester = s).count()
             mSemesters.append(self.addSemesterModel(i, False))
@@ -130,9 +125,7 @@ class PreInitialSolution:
                 l.info("semster (%d/%d) are processing[%d]",y,s,numSubjects)
 
         for gradeSubject in solution.findFailSubjects():
-            self.addRemainSubjects(gradeSubject)
-
-        # l.info(self.countImportedSubject())
+            self.remain_subjects[gradeSubject.semester-1].append(gradeSubject)
 
         grade_subjects = []
         for grade_subject in solution.get_grade_subjects():
@@ -145,14 +138,15 @@ class PreInitialSolution:
         tmp_diff_lists = list(set(grade_subjects) - set(all_subjects))
         if len(tmp_diff_lists) > 0:
             for tmp_subject in tmp_diff_lists:
-                l.info(self.findSubjectById(tmp_subject).short_name +"\t\t is enrolled over than the curriculum")
+                l.info(models.Subject.objects(id=tmp_subject).first().short_name +
+                       "\t\t is enrolled over than the curriculum")
 
         # checking missing subject
         missing_subjects = list(set(all_subjects) - set(grade_subjects))
         missing_grade_subjects = []
         if len(missing_subjects) > 0:
             for missing_subject in missing_subjects:
-                subject = self.findSubjectById(missing_subject)
+                subject = models.Subject.objects(id=missing_subject).first()
                 l.info(subject.short_name +"\t is missing")
                 subject_group = models.SubjectGroup.objects(subject_id=subject.id,
                                                             curriculum= self.member.curriculum,
@@ -161,15 +155,15 @@ class PreInitialSolution:
                     tmp_grade_subject = models.GradeSubject(subject=subject_group.subject,
                                                             year=subject_group.year,
                                                             semester=subject_group.semester)
-                    self.addRemainSubjects(tmp_grade_subject)
+                    self.remain_subjects[tmp_grade_subject.semester-1].append(tmp_grade_subject)
                     missing_grade_subjects.append(models.GradeSubject(subject=subject_group.subject))
                 else:
                     l.error("Can't find subject")
 
         # add extra semester
         # if len(self.remainSubjects[]) > 0:
-        l.info("self.countRemainSubjects() " + str(self.countRemainSubjects()))
-        if self.countRemainSubjects() > 0:
+        l.info("self.countRemainSubjects() " + str(self.count_remain_subjects()))
+        if self.count_remain_subjects() > 0:
 
             for i in range(self.numSemesterIndex,
                            self.numSemesterIndex + self.curriculum.num_semester):
@@ -182,13 +176,10 @@ class PreInitialSolution:
         # solution.update_all_prerequisite()
         return solution
 
-    def findSubjectById(self, subject_id):
-        return models.Subject.objects(id = subject_id).first()
-
-    def differenceTwoList(self, list1, list2):
-        if(len(list1) > len(list2)):
-            return list(set(list1) - set(list2))
-        return list(set(list2) - set(list1))
+    # def differenceTwoList(self, list1, list2):
+    #     if(len(list1) > len(list2)):
+    #         return list(set(list1) - set(list2))
+    #     return list(set(list2) - set(list1))
 
 # def isCorrectInitialSolution(self):
 #     for y in range(1,self.curriculum.required_num_year+1):

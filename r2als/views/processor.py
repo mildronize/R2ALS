@@ -10,7 +10,6 @@ from r2als.scripts.initial_db import add_member
 from r2als.engines.processor import Processor
 from r2als.libs.exports import ExportJson, ExportJointjs
 
-
 l = Log("view/processor").getLogger()
 
 def prepare_add_member(semesters, member):
@@ -95,8 +94,11 @@ def index(request):
     # for testing
 
     if is_testing == True:
-        member = models.Member.objects(member_id = '5710110997').first()
+        member = models.Member.objects().first()
+        if member is None:
+            return response_json({}, "error", 'Can\'t run testing mode because no member in database')
         si = SemesterIndex(member.curriculum.num_semester)
+
     else:
         member = add_member(prepare_add_member(semesters, member))
         if member is None:

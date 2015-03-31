@@ -105,6 +105,7 @@ class ExportJson:
                     subject['isFail'] = gradeSubject.grade.mustReEnroll
                 else:
                     subject['isFail'] = False
+                subject['tags']  = gradeSubject.subject.tags
                 tmp['subjects'].append(subject)
                 tmp['subjects'] = sorted(tmp['subjects'], key=lambda k: k['hasPrerequisite'], reverse= True)
             lists.append(tmp)

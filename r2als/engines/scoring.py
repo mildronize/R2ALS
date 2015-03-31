@@ -15,10 +15,9 @@ class Scoring:
         self.mSemesters = solution.semesters
         self.member = solution.member
         # end before year 4 semester 3
-        si = SemesterIndex(self.member.curriculum.num_semester)
-        self.expectedSemesterToEnd = si.get(self.member.curriculum.required_num_year , self.member.curriculum.num_semester)
-        # score will be increased if the user study more than over
-        self.scorePerSemester = 100
+        self.si = SemesterIndex(self.member.curriculum.num_semester)
+
+        # self.scorePerSemester = 100
 
     def __count_semester(self):
         count = len(self.mSemesters)
@@ -28,20 +27,27 @@ class Scoring:
                 return count
         return count
 
-    def __scoring_semester(self):
-        diff_semester = self.__count_semester() - self.expectedSemesterToEnd
+    def _scoring_semester(self, expected_semester_to_end, score_per_semester):
+        diff_semester = self.__count_semester() - expected_semester_to_end
         #todo: missing conidition
         # if diff_semester < 0:
         l.info(self.__count_semester())
-        l.info(self.expectedSemesterToEnd)
+        l.info(expected_semester_to_end)
         if diff_semester >= 0:
-            return diff_semester * self.scorePerSemester
+            return diff_semester * score_per_semester
         else:
             return 0
 
     def get_score(self):
         totalScore = 10
-        totalScore += self.__scoring_semester()
+        # parameter
+        score_per_semester = 100
+        expected_semester_to_end = self.si.get(self.member.curriculum.required_num_year , self.member.curriculum.num_semester)
+        # expected_semester_to_end = self.si.get(5,1)
+
+        # score will be increased if the user study more than over
+        # static scoring
+        totalScore += self._scoring_semester(expected_semester_to_end, score_per_semester)
         return totalScore
 
 # def scoring(data):

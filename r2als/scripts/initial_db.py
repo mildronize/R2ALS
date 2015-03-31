@@ -1,6 +1,6 @@
 '''
 initial_db
-Description#   Initialize a database and test case
+Description#   Initialize a database
 Developer#     Thada Wangthammang
 '''
 import os
@@ -10,21 +10,16 @@ import pprint
 from mongoengine import Q
 
 from r2als.libs.logs import Log
-from r2als.libs.solutions import InitialSolution
 from r2als import models
 from r2als import config
-from r2als.libs.functions import SemesterIndex
 # 2 types for importing library
 # 1. from path/directory import package_name(*.py)
 # 2. from path/package_name(*.py) import class_name
 from r2als.scripts.convert_curriculum import CsvToModel
 
 pp = pprint.PrettyPrinter(indent=4)
-# lh = LogHandler()
 
- # setup `logging` module
 l = Log('initial_db').getLogger()
-# l.startApp('scripts/initial_db')
 
 def import_curriculum_to_model(path):
     # Not check key yet
@@ -118,6 +113,11 @@ def create_Subject(raw_subjects, curriculum):
         if 'categories' in raw_subject:
             for category in raw_subject['categories']:
                 subject_tmp.categories.append(category)
+        # add tags
+        if 'tags' in raw_subject:
+            for tag in raw_subject['tags']:
+                subject_tmp.tags.append(tag)
+            l.info("add tags of %s: %s" % (subject_tmp.short_name,list(subject_tmp.tags)))
         subject_tmp.save()
 
 def update_SubjectGroup(curriculum):
@@ -252,6 +252,7 @@ def main():
 
     curriculumPath = sys.argv[2]
     configuration = config.Configurator(sys.argv[1])
+    configuration.set('mongodb.is_drop_database', True)
     models.initial(configuration.settings)
 
     coe_curriculum_model = initial_coe_curriculum_data(curriculumPath)
@@ -267,62 +268,62 @@ def main():
                subject_group.subject.name)
 
     #initial test cases
-    l.info("======== Starting initial test cases")
+    # l.info("======== Starting initial test cases")
     #add a member
-    testing_members = [
-
-        {
-            'info': {
-                'member_id':'5710110997',
-                'name' : 'Sangkaya Thaithai',
-                'curriculum' : coe_curriculum_model,
-                'subject_group' : 'first-group',
-                'registered_year' : 2557,
-                'last_year' : 2,
-                'last_semester' : 1
-                },
-            'semesters' : [{
-                'year': 1,
-                'semester': 1,
-                'subjects': [
-                    {'code' : '200-101','grade' : 'C'},
-                    {'code' : '242-101','grade' : 'C'},
-                    {'code' : '322-101','grade' : 'C'},  # E Math 1
-                    {'code' : '332-103','grade' : 'C'}, # W Drop Phy 1
-                    {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
-                    {'code' : '640-101','grade' : 'C'},
-                    {'code' : '890-101','grade' : 'C'},
-                    ]
-                },
-                {
-                'year': 1,
-                'semester': 2,
-                'subjects': [
-                    {'code' : '215-111','grade' : 'C'},
-                    {'code' : '220-102','grade' : 'C'},
-                    {'code' : '322-102','grade' : 'C'},
-                    {'code' : '324-103','grade' : 'C'},
-                    {'code' : '325-103','grade' : 'C'},
-                    {'code' : '332-104','grade' : 'C'},
-                    {'code' : '332-114','grade' : 'C'},
-                    {'code' : '340-326','grade' : 'C'},
-                    ]
-                },{
-                'year': 2,
-                'semester': 1,
-                'subjects': [
-                    {'code' : '242-201','grade' : 'C'},
-                    {'code' : '242-202','grade' : 'E'}, # lab hard 1
-                    {'code' : '242-205','grade' : 'C'},
-                    {'code' : '242-206','grade' : 'C'},
-                    {'code' : '242-207','grade' : 'E'}, #CPT
-                    {'code' : '242-208','grade' : 'E'}, #Digital
-                    {'code' : '322-201','grade' : 'C'},
-                    {'code' : '890-102','grade' : 'C'},
-                    ]
-                }
-            ]
-        }
+    # testing_members = [
+    #
+    #     {
+    #         'info': {
+    #             'member_id':'5710110997',
+    #             'name' : 'Sangkaya Thaithai',
+    #             'curriculum' : coe_curriculum_model,
+    #             'subject_group' : 'first-group',
+    #             'registered_year' : 2557,
+    #             'last_year' : 2,
+    #             'last_semester' : 1
+    #             },
+    #         'semesters' : [{
+    #             'year': 1,
+    #             'semester': 1,
+    #             'subjects': [
+    #                 {'code' : '200-101','grade' : 'C'},
+    #                 {'code' : '242-101','grade' : 'C'},
+    #                 {'code' : '322-101','grade' : 'C'},  # E Math 1
+    #                 {'code' : '332-103','grade' : 'C'}, # W Drop Phy 1
+    #                 {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
+    #                 {'code' : '640-101','grade' : 'C'},
+    #                 {'code' : '890-101','grade' : 'C'},
+    #                 ]
+    #             },
+    #             {
+    #             'year': 1,
+    #             'semester': 2,
+    #             'subjects': [
+    #                 {'code' : '215-111','grade' : 'C'},
+    #                 {'code' : '220-102','grade' : 'C'},
+    #                 {'code' : '322-102','grade' : 'C'},
+    #                 {'code' : '324-103','grade' : 'C'},
+    #                 {'code' : '325-103','grade' : 'C'},
+    #                 {'code' : '332-104','grade' : 'C'},
+    #                 {'code' : '332-114','grade' : 'C'},
+    #                 {'code' : '340-326','grade' : 'C'},
+    #                 ]
+    #             },{
+    #             'year': 2,
+    #             'semester': 1,
+    #             'subjects': [
+    #                 {'code' : '242-201','grade' : 'C'},
+    #                 {'code' : '242-202','grade' : 'E'}, # lab hard 1
+    #                 {'code' : '242-205','grade' : 'C'},
+    #                 {'code' : '242-206','grade' : 'C'},
+    #                 {'code' : '242-207','grade' : 'E'}, #CPT
+    #                 {'code' : '242-208','grade' : 'E'}, #Digital
+    #                 {'code' : '322-201','grade' : 'C'},
+    #                 {'code' : '890-102','grade' : 'C'},
+    #                 ]
+    #             }
+    #         ]
+    #     }
         # {
         #     'info': {
         #         'member_id':'5710110997',
@@ -347,10 +348,10 @@ def main():
         #             ]
         #         }]
         # }
-    ]
-
-    for testing_member in testing_members:
-        add_member(testing_member)
+    # ]
+    #
+    # for testing_member in testing_members:
+    #     add_member(testing_member)
 
 
         # {

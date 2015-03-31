@@ -43,6 +43,7 @@ class Solution(me.Document):
     member = me.ReferenceField('Member', primary_key= True)
     semesters = me.ListField(me.ReferenceField('Semester'))
     min_semester_id = me.IntField()
+    conditions = me.ListField(me.IntField())
     score = me.IntField(default=-1)
 
     def get_ready(self):
@@ -153,6 +154,41 @@ class Solution(me.Document):
                 if subject == grade_subject.subject:
                     return grade_subject
         return None
+
+    def countAllSubjects(self):
+        total = 0
+        for semester in self.semesters:
+            total += len(semester.subjects)
+        return total
+
+    def find_not_empty_semester_ids(self, external_available_semesters=None):
+        # original from random_subject_with_rule
+        available_semesters = []
+        if external_available_semesters is None:
+            for semester_id in range(self.member.num_studied_semester_id,
+                                     len(self.semesters)):
+                if len(self.semesters[semester_id].subjects) != 0:
+                    available_semesters.append(semester_id)
+        else:
+            available_semesters = external_available_semesters
+            # for semester_id in external_available_semesters:
+            #     # if semester_id < len(self.solution.semesters):
+            #     if len(self.solution.semesters[semester_id].subjects) != 0:
+            #         available_semesters.append(semester_id)
+        return available_semesters
+
+    def check_subject_exist(self, subject, semester_id=None):
+        if semester_id is not None:
+            for grade_subject in self.semesters[semester_id].subjects:
+                if grade_subject.subject == subject:
+                    return True
+        else:
+            for semester_id in range(self.member.num_studied_semester_id,
+                                     len(self.semesters)):
+                for grade_subject in self.semesters[semester_id].subjects:
+                    if grade_subject.subject == subject:
+                        return True
+        return False
 
 
 class Semester(me.Document):

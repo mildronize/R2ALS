@@ -27,7 +27,7 @@ class Configurator:
 
         sections = ['r2als','Paths']
 
-        boolean_conf = ['is_reset']
+        boolean_conf = ['mongodb.is_reset']
         integer_conf = ['']
 
 
@@ -37,14 +37,17 @@ class Configurator:
         for section in sections:
             if not config_parser.has_section(section):
                 continue
-
+            # print(list(config_parser.items(section)))
             for k, v in config_parser.items(section):
+                # print(k)
                 if k in boolean_conf:
                     self.settings[k] = config_parser.getboolean(section, k)
+                    # print("Yep")
                 elif k in integer_conf:
                     self.settings[k] = config_parser.getint(section, k)
                 else:
                     self.settings[k] = v
+                    # print("Npoe")
 
     def get(self, key):
         if key not in self.settings:
