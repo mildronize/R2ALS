@@ -10,22 +10,29 @@ from r2als.libs.next_solution_methods import *
 from r2als.engines.scoring import Scoring
 from r2als.engines.filter import Filter
 
-SEED = None
-
 l=Log("engine/Processor").getLogger()
 
 class Processor:
 
-    def __init__(self, member):
+    def __init__(self, member, tabu_size, target_num_solution, seed=None):
         self.result_solutions = []
         self.member = member
+        self.tabu_size = tabu_size
         self.high_score_is_good = False
         self.best_solution = None
+        self.seed = seed
+        self.target_num_solution = target_num_solution
+
+        self.num_nsg_fail = 0
+        self.num_validate_fail = 0
+        self.num_add_tabu_fail = 0
+        self.num_equal_best = 0
+        self.num_iteration = 1
 
     def start(self):
         l.info("Starting processor...")
-        random.seed(SEED)
-        tabu = TabuManager(20)
+        random.seed(self.seed)
+        tabu = TabuManager(self.tabu_size)
         # tmp_solution = PreInitialSolution(self.member).get_solution()
         # tmp_solution.score = Scoring(tmp_solution).get_score()
         # self.__add_to_result(SnapSolution(tmp_solution), False)
@@ -34,36 +41,34 @@ class Processor:
         self.best_solution = SnapSolution(working_solution)
         # self.__add_to_result(self.best_solution, False)
         validator(working_solution, ['*'])
-        num_nsg_fail = 0
-        num_validate_fail = 0
-        num_add_tabu_fail = 0
-        num_equal_best = 0
 
-        for i in range(100):
+        self.num_iteration=1
+        while True:
             l.info("-"*45)
-            l.info("Random "+str(i) + " rounds ....")
+            l.info("Random "+str(self.num_iteration) + " rounds ....")
+            self.num_iteration+=1
             tmp_solution = self.__next_solution_generator(working_solution)
             if tmp_solution is None:
-                num_nsg_fail = num_nsg_fail + 1
+                self.num_nsg_fail = self.num_nsg_fail + 1
                 continue
             working_solution = tmp_solution
             if validator(working_solution, ['*']) is False:
-                num_validate_fail = num_nsg_fail + 1
+                self.num_validate_fail = self.num_nsg_fail + 1
                 break
             if not tabu.add_next_solution(working_solution):
-                num_add_tabu_fail = num_add_tabu_fail + 1
+                self.num_add_tabu_fail = self.num_add_tabu_fail + 1
                 continue
             working_solution.score = Scoring(working_solution).get_score()
             l.info("Current score %d" %(working_solution.score))
             if self.__compare_best_solution(working_solution):
-                num_equal_best = num_equal_best + 1
+                self.num_equal_best = self.num_equal_best + 1
             if working_solution == self.best_solution:
                 l.error("Something wrong")
                 break
             l.warn("Adding to result %d" % (len(self.result_solutions)) )
             self.__add_to_result(SnapSolution(working_solution))
-            # if len(self.result_solutions) > 12:
-            #     break
+            if len(self.result_solutions) == self.target_num_solution:
+                break
 
         # self.__add_to_result(self.best_solution)
         # self.__add_to_result(working_solution)
@@ -71,14 +76,11 @@ class Processor:
         l.info("-"*60)
         l.info("The result")
         l.info("-"*60)
-        l.info("Random seed: " + str(SEED))
-        l.info("Num of Next Solution Generator can't find the solution: " + str(num_nsg_fail))
-        l.info("Num of solution which validate fail: " + str(num_validate_fail))
-        l.info("Num of solution which exist in tabu: " + str(num_add_tabu_fail))
-        l.info("Num of solution which has score equal to the best: " + str(num_equal_best))
+        for extra in self.conclusion_list():
+            l.info(extra)
         l.info("="*60)
-        # return self.result_solutions
-        return Filter(self.result_solutions).start()
+        return self.result_solutions
+        # return Filter(self.result_solutions, extras).start()
 
     # def __prepare(self):
     #     l.info("Preparing some data....")
@@ -87,6 +89,16 @@ class Processor:
     #     # tabu.add_next_solution(solution)
     #     # self.result_solutions.append(solution)
     #     return solution
+
+    def conclusion_list(self):
+        extras = []
+        extras.append("Random seed: " + str(self.seed))
+        extras.append("Num of iteration: "+ str(self.num_iteration))
+        extras.append("Num of Next Solution Generator can't find the solution: %d (%.2f%s)" % (self.num_nsg_fail, float(self.num_nsg_fail/self.num_iteration*100),'%'))
+        extras.append("Num of solution which validate fail: %d (%.2f%s)" % (self.num_validate_fail, float(self.num_validate_fail/self.num_iteration*100),'%'))
+        extras.append("Num of solution which exist in tabu: %d (%.2f%s)" % (self.num_add_tabu_fail, float(self.num_add_tabu_fail/self.num_iteration*100),'%'))
+        extras.append("Num of solution which has score equal to the best: %d (%.2f%s)" % (self.num_equal_best, float(self.num_equal_best/self.num_iteration*100),'%'))
+        return extras
 
     def __compare_best_solution(self, solution):
         l.info("Comparing between best(%d), current(%d)" % (self.best_solution.score, solution.score))
@@ -115,6 +127,7 @@ class Processor:
 
     def __next_solution_generator(self, solution):
         tmp_solution = RandomSubjectWithRules(solution).get_solution(random)
+        # tmp_solution = RandomSubjectWithRules(solution).get_solution_move_only(random)
         if tmp_solution is not None:
             solution = MoveWholeChain(solution).get_solution()
             solution = MoveNonRelatedSubjectOut(solution).get_solution(random)

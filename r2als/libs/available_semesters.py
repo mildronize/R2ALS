@@ -4,7 +4,7 @@ from r2als.libs.rules import Rule
 
 # grade_subject must correct in the curriculum
 
-def get_available_semesters(solution, grade_subject):
+def get_available_semesters(solution, grade_subject, ignore_credit=False):
     lists = []
     l.debug(extract_grade_subject(grade_subject))
     si = SemesterIndex(solution.member.curriculum.num_semester)
@@ -15,7 +15,7 @@ def get_available_semesters(solution, grade_subject):
             continue
         if semester_id == si.get(grade_subject.year, grade_subject.semester):
             continue
-        if solution.semesters[semester_id].calculate_total_credit() + grade_subject.subject.credit > \
+        if not ignore_credit and solution.semesters[semester_id].calculate_total_credit() + grade_subject.subject.credit > \
                 rule.calculate_maximum_credit(semester_id):
             continue
         lists.append(semester_id)

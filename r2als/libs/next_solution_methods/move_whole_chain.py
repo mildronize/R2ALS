@@ -106,13 +106,13 @@ class MoveWholeChain(NextSolutionMethod):
                 # move to next year and same semester
                 target_semester['year'] = self.solution.member.last_year + 1
                 target_semester['semester'] = subjectGroup.semester
-                l.warn(">> "+ extract_grade_subject(grade_subject)+ ": fail subject")
+                l.debug(">> "+ extract_grade_subject(grade_subject)+ ": fail subject")
 
             elif previous_grade_subject is None:
                 l.error("previous_grade_subject is None")
                 return -4
             else:
-                l.warn(">> "+ extract_grade_subject(grade_subject)+ ": pass subject")
+                l.debug(">> "+ extract_grade_subject(grade_subject)+ ": pass subject")
                 # move to next year and same semester from previous subject
                 # l.info(extract_grade_subject(previous_grade_subject))
 
