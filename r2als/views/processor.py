@@ -94,7 +94,7 @@ def index(request):
     # for testing
 
     if is_testing == True:
-        member = models.Member.objects().first()
+        member = models.Member.objects(member_id="testcase1").first()
         if member is None:
             return response_json({}, "error", 'Can\'t run testing mode because no member in database')
         si = SemesterIndex(member.curriculum.num_semester)
@@ -119,7 +119,10 @@ def index(request):
         if count_semester + count_not_force_enrolled_semesters != len(semesters):
             return response_json({}, "error", 'Please checking your enrollment')
 
-    solutions = Processor(member).start()
+    seed = 521
+    # 37,107,257,521
+
+    solutions = Processor(member, 20, 10, seed).start()
 
     for solution in solutions:
         # l.info("Last semester %d/%d" % (si.toYear(len(solution.semesters)-1), si.toSemester(len(solution.semesters)-1) ) )

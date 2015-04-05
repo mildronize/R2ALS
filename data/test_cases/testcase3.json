@@ -1,6 +1,6 @@
 {
   "info": {
-      "member_id":"testcase1",
+      "member_id":"testcase3",
       "subject_group" : "first-group",
       "registered_year" : 2557,
       "last_year" : 2,
@@ -39,10 +39,10 @@
       "semester": 1,
       "subjects": [
           {"code" : "242-201","grade" : "C"},
-          {"code" : "242-202","grade" : "C","comment":"lab hard 1"},
+          {"code" : "242-202","grade" : "E","comment":"lab hard 1"},
           {"code" : "242-205","grade" : "C"},
           {"code" : "242-206","grade" : "C"},
-          {"code" : "242-207","grade" : "C","comment":"CPT"},
+          {"code" : "242-207","grade" : "E","comment":"CPT"},
           {"code" : "242-208","grade" : "C","comment":"Digital"},
           {"code" : "322-201","grade" : "C"},
           {"code" : "890-102","grade" : "C"}

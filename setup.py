@@ -41,5 +41,6 @@ setup(name='r2als',
       [console_scripts]
       initialize_r2als_db = r2als.scripts.initial_db:main
       initialize_test_case = r2als.scripts.initial_test_case:main
+      run_r2als = r2als.bin.r2als:main
       """,
       )

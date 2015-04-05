@@ -75,7 +75,7 @@ code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurr
 ,Optional English Language,3,,,,,lecture,,3,1,Adv Eng 1,english
 #Table 13 Second semester courses for the third-year students,,,,,,,,,,,,
 242-302 ,Advanced Computer Engineering Laboratory II,1,,242-301,,,lab,,3,2,Lab Com 2,programming:experiment:software:hardware
-242-308,Computer Engineering Project Preparation,2,,242-207:242-208,,,project,,3,2,Prop Prep,project:experiment:presentation
+242-308,Computer Engineering Project Preparation,2,,242-207:242-208,,,project,,3,2,Prop Prep,project:presentation
 242-309,Microcontroller and Interfacing,3,,,,,lecture,,3,2,Microcon,theory:hardware:programming
 242-310,Introduction to Algorithms and Complexity,2,,242-207,,,lecture,,3,2,Algo,theory:software:algorithm
 242-311,Client/Server Computing and Web Technologies,2,,,,,lecture,,3,2,Client/Serv,theory:software:network:programming
@@ -85,14 +85,14 @@ code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurr
 #Table 14 Third semester courses for the third-year students,,,,,,,,,,,,
 242-400,Practical Training,,,200-101:242-101:322-101:332-103:332-113:640-101:890-101:215-111:220-102:322-102:324-103:325-103:332-104:332-114:340-326:242-201:242-202:242-205:242-206:242-207:242-208:322-201:890-102:242-203:242-204:242-209:242-210 :242-211:242-212:242-213:242-214:242-301:242-303:242-304:242-305:242-306:242-307,,,,,3,3,Trainning,tranning
 #Table 15 First semester courses for the Fourth-year students,,,,,,,lecture,,,,,
-242-401,Computer Engineering Project I,3,,242-203:242-204:242-308,,,project,,4,1,Prop 1,project:experiment:presentation
+242-401,Computer Engineering Project I,3,,242-203:242-204:242-308,,,project,,4,1,Prop 1,project:presentation
 ,Branch Technical Subject,3,,,,,lecture,,4,1,Branch 3,
 ,Technical Elective,3,,,,,lecture,,4,1,T Elective 1,
 895-171,Wisdom of Living,3,,,,,lecture,,4,1,Wisdom,theory:choice
 ,Free Elective,3,,,,,lecture,,4,1,Free,
 ,Optional physical education,1,,,,,lecture,,4,1,Phy Edu 1,physic-edu
 #Table 16 Second semester courses for the Fourth-year students,,,,,,,,,,,,
-242-402,Computer Engineering Project II,3,,242-401,,,project,,4,2,Prop 2,project:experiment:presentation
+242-402,Computer Engineering Project II,3,,242-401,,,project,,4,2,Prop 2,project:presentation
 242-001,Co-Curricular Activities,1,,,,,lecture,,4,2,Co-act,activity
 ,Branch Technical Subject,3,,,,,lecture,,4,2,Branch  4,
 ,Technical Elective,3,,,,,lecture,,4,2,T Elective 2,

@@ -45,6 +45,7 @@ class Solution(me.Document):
     min_semester_id = me.IntField()
     conditions = me.ListField(me.IntField())
     score = me.IntField(default=-1)
+    scores = me.ListField(me.IntField())
 
     def get_ready(self):
         self.update_all_grade_subject()
@@ -240,9 +241,9 @@ class Member(me.Document):
     num_studied_semester_id = me.IntField()
 
     # Expected semester id
-    # expected_year = me.IntField(required=True)
-    # expected_semester = me.IntField(required=True)
-    # num_expected_semester_id = me.IntField()
+    expected_year = me.IntField(required=True)
+    expected_semester = me.IntField(required=True)
+    num_expected_semester_id = me.IntField()
 
     # margin credit that user allow extra total credit
     # margin_credit = me.IntField(required=True)
@@ -253,4 +254,7 @@ class Member(me.Document):
         from r2als.libs.functions import SemesterIndex
         si = SemesterIndex(self.curriculum.num_semester)
         self.num_studied_semester_id = si.get(self.last_year, self.last_semester) + 1
-        # self.num_expected_semester_id = si.get(self.expected_year, self.expected_semester) + 1
+        if self.expected_year is None or self.expected_semester is None:
+            self.expected_year = self.curriculum.required_num_year
+            self.expected_semester = self.curriculum.num_semester
+        self.num_expected_semester_id = si.get(self.expected_year, self.expected_semester) + 1
