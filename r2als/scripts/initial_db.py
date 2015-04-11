@@ -108,7 +108,14 @@ def create_Subject(raw_subjects, curriculum):
         subject_tmp.name = raw_subject['name']
         subject_tmp.short_name = raw_subject['short_name']
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
-
+        # print(raw_subject)
+        if 'not_fix_semester' in raw_subject:
+            if str(raw_subject['not_fix_semester']).lower() == "true":
+                subject_tmp.not_fix_semester = True
+            else:
+                subject_tmp.not_fix_semester = False
+        else:
+            subject_tmp.not_fix_semester = False
         # add categories
         if 'categories' in raw_subject:
             for category in raw_subject['categories']:

@@ -10,9 +10,9 @@ def get_available_semesters(solution, grade_subject, ignore_credit=False):
     si = SemesterIndex(solution.member.curriculum.num_semester)
     rule = Rule(solution.member)
     for semester_id in range(solution.member.num_studied_semester_id, len(solution.semesters)):
-        if grade_subject.semester != si.toSemester(semester_id):
-                #and  grade_subject.subject.isSpecific is True:
-            continue
+        if not grade_subject.subject.not_fix_semester:
+            if grade_subject.semester != si.toSemester(semester_id):
+                continue
         if semester_id == si.get(grade_subject.year, grade_subject.semester):
             continue
         if not ignore_credit and solution.semesters[semester_id].calculate_total_credit() + grade_subject.subject.credit > \

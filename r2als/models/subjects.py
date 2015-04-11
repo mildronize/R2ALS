@@ -82,7 +82,7 @@ class Subject(me.Document):
     reverse_prerequisites = me.ListField(me.EmbeddedDocumentField(Prerequisite))
     subject_groups = me.ListField(me.ReferenceField('SubjectGroup'))
     tags = me.ListField(me.StringField(required=True))
-
+    not_fix_semester = me.BooleanField(required=True)
     isSpecific = me.BooleanField(required=True)
     # registration_date = me.DateTimeField(
     #     required=True, default=datetime.datetime.now)
