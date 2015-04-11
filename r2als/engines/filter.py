@@ -115,7 +115,7 @@ class Filter:
                                           self.EXPECTED_GRADUATE_SEMESTER,
                                           1))
         for item in self.msps:
-            tmp.append(self.scoring_condition(self.count_subject_with_tag_per_semester(solution,item['tag'])['max'],
+            tmp.append(self.scoring_condition(self.count_subject_with_tag_per_semester(solution, item['tag'])['max'],
                                               item['value'],
                                               1))
 

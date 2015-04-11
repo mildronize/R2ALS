@@ -31,8 +31,8 @@ class Scoring:
         diff_semester = self.__count_semester() - expected_semester_to_end
         #todo: missing conidition
         # if diff_semester < 0:
-        l.info(self.__count_semester())
-        l.info(expected_semester_to_end)
+        # l.info(self.__count_semester())
+        # l.info(expected_semester_to_end)
         if diff_semester >= 0:
             return diff_semester * score_per_semester
         else:

@@ -65,7 +65,7 @@ class Processor:
             if working_solution == self.best_solution:
                 l.error("Something wrong")
                 break
-            l.warn("Adding to result %d" % (len(self.result_solutions)) )
+            l.info("Adding to result %d" % (len(self.result_solutions)) )
             self.__add_to_result(SnapSolution(working_solution))
             if len(self.result_solutions) == self.target_num_solution:
                 break

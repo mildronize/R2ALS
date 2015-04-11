@@ -29,6 +29,11 @@ def main():
 
     configuration = config.Configurator(config.root_path + config_uri)
     models.initial(configuration.settings)
+
+    # profile.run("print('555')")
+    start(test_case_name)
+
+def start(test_case_name):
     member = models.Member.objects(member_id=test_case_name).first()
     if member is None:
         l.error('No have '+ test_case_name + ' in db!')
@@ -65,7 +70,7 @@ def main():
         average_overall.append(0)
         sum_overall.append(0)
 
-    num_seed = 1
+    num_seed = 100
 
 
     with open(output_path+test_case_name+'.csv', 'w', newline='') as csvfile:
@@ -75,7 +80,7 @@ def main():
             # seed = 37
             p = Processor(member=member,
                           tabu_size=20,
-                          target_num_solution=10,
+                          target_num_solution=300,
                           seed=seed)
             solutions = p.start()
             filter = Filter(out_path=output_test_case_path,
@@ -125,4 +130,4 @@ def main():
     # profile.run('p.start()')
     # p.start()
 
-    print("test")
+    # print("test")

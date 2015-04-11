@@ -15,7 +15,7 @@ class TabuManager:
 
     def add_next_solution(self, solution):
         if self.__is_existed(solution):
-            l.error("Exist solution is found")
+            l.info("Exist solution is found")
             return False
         self.__store_solution(solution)
         return True
@@ -61,6 +61,6 @@ class TabuManager:
     def __store_solution(self, solution):
         if len(self.tabu_list) == self.tabu_size:
             self.tabu_list.pop(0)
-            l.warn("Tabu is full. Removing oldest solution from Tabu List (size %d)" % (self.tabu_size))
+            l.info("Tabu is full. Removing oldest solution from Tabu List (size %d)" % (self.tabu_size))
         self.tabu_list.append(self.__generate_solution_id(solution))
         return True
