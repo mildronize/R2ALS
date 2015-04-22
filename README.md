@@ -38,34 +38,34 @@ r2las/bin/r2als
 ```
 
 # Full Installation Guide
-1.	Prepare server machine for the experiment by using Debian Jessie.
-2.	Enter the terminal.
-3.	Install prerequisite packages for this project. If all of those packages have installed, you can skip this step.
+-	Prepare server machine for the experiment by using Debian Jessie.
+-	Enter the terminal.
+-	Install prerequisite packages for this project. If all of those packages have installed, you can skip this step.
 ```
 sudo aptitude install git python3 python3-venv python3-pip mongodb
 ```
-4.	Access the target directory
+-  Access the target directory
 ```
 mkdir ~/server
 cd ~/server
 ```
-5.	Place the source code in the target directory. Use the git command to download lastest version source code from github.
+-	Place the source code in the target directory. Use the git command to download lastest version source code from github.
 ```
 git clone https://github.com/mildronize/R2ALS.git
 ```
-6.	Create a virtual environment.
+-	Create a virtual environment.
 ```
 pyvenv r2als-env
 ```
-7.	Activate the virtual environment.
+-	Activate the virtual environment.
 ```
 source r2als-env/bin/activate
 ```
-8.	Access R2ALS directory that gets from step 5.
+-	Access R2ALS directory
 ```
 cd R2ALS
 ```
-9.	Setup this project with command line. You should select one of ways below this depend on usage.
+-	Setup this project with command line. You should select one of ways below this depend on usage.
     -	Setup this project for production
     ```
     python setup.py install
@@ -74,7 +74,7 @@ cd R2ALS
     ```
     python setup.py develop
     ```
-10.	Setup the database. The file which describes the curriculum is located in R2ALS/data/coe_2553_curriculum.csv. You should select one of ways below this depend on usage.
+-	Setup the database. The file which describes the curriculum is located in R2ALS/data/coe_2553_curriculum.csv. You should select one of ways below this depend on usage.
     -	Setup the database for production
     ```
     initialize_r2als_db production.ini data/coe_2553_curriculum.csv
@@ -83,7 +83,7 @@ cd R2ALS
     ```
     initialize_r2als_db development.ini data/coe_2553_curriculum.csv
     ```
-11.	Run the project. You should select one of ways below this depend on usage.
+-	Run the project. You should select one of ways below this depend on usage.
     -	Run the project for production
     ```
     pserve production.ini
