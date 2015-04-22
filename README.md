@@ -75,23 +75,23 @@ python setup.py install
 python setup.py develop
 ```
 10.	Setup the database. The file which describes the curriculum is located in R2ALS/data/coe_2553_curriculum.csv. You should select one of ways below this depend on usage.
-10.1.	Setup the database for production
-```
-initialize_r2als_db production.ini data/coe_2553_curriculum.csv
-```
-10.2.	Setup the database for development
-```
-initialize_r2als_db development.ini data/coe_2553_curriculum.csv
-```
+    -	Setup the database for production
+    ```
+    initialize_r2als_db production.ini data/coe_2553_curriculum.csv
+    ```
+    -	Setup the database for development
+    ```
+    initialize_r2als_db development.ini data/coe_2553_curriculum.csv
+    ```
 11.	Run the project. You should select one of ways below this depend on usage.
-11.1.	Run the project for production
-```
-pserve production.ini
-```
-11.2.	Run the project for development
-```
-pserve development.ini --reload
-```
+    -	Run the project for production
+    ```
+    pserve production.ini
+    ```
+    -	Run the project for development
+    ```
+    pserve development.ini --reload
+    ```
 The URL that uses access this server
 ```
 http://your_domain_name:6543/ 
