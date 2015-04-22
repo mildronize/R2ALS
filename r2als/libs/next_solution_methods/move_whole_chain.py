@@ -37,7 +37,7 @@ class MoveWholeChain(NextSolutionMethod):
         # step 3 : move back each semester
         # Loop in remaining semester
         for grade_subject in subjects:
-            # l.warn(extract_grade_subject(fail_grade_subject))
+            l.warn("Fail: "+extract_grade_subject(grade_subject))
             self.move_subject_whole_chain(grade_subject)
         return self.solution
 

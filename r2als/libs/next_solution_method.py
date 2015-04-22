@@ -61,7 +61,6 @@ class NextSolutionMethod(object):
             # extending the semester
             self.solution.extend_semester_size(target_semester_id)
             # Moving
-            l.info("Moving subject %s to %d/%d" % (extract_grade_subject(grade_subject), self.si.toYear(target_semester_id), self.si.toSemester(target_semester_id) ) )
             self.solution.semesters[target_semester_id].subjects.append(
                 self.solution.semesters[semester_id].subjects.pop(subject_position)
             )
@@ -73,7 +72,7 @@ class NextSolutionMethod(object):
         elif subject_position == -2:
             l.error(msg + extract_grade_subject(grade_subject)+ " is a fail subject ( studied subject)")
             return False
-
+        l.info("Moved subject %s to %d/%d" % (extract_grade_subject(grade_subject), self.si.toYear(target_semester_id), self.si.toSemester(target_semester_id) ) )
         return True
     # def moveGradeSubject(self, source_semester, source_subject_order, target_semester):
     #     l.warn("This function is deprecated, please use \"move_grade_subject\" instead")

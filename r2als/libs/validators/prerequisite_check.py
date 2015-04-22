@@ -8,18 +8,21 @@ l = Log('prerequisite_check').getLogger()
 
 # todo: Change this function into Class
 
-def prerequisite_check(solution, quick_checking=True, isReversed=True):
+def prerequisite_check(solution, quick_checking=True, isReversed=True, check_studied_semester_only=False):
     l.info("prerequisite_check is validating ...")
     if quick_checking:
         l.info("Quick checking mode")
     invalid_grade_subjects = []
-    if isReversed:
-        range_finding = reversed(range(solution.member.num_studied_semester_id, len(solution.semesters)))
+    if check_studied_semester_only:
+        range_finding = range(0, solution.member.num_studied_semester_id)
     else:
-        range_finding = range(solution.member.num_studied_semester_id, len(solution.semesters))
+        if isReversed:
+            range_finding = reversed(range(solution.member.num_studied_semester_id, len(solution.semesters)))
+        else:
+            range_finding = range(solution.member.num_studied_semester_id, len(solution.semesters))
     si = SemesterIndex(solution.member.curriculum.num_semester)
     for current_semester_id in range_finding:
-        # l.info("semester_id %d " % current_semester_id)
+        l.info("semester_id %d " % current_semester_id)
         semester_item = solution.semesters[current_semester_id]
         for grade_subject in semester_item.subjects:
             # if grade_subject.subject.prerequisites != []:
@@ -41,6 +44,7 @@ def prerequisite_check(solution, quick_checking=True, isReversed=True):
                         tmp = dict()
                         tmp['prerequisite_grade_subject'] = prerequisite.grade_subject
                         tmp['grade_subject'] = grade_subject
+                        tmp['prerequisite'] = prerequisite.name
                         invalid_grade_subjects.append(tmp)
                     # else:
                     #     l.debug("List of subject prerequisite is pass testing:")

@@ -9,6 +9,8 @@ from r2als.libs.functions import response_json, SemesterIndex
 from r2als.scripts.initial_db import add_member
 from r2als.engines.processor import Processor
 from r2als.libs.exports import ExportJson, ExportJointjs
+from r2als.libs.validators.prerequisite_check import prerequisite_check
+from r2als.libs.solutions import PreInitialSolution
 
 l = Log("view/processor").getLogger()
 
@@ -51,22 +53,22 @@ def index(request):
         json_body = request.json_body
     except ValueError as e:
         l.error(e)
-        return response_json({}, "error", "The request support only JSON format")
+        return response_json({}, "error", ["The request support only JSON format"])
 
     ##########################################################
     # checking all keys
     if 'is_testing' not in json_body:
-        return response_json({}, "error", 'The request must have key "is_testing"')
+        return response_json({}, "error", ['The request must have key "is_testing"'])
 
     if json_body['is_testing'] == True:
         is_testing = json_body['is_testing']
     else:
         if 'type' not in json_body:
-            return response_json({}, "error", 'The request must have key "type"')
+            return response_json({}, "error", ['The request must have key "type"'])
         elif 'semesters' not in json_body:
-            return response_json({}, "error", 'The request must have key "semesters"')
+            return response_json({}, "error", ['The request must have key "semesters"'])
         elif 'member' not in json_body:
-            return response_json({}, "error", 'The request must have key "member"')
+            return response_json({}, "error", ['The request must have key "member"'])
         elif 'is_testing' in json_body:
             is_testing = json_body['is_testing']
 
@@ -78,14 +80,14 @@ def index(request):
         member = json_body['member']
 
         if 'name' not in member:
-            return response_json({}, "error", 'The request must have key "member.name"')
+            return response_json({}, "error", ['The request must have key "member.name"'])
         if 'subject_group' not in member:
-            return response_json({}, "error", 'The request must have key "member.subject_group"')
+            return response_json({}, "error", ['The request must have key "member.subject_group"'])
         if len(semesters) == 0:
-            return response_json({}, "error", 'Please add your enrolled subjects.')
+            return response_json({}, "error", ['Please add your enrolled subjects.'])
 
         if json_body['type'] != "array-of-semester":
-            return response_json({}, "error", 'The type of data allows only "array-of-semester"')
+            return response_json({}, "error", ['The type of data allows only "array-of-semester"'])
 
 
 
@@ -96,13 +98,14 @@ def index(request):
     if is_testing == True:
         member = models.Member.objects(member_id="testcase4").first()
         if member is None:
-            return response_json({}, "error", 'Can\'t run testing mode because no member in database')
+            return response_json({}, "error", ['Can\'t run testing mode because no member in database'])
         si = SemesterIndex(member.curriculum.num_semester)
 
     else:
         member = add_member(prepare_add_member(semesters, member))
         if member is None:
-            return response_json({}, "error", 'Can\'t add member')
+            return response_json({}, "error", ['Can\'t add member'])
+
 
         count_semester = 0
         si = SemesterIndex(member.curriculum.num_semester)
@@ -117,17 +120,31 @@ def index(request):
 
         count_not_force_enrolled_semesters = si.count_specific_semesters(len(semesters), member.curriculum.not_force_enrolled_semesters)
         if count_semester + count_not_force_enrolled_semesters != len(semesters):
-            return response_json({}, "error", 'Please checking your enrollment')
+            return response_json({}, "error", ['Please checking your enrollment'])
 
-    seed = 521
+
+    # checking the enrollment is possible
+    # checking_solution = PreInitialSolution(member).get_solution()
+    #
+    # # result['plans'].append(ExportJson(checking_solution).get_semester_list())
+    # # return response_json(result)
+    #
+    # problem_subjects = prerequisite_check(checking_solution, quick_checking=False, check_studied_semester_only=True)
+    # if len(problem_subjects) != 0:
+    #     tmp = ['Impossible enrollment:']
+    #     for problem_subject in problem_subjects:
+    #         tmp_message = 'Because "%s" is not %s of "%s"' % (problem_subject['prerequisite_grade_subject'].subject.name,
+    #                                                         problem_subject['prerequisite'],
+    #                                                         problem_subject['grade_subject'].subject.name)
+    #         tmp.append(tmp_message)
+    #     return response_json({}, "error", tmp)
+
+    l.info("ahaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    seed = None
     # 37,107,257,521
-
-    solutions = Processor(member, 20, 100, seed).start()
+    solutions = Processor(member, 20, 20, seed).start()
 
     for solution in solutions:
-        # l.info("Last semester %d/%d" % (si.toYear(len(solution.semesters)-1), si.toSemester(len(solution.semesters)-1) ) )
-        # json_obj = ExportJson(solution).get()
-        # result['plans'].append(ExportJointjs(json_obj).get())
         result['plans'].append(ExportJson(solution).get_semester_list())
 
     return response_json(result)

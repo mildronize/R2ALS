@@ -113,7 +113,7 @@ class Processor:
         else:
             if self.best_solution.score > solution.score:
                 self.best_solution = SnapSolution(solution)
-                l.warn("Best score is " + self.best_solution.score)
+                l.warn("Best score is " + str(self.best_solution.score))
             elif self.best_solution.score == solution.score:
                 l.info("Score is equal with the best")
                 return True

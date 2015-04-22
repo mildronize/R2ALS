@@ -39,77 +39,18 @@ def start(test_case_name):
         l.error('No have '+ test_case_name + ' in db!')
         exit(0)
 
-    # MAX_SUBJECT_PER_SEMESTER
-    msps = [
-            {'tag':'calculation','value':2},
-            {'tag':'english','value':1},
-            {'tag':'physic-edu','value':1},
-            {'tag':'network','value':1},
-            {'tag':'experiment','value':2},
-            {'tag':'algorithm','value':1},
-            {'tag':'programming','value':1}
-        ]
-
-    output_path = 'data/output/'
-    output_test_case_path = output_path + test_case_name + '/'
-    if not os.path.exists(output_test_case_path):
-        os.makedirs(output_test_case_path)
-
-    fieldnames = ['Seed']
-    fieldnames+= ['num_iteration','num_cant_find','num_validate_fail','num_add_tabu_fail','num_equal_best']
-    fieldnames.append('[Avg]graduate_semester')
-    for item in msps:
-        fieldnames.append("[Avg]"+item['tag']+" <= " + str(item['value']))
-    fieldnames.append('[FailR]graduate_semester')
-    for item in msps:
-        fieldnames.append("[FailR]"+item['tag']+" <= " + str(item['value']))
-
-    average_overall = ['AVG']
-    sum_overall = ['SUM']
-    for item in range(1, len(fieldnames)):
-        average_overall.append(0)
-        sum_overall.append(0)
-
-    num_seed = 100
-
-
-    with open(output_path+test_case_name+'.csv', 'w', newline='') as csvfile:
-        spamwriter = csv.writer(csvfile, dialect='excel')
-        spamwriter.writerow(fieldnames)
-        for seed in range(num_seed):
-            # seed = 37
-            p = Processor(member=member,
-                          tabu_size=20,
-                          target_num_solution=300,
-                          seed=seed)
-            solutions = p.start()
-            filter = Filter(out_path=output_test_case_path,
-                            solutions=solutions,
-                            max_subject_per_semester=msps,
-                            extras=p.conclusion_list(),
-                            seed=seed)
-            filter.start()
-            t = []
-            t.append(seed)
-            t+= [p.num_iteration,
-                 p.num_nsg_fail/p.num_iteration*100,
-                 p.num_validate_fail/p.num_iteration*100,
-                 p.num_add_tabu_fail/p.num_iteration*100,
-                 p.num_equal_best/p.num_iteration*100]
-            for i in range(1, len(filter.averages)):
-                t.append(filter.averages[i])
-            for i in range(1, len(filter.fail_rate)):
-                t.append(filter.fail_rate[i])
-
-            l.info(len(t))
-            l.info(len(sum_overall))
-            for i in range(1, len(average_overall)):
-                sum_overall[i] += t[i]
-            spamwriter.writerow(t)
-        # find average overall
-        for i in range(1, len(average_overall)):
-            average_overall[i] = sum_overall[i]/num_seed
-        spamwriter.writerow(average_overall)
+    seed = 37
+    p = Processor(member=member,
+                  tabu_size=20,
+                  target_num_solution=20,
+                  seed=seed)
+    solutions = p.start()
+    # filter = Filter(out_path=output_test_case_path,
+    #                 solutions=solutions,
+    #                 max_subject_per_semester=msps,
+    #                 extras=p.conclusion_list(),
+    #                 seed=seed)
+    # filter.start()
 
 
 

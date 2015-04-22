@@ -1,0 +1,20 @@
+faculty,Engineering,,,,,,,,,,,,,,
+department,Computer Engineering,,,,,,,,,,,,,,
+year,2553,,,,,,,,,,,,,,
+code,name,credit,branch,keyword_replacement,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,*categories,subject_group,year,semester,short_name,not_fix_semester,*tags
+242-320,Software Development Methodologies,3,information,Branch Technical Subject 1,,242-211,,,lecture,,3,1,,,software:programming
+242-321,Design Architecture and Engineering for Intelligent Systems,3,information,Branch Technical Subject 2,,,,,lecture,,3,2,,,thoery
+242-420,Web Engineering and Applications,3,information,Branch Technical Subject 3,,,,,lecture,,4,1,,,software:programming
+242-421,Information System and Management,3,information,Branch Technical Subject 4,,242-305,,,lecture,,4,2,,,thoery
+242-360,Modeling and Analysis for Network Communications,3,information-network,Branch Technical Subject 1,242-212,,,,lecture,,3,1,,,calculation
+242-361,Internet Engineering,3,information-network,Branch Technical Subject 2,,,,,lecture,,3,2,,,thoery:network
+242-460,Multimedia Networks,3,information-network,Branch Technical Subject 3,,,,,lecture,,4,1,,,thoery:network
+242-461,Broadband and High Speed Networks,3,information-network,Branch Technical Subject 4,,,,,lecture,,4,2,,,thoery:network
+,Signals and Image Processing,3,computer-control,Branch Technical Subject 1,,,,,lecture,,3,1,,,calculation
+242-381,Computer Control Systems,3,computer-control,Branch Technical Subject 2,,,,,lecture,,3,2,,,
+242-480,Principle of Robotics,3,computer-control,Branch Technical Subject 3,,,,,lecture,,4,1,,,
+242-481,Machine Intelligence,3,computer-control,Branch Technical Subject 4,,,,,lecture,,4,2,,,
+242-340,VLSI Design,3,computer-system-design,Branch Technical Subject 1,242-208,,,,lecture,,3,1,,,calculation
+242-341,Embedded System Design,3,computer-system-design,Branch Technical Subject 2,,,242-309,,lecture,,3,2,,,thoery
+242-440,Real-time Operating Systems,3,computer-system-design,Branch Technical Subject 3,242-304,,,,lecture,,4,1,,,programming
+242-441,Advanced Computer Architecture and Organization,3,computer-system-design,Branch Technical Subject 4,242-307,,,,lecture,,4,2,,,thoery:programming

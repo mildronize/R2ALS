@@ -40,7 +40,7 @@ class MoveNonRelatedSubjectOut(NextSolutionMethod):
                 # To find non related subject
                 non_related_grade_subjects = self.solution.semesters[i].find_non_related_subjects()
 
-                while over_credit > 0:
+                while over_credit > 0 and len(non_related_grade_subjects) > 0:
                     random_position = self.random_operator.randint(0,len(non_related_grade_subjects) - 1)
                     over_credit -= non_related_grade_subjects[random_position].subject.credit
                     # remove the subject
@@ -49,8 +49,11 @@ class MoveNonRelatedSubjectOut(NextSolutionMethod):
                     temp_subjects.append(non_related_grade_subjects[random_position])
                     self.solution.semesters[i].subjects.remove(non_related_grade_subjects[random_position])
                     non_related_grade_subjects.remove(non_related_grade_subjects[random_position])
-                # find the semesters that allow the subject to move in the semester
 
+                if len(non_related_grade_subjects) == 0:
+                    l.error("Error, no non_related_grade_subjects")
+
+                # find the semesters that allow the subject to move in the semester
                 for temp_grade_subject in temp_subjects:
                     # available_semesters = self.get_available_semesters(i, temp_subject)
                     available_semesters = get_available_semesters(self.solution, temp_grade_subject)
