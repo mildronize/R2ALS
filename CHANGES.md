@@ -1,5 +1,13 @@
 # R2ALS Releases #
 
+### Version 0.2.1 ###
+- Unit testing
+- Fix sth for flexible coding
+- Fix some bug
+- Add not fix semester to solve problem which some subject should be enrolled all semesters
+- Evaluation
+
+
 ### Version 0.2.0 ###
 
 - This program can return a set of solutions
