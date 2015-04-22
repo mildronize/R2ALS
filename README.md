@@ -66,14 +66,14 @@ source r2als-env/bin/activate
 cd R2ALS
 ```
 9.	Setup this project with command line. You should select one of ways below this depend on usage.
-9.1.	Setup this project for production
-```
-python setup.py install
-```
-9.2.	Setup this project for development
-```
-python setup.py develop
-```
+    -	Setup this project for production
+    ```
+    python setup.py install
+    ```
+    -	Setup this project for development
+    ```
+    python setup.py develop
+    ```
 10.	Setup the database. The file which describes the curriculum is located in R2ALS/data/coe_2553_curriculum.csv. You should select one of ways below this depend on usage.
     -	Setup the database for production
     ```
