@@ -140,12 +140,13 @@ def index(request):
     #     return response_json({}, "error", tmp)
 
     l.info("ahaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    seed = None
+    seed = 37
     # 37,107,257,521
     solutions = Processor(member, 20, 20, seed).start()
 
     for solution in solutions:
         result['plans'].append(ExportJson(solution).get_semester_list())
-
+    # solution = PreInitialSolution(member).get_solution()
+    # result['plans'].append(ExportJson(solution).get_semester_list())
     return response_json(result)
 

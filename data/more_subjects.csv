@@ -1,0 +1,2 @@
+code,name,credit,*studied_prerequisite,*passed_prerequisite,*corequisite,*cocurrent,short_name,not_fix_semester,not_fix_type,*tags
+200-101,วิชาช่วย,1,,,,,Intro Eng,TRUE,,theory:choice

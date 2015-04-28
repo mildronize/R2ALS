@@ -46,7 +46,7 @@ def subject_groups_search(request):
     result = dict()
     result['subjects'] = []
 
-    subjects = models.Subject.objects((Q(name__icontains=query_string) | Q(code__icontains=query_string)) & Q(isSpecific=True))
+    subjects = models.Subject.objects((Q(name__icontains=query_string) | Q(code__icontains=query_string)))
     for subject in subjects:
         tmp = {
             'id': str(subject.id),

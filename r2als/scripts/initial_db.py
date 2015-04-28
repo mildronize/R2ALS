@@ -21,9 +21,10 @@ pp = pprint.PrettyPrinter(indent=4)
 
 l = Log('initial_db').getLogger()
 
-def import_curriculum_to_model(path):
-    # Not check key yet
-    return CsvToModel().process(path, True)
+def import_curriculum_to_model(path, header_format):
+    # todo: Not check key yet
+    # header_format = ['faculty','department','year','required_num_year','num_semester','max_year','*not_force_enrolled_semesters','*subject_groups','*branches','*categories','*prerequisites','*not_fix_types','*min_credit_each_types']
+    return CsvToModel(header_format).process(path)
 
 # def createCategories(raw_categories):
 #     l.info("Creating categories")
@@ -57,6 +58,19 @@ def create_Curriculum(curriculum_data):
     l.info("Adding categories for the curriculum")
     for categories in curriculum_data['categories']:
         curriculum['categories'].append(categories)
+    for prerequisite in curriculum_data['prerequisites']:
+        curriculum['prerequisite_names'].append(prerequisite)
+    for branch in curriculum_data['branches']:
+        curriculum['branches'].append(branch)
+
+    if len(curriculum_data['not_fix_types']) != len(curriculum_data['min_credit_each_types']) :
+        l.error("num of not_fix_types must equal to num of min_credit_each_types")
+        exit(1)
+
+    tmp = {}
+    for i in range(len(curriculum_data['min_credit_each_types'])):
+        tmp[curriculum_data['not_fix_types'][i]] = curriculum_data['min_credit_each_types'][i]
+    curriculum.min_credit_each_type = tmp
     curriculum.save()
     curriculum.reload()
     return curriculum
@@ -106,7 +120,13 @@ def create_Subject(raw_subjects, curriculum):
                 subject_tmp.subject_groups.append(create_SubjectGroup(subject_group, raw_subject, curriculum))
 
         subject_tmp.name = raw_subject['name']
-        subject_tmp.short_name = raw_subject['short_name']
+        if 'short_name' in raw_subject:
+            subject_tmp.short_name = raw_subject['short_name']
+        if 'not_fix_type' in raw_subject:
+            subject_tmp.not_fix_type = raw_subject['not_fix_type']
+        if 'branch' in raw_subject:
+            subject_tmp.branch = raw_subject['branch']
+
         subject_tmp.credit = int(raw_subject.get('credit', '0'))
         # print(raw_subject)
         if 'not_fix_semester' in raw_subject:
@@ -191,9 +211,12 @@ def add_member(member):
             elif 'code' in subject:
                 mSubject = models.Subject.objects(code = subject['code']).first()
                 tmp_subject = subject['code']
+            elif 'name' in subject:
+                mSubject = models.Subject.objects(name = subject['name']).first()
+                tmp_subject = subject['name']
             else:
-                mSubject = None
-                tmp_subject = None
+                # mSubject = None
+                # tmp_subject = None
                 return None
 
             gradeSubject = models.GradeSubject()
@@ -215,8 +238,9 @@ def add_member(member):
     member_tmp.reload()
     return member_tmp
 
-def initial_coe_curriculum_data(curriculumPath):
-    raw_curriculum = import_curriculum_to_model(curriculumPath)
+def initial_coe_curriculum_data(path):
+    header_format = ['faculty','department','year','required_num_year','num_semester','max_year','*not_force_enrolled_semesters','*subject_groups','*branches','*categories','*prerequisites','*not_fix_types','*min_credit_each_types']
+    raw_curriculum = import_curriculum_to_model(path, header_format)
     # createCategories(raw_curriculum['info']['categories'])
     curriculum_model = create_Curriculum(raw_curriculum['info'])
     create_Subject(raw_curriculum['subjects'], curriculum_model)
@@ -244,169 +268,93 @@ def initial_coe_curriculum_data(curriculumPath):
     ])
     return curriculum_model
 
+def add_branch_subject(argv, path):
+    header_format = ['faculty','department','year']
+    raw_data = import_curriculum_to_model(path, header_format)
+    curriculum_model = models.Curriculum.objects(faculty=raw_data['info']['faculty'],
+                                                 department=raw_data['info']['department'],
+                                                 year=raw_data['info']['year']).first()
+    if curriculum_model is None:
+        l.error("Not found %s, %s %s curriculum data" % (raw_data['info']['faculty'],
+                                                         raw_data['info']['department'],
+                                                         raw_data['info']['year']))
+        l.error("Please import main curriculum csv file first, please see instruction in\n"
+                "https://github.com/mildronize/R2ALS/blob/master/README.md\n"
+                "or\n")
+        usage(argv)
+
+    create_Subject(raw_data['subjects'], curriculum_model)
+    # update_SubjectGroup(curriculum_model)
+    raw_data['info']['prerequisites'] = curriculum_model.prerequisite_names
+    link_all_Subject(raw_data)
+    link_all_reverse_Subject(curriculum_model)
+    return curriculum_model
+
 def usage(argv):
     cmd = os.path.basename(argv[0])
-    print('usage: %s <config_uri> <curriculum_path>\n'
-          '(example: "%s development.ini data/coe.csv")' % (cmd, cmd))
+    print('usage: %s <config_uri> <curriculum_path> [action] [option]\n'
+          'action: --add-branch      \tFor add branch subject\n'
+          '        --add-more-subject\tFor add more subject, such as optional subject\n'
+          'option: --db-reset        \tFor reset db before perform any action, Default: no reset db\n\n'
+          'example: "%s development.ini data/coe_2553_curriculum.csv"\n'
+          '         "%s development.ini data/coe_2553_branch_subjects.csv --db-reset"\n'
+          '         "%s development.ini data/coe_2553_branch_subjects.csv --add-branch"\n'
+          '         "%s development.ini data/coe_2553_branch_subjects.csv --add-more-subject"\n'% (cmd, cmd, cmd, cmd, cmd))
     sys.exit(1)
-
 
 def main():
 #if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    is_reset_db = False
+    action = None
+    action_list = ['--add-branch','--add-more-subject']
+    option_list = ['--db-reset']
+    if len(sys.argv) < 3:
         usage(sys.argv)
-        sys.exit()
 
-    curriculumPath = sys.argv[2]
+    print(len(sys.argv))
+    # run script with action or option
+    if len(sys.argv) == 4:
+        if sys.argv[3] == '--db-reset':
+            is_reset_db = True
+        elif sys.argv[3] in action_list:
+            action = sys.argv[3]
+        else:
+            usage(sys.argv)
+
+    # run script with action & option
+    elif len(sys.argv) == 5:
+        if sys.argv[3] in action_list:
+            action = sys.argv[3]
+        else:
+            usage(sys.argv)
+
+        if sys.argv[4] == '--db-reset':
+            is_reset_db = True
+        else:
+            usage(sys.argv)
+
+    path = sys.argv[2]
     configuration = config.Configurator(sys.argv[1])
-    configuration.set('mongodb.is_drop_database', True)
+    configuration.set('mongodb.is_drop_database', is_reset_db)
     models.initial(configuration.settings)
 
-    coe_curriculum_model = initial_coe_curriculum_data(curriculumPath)
-
-    subject_groups = models.SubjectGroup.objects(name = 'first-group',
-                                                 curriculum = coe_curriculum_model,
-                                                 ).order_by('year','semester')
-    for subject_group in subject_groups:
-        l.info('(%s/%s) [%s] %s',
-               subject_group.year,
-               subject_group.semester,
-               subject_group.name,
-               subject_group.subject.name)
-
-    #initial test cases
-    # l.info("======== Starting initial test cases")
-    #add a member
-    # testing_members = [
-    #
-    #     {
-    #         'info': {
-    #             'member_id':'5710110997',
-    #             'name' : 'Sangkaya Thaithai',
-    #             'curriculum' : coe_curriculum_model,
-    #             'subject_group' : 'first-group',
-    #             'registered_year' : 2557,
-    #             'last_year' : 2,
-    #             'last_semester' : 1
-    #             },
-    #         'semesters' : [{
-    #             'year': 1,
-    #             'semester': 1,
-    #             'subjects': [
-    #                 {'code' : '200-101','grade' : 'C'},
-    #                 {'code' : '242-101','grade' : 'C'},
-    #                 {'code' : '322-101','grade' : 'C'},  # E Math 1
-    #                 {'code' : '332-103','grade' : 'C'}, # W Drop Phy 1
-    #                 {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
-    #                 {'code' : '640-101','grade' : 'C'},
-    #                 {'code' : '890-101','grade' : 'C'},
-    #                 ]
-    #             },
-    #             {
-    #             'year': 1,
-    #             'semester': 2,
-    #             'subjects': [
-    #                 {'code' : '215-111','grade' : 'C'},
-    #                 {'code' : '220-102','grade' : 'C'},
-    #                 {'code' : '322-102','grade' : 'C'},
-    #                 {'code' : '324-103','grade' : 'C'},
-    #                 {'code' : '325-103','grade' : 'C'},
-    #                 {'code' : '332-104','grade' : 'C'},
-    #                 {'code' : '332-114','grade' : 'C'},
-    #                 {'code' : '340-326','grade' : 'C'},
-    #                 ]
-    #             },{
-    #             'year': 2,
-    #             'semester': 1,
-    #             'subjects': [
-    #                 {'code' : '242-201','grade' : 'C'},
-    #                 {'code' : '242-202','grade' : 'E'}, # lab hard 1
-    #                 {'code' : '242-205','grade' : 'C'},
-    #                 {'code' : '242-206','grade' : 'C'},
-    #                 {'code' : '242-207','grade' : 'E'}, #CPT
-    #                 {'code' : '242-208','grade' : 'E'}, #Digital
-    #                 {'code' : '322-201','grade' : 'C'},
-    #                 {'code' : '890-102','grade' : 'C'},
-    #                 ]
-    #             }
-    #         ]
-    #     }
-        # {
-        #     'info': {
-        #         'member_id':'5710110997',
-        #         'name' : 'Sangkaya Thaithai',
-        #         'curriculum' : coe_curriculum_model,
-        #         'subject_group' : 'first-group',
-        #         'registered_year' : 2557,
-        #         'last_year' : 1,
-        #         'last_semester' : 1
-        #         },
-        #     'semesters' : [{
-        #         'year': 1,
-        #         'semester': 1,
-        #         'subjects': [
-        #             {'code' : '200-101','grade' : 'C'},
-        #             {'code' : '242-101','grade' : 'C'},
-        #             {'code' : '322-101','grade' : 'C'},  # E Math 1
-        #             {'code' : '332-103','grade' : 'C'}, # W Drop Phy 1
-        #             {'code' : '332-113','grade' : 'C'}, # Lab Phy 1
-        #             {'code' : '640-101','grade' : 'C'},
-        #             {'code' : '890-101','grade' : 'C'},
-        #             ]
-        #         }]
-        # }
-    # ]
-    #
-    # for testing_member in testing_members:
-    #     add_member(testing_member)
+    if action is None:
+        l.info("Initial curriculum...")
+        initial_coe_curriculum_data(path)
+    elif action == "--add-branch":
+        l.info("Add more branch subject of curriculum...")
+        add_branch_subject(sys.argv, path)
+    elif action == "--add-more-subject":
+        l.info("Add more subject of curriculum...")
 
 
-        # {
-        #     'info': {
-        #         'member_id':'5710110999',
-        #         'name' : 'Thongdee Mana',
-        #         'curriculum' : coe_curriculum_model,
-        #         'subject_group' : 'first-group',
-        #         'registered_year' : 2557,
-        #         'last_year' : 1,
-        #         'last_semester' : 1,
-        #         },
-        #     'semesters' : [{
-        #         'year': 1,
-        #         'semester': 1,
-        #         'subjects': [
-        #             {'code' : '895-171','grade' : 'C'}, # subject from another semester
-        #             {'code' : '200-101','grade' : 'C'},
-        #             {'code' : '242-101','grade' : 'C'},
-        #             {'code' : '322-101','grade' : 'C'},
-        #             {'code' : '332-103','grade' : 'C'},
-        #             {'code' : '332-113','grade' : 'C'},
-        #             {'code' : '640-101','grade' : 'C'},
-        #             {'code' : '890-101','grade' : 'C'},
-        #             ]
-        #         }]
-        # },
-        # {
-        #     'info': {
-        #         'member_id':'5710110998',
-        #         'name' : 'Thongyib kondee',
-        #         'curriculum' : coe_curriculum_model,
-        #         'subject_group' : 'first-group',
-        #         'registered_year' : 2557,
-        #         'last_year' : 1,
-        #         'last_semester' : 1,
-        #         },
-        #     'semesters' : [{
-        #         'year': 1,
-        #         'semester': 1,
-        #         'subjects': [
-        #             {'code' : '200-101','grade' : 'C'},
-        #             {'code' : '242-101','grade' : 'C'},
-        #             {'code' : '322-101','grade' : 'C'},
-        #             {'code' : '332-103','grade' : 'C'},
-        #             {'code' : '332-113','grade' : 'C'},
-        #             {'code' : '640-101','grade' : 'C'},
-        #             # not complete enrollment
-        #             ]
-        #         }]
-        # },
+
+    # subject_groups = models.SubjectGroup.objects(name = 'first-group',
+    #                                              curriculum = coe_curriculum_model,
+    #                                              ).order_by('year','semester')
+    # for subject_group in subject_groups:
+    #     l.info('(%s/%s) [%s] %s',
+    #            subject_group.year,
+    #            subject_group.semester,
+    #            subject_group.name,
+    #            subject_group.subject.name)

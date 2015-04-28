@@ -232,6 +232,7 @@ class Member(me.Document):
     member_id = me.StringField(required=True,primary_key=True)
     name = me.StringField(required=True)
     curriculum = me.ReferenceField('Curriculum')
+    # branch = me.StringField()
     subject_group = me.StringField()
     registered_year = me.IntField(required=True)
 
@@ -251,6 +252,10 @@ class Member(me.Document):
     enrolled_semesters = me.ListField(me.EmbeddedDocumentField(EnrolledSemester))
 
     def clean(self):
+        # if self.branch not in self.curriculum.branches:
+        #     raise me.ValidationError('branch(%s) not allow in this curriculum' % self.name)
+
+
         from r2als.libs.functions import SemesterIndex
         si = SemesterIndex(self.curriculum.num_semester)
         self.num_studied_semester_id = si.get(self.last_year, self.last_semester) + 1

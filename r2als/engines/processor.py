@@ -130,7 +130,7 @@ class Processor:
         # tmp_solution = RandomSubjectWithRules(solution).get_solution_move_only(random)
         if tmp_solution is not None:
             solution = MoveWholeChain(solution).get_solution()
-            solution = MoveNonRelatedSubjectOut(solution).get_solution(random)
+            solution = MoveSubjectOut(solution).get_solution(random)
             solution.get_ready()
             # solution.update_all_prerequisite()
             return solution

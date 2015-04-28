@@ -7,7 +7,7 @@ from r2als import models
 
 from r2als.libs.logs import Log
 from r2als.libs.functions import SemesterIndex, extract_grade_subject
-from r2als.libs.next_solution_methods import MoveWholeChain, MoveNonRelatedSubjectOut
+from r2als.libs.next_solution_methods import MoveWholeChain, MoveSubjectOut
 from r2als.engines.validator import validator
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -20,7 +20,7 @@ class InitialSolution:
         self.solution = PreInitialSolution(member).get_solution()
         # # l.info("Last semester %d/%d" % (si.toYear(len(self.solution.semesters)-1), si.toSemester(len(self.solution.semesters)-1) ) )
         self.solution = MoveWholeChain(self.solution).get_initial_solution()
-        self.solution = MoveNonRelatedSubjectOut(self.solution).get_solution(random_operator)
+        self.solution = MoveSubjectOut(self.solution).get_solution(random_operator)
         self.solution.get_ready()
         self.solution.min_semester_id = len(self.solution.semesters) - 1
         if validator(self.solution, ['*']) is False:
@@ -86,6 +86,9 @@ class PreInitialSolution:
                     if enrolled_semester.year == mSemester.year and \
                     enrolled_semester.semester == mSemester.semester:
                         mSemester.subjects = copy.copy(enrolled_semester.subjects)
+
+                        for grade_subject in enrolled_semester.subjects:
+                            self.add_imported_subject(str(grade_subject.subject.id))
                         break
             # for not studied semester index
             else:
@@ -144,6 +147,8 @@ class PreInitialSolution:
         # checking missing subject
         missing_subjects = list(set(all_subjects) - set(grade_subjects))
         missing_grade_subjects = []
+
+        l.info(len(missing_subjects))
         if len(missing_subjects) > 0:
             for missing_subject in missing_subjects:
                 subject = models.Subject.objects(id=missing_subject).first()
